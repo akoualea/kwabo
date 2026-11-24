@@ -44,14 +44,19 @@ export const AdminMessages: React.FC = () => {
   const [attachment, setAttachment] = useState<File | null>(null);
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const prevThreadRef = useRef<string>('');
+  const prevMsgCountRef = useRef<number>(0);
 
-  const loadThreads = useCallback(async () => {
+  const loadThreads = useCallback(async (silent = false) => {
     try {
       const res = await api<any>('/messages');
       const raw = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
       const mapped: AdminThread[] = raw.map(mapAdminThread);
       setThreads(mapped);
       setSelectedId((prev) => {
+        if (silent && prev && mapped.some(t => t.requestId === prev)) {
+          return prev;
+        }
         if (activeRequestId && mapped.some(t => t.requestId === activeRequestId)) {
           return activeRequestId;
         }
@@ -61,48 +66,67 @@ export const AdminMessages: React.FC = () => {
         return mapped[0]?.requestId || '';
       });
     } catch {
-      setThreads([]);
+      if (!silent) setThreads([]);
     } finally {
-      setLoadingThreads(false);
+      if (!silent) setLoadingThreads(false);
     }
   }, [activeRequestId]);
 
   useEffect(() => {
     setLoadingThreads(true);
-    loadThreads();
+    loadThreads(false);
   }, [loadThreads]);
 
-  const loadMessages = useCallback(async (reqId: string) => {
+  const loadMessages = useCallback(async (reqId: string, silent = false) => {
     if (!reqId) {
       setCurrentMessages([]);
       return;
     }
-    setLoadingMsgs(true);
+    if (!silent) setLoadingMsgs(true);
     try {
       const res = await api<any>(`/requests/${reqId}/messages`);
       const raw = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
-      setCurrentMessages(raw.map((m: any) => mapMessage(m, reqId)));
+      const mapped: MessageItem[] = raw.map((m: any) => mapMessage(m, reqId));
+      setCurrentMessages(mapped);
 
-      await api(`/requests/${reqId}/messages/read`, { method: 'POST' }).catch(() => {});
-      setThreads(prev => prev.map(t => (t.requestId === reqId ? { ...t, unread: 0 } : t)));
-      await refreshCounters();
+      const hasUnreadIncoming = mapped.some(m => m.from === 'client' && !m.read);
+      if (!silent || hasUnreadIncoming) {
+        await api(`/requests/${reqId}/messages/read`, { method: 'POST' }).catch(() => {});
+        setThreads(prev => prev.map(t => (t.requestId === reqId ? { ...t, unread: 0 } : t)));
+        await refreshCounters();
+      }
     } catch {
-      setCurrentMessages([]);
+      if (!silent) setCurrentMessages([]);
     } finally {
-      setLoadingMsgs(false);
+      if (!silent) setLoadingMsgs(false);
     }
   }, [refreshCounters]);
 
   useEffect(() => {
     if (selectedId) {
-      loadMessages(selectedId);
+      loadMessages(selectedId, false);
     }
   }, [selectedId, loadMessages]);
 
   useEffect(() => {
-    if (messagesEndRef.current) {
+    const timer = window.setInterval(() => {
+      if (document.visibilityState !== 'visible' || sending) return;
+      void loadThreads(true);
+      if (selectedId) {
+        void loadMessages(selectedId, true);
+      }
+    }, 4000);
+    return () => window.clearInterval(timer);
+  }, [selectedId, sending, loadThreads, loadMessages]);
+
+  useEffect(() => {
+    const threadChanged = prevThreadRef.current !== selectedId;
+    const hasNewMessages = currentMessages.length > prevMsgCountRef.current;
+    if ((threadChanged || hasNewMessages) && messagesEndRef.current) {
       messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
     }
+    prevThreadRef.current = selectedId;
+    prevMsgCountRef.current = currentMessages.length;
   }, [selectedId, currentMessages]);
 
   const selectedThread = threads.find(t => t.requestId === selectedId);
@@ -129,10 +153,16 @@ export const AdminMessages: React.FC = () => {
         body = { text: inputText.trim() };
       }
 
-      await api(`/requests/${selectedId}/messages`, {
+      const res = await api<any>(`/requests/${selectedId}/messages`, {
         method: 'POST',
         body,
       });
+
+      const createdRaw = res?.data ?? (res?.id ? res : null);
+      if (createdRaw) {
+        const createdMsg = mapMessage(createdRaw, selectedId);
+        setCurrentMessages(prev => (prev.some(m => m.id === createdMsg.id) ? prev : [...prev, createdMsg]));
+      }
 
       const preview = inputText.trim() || attachment?.name || 'Message';
       setInputText('');
@@ -140,7 +170,8 @@ export const AdminMessages: React.FC = () => {
       setThreads(prev =>
         prev.map(t => (t.requestId === selectedId ? { ...t, lastText: preview } : t))
       );
-      await loadMessages(selectedId);
+      await loadMessages(selectedId, true);
+      void loadThreads(true);
     } catch (err) {
       addToast(
         getFirstValidationError(err) || (err instanceof ApiError ? err.message : "Impossible d'envoyer le message."),

@@ -250,8 +250,9 @@ export const ClientNewRequest: React.FC = () => {
   const [title, setTitle] = useState('');
   const [city, setCity] = useState(CITIES[0]);
   const [urgency, setUrgency] = useState<'normal' | 'urgent'>('normal');
+  const [desiredTimeline, setDesiredTimeline] = useState('');
+  const [preferredPaymentMode, setPreferredPaymentMode] = useState('Moitié / moitié (50 % à mi-parcours, 50 % à la fin)');
   const [description, setDescription] = useState('');
-  const [budget, setBudget] = useState('');
   const [specificDetails, setSpecificDetails] = useState<Record<string, string>>({});
   const [specificFiles, setSpecificFiles] = useState<Record<string, File | null>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -296,7 +297,6 @@ export const ClientNewRequest: React.FC = () => {
     if (target) {
       setSelectedServiceId(target.id);
       setTitle(target.name);
-      setBudget(target.price);
       setSpecificDetails({});
       setSpecificFiles({});
       setStep(2);
@@ -317,7 +317,6 @@ export const ClientNewRequest: React.FC = () => {
     const s = services.find(x => x.id === id);
     if (s) {
       setTitle(s.name);
-      setBudget(s.price);
     }
     setSpecificDetails({});
     setSpecificFiles({});
@@ -332,14 +331,19 @@ export const ClientNewRequest: React.FC = () => {
     setSubmitting(true);
     setErrorMsg(null);
     try {
+      const enrichedDetails: Record<string, string> = {
+        ...specificDetails,
+        ...(desiredTimeline.trim() ? { 'Délai souhaité': desiredTimeline.trim() } : {}),
+        ...(preferredPaymentMode ? { 'Modalité de paiement préférée': preferredPaymentMode } : {}),
+      };
+
       const req = await createServiceRequest({
         service: selectedService.slug || selectedService.id,
         title: title.trim() || selectedService.name,
         city,
         urgency,
-        budget: budget.trim() || selectedService.price,
         description: description.trim() || `Demande pour ${selectedService.name}.`,
-        details: specificDetails,
+        details: enrichedDetails,
         files: specificFiles,
       });
 
@@ -460,7 +464,6 @@ export const ClientNewRequest: React.FC = () => {
                 <div className="service-card-body">
                   <h3 className="service-card-title">{service.name}</h3>
                   <p className="service-card-desc">{service.desc || service.short}</p>
-                  <p className="service-card-price">{service.price}</p>
                   <button 
                     type="button" 
                     className="btn btn-outline-gold btn-sm w-full mt-2"
@@ -532,6 +535,38 @@ export const ClientNewRequest: React.FC = () => {
               </div>
             </div>
 
+            <div className="form-grid">
+              <div className="field kw-field" style={{ animationDelay: '0.4s' }}>
+                <label className="field-label" htmlFor="req-timeline">
+                  Délai souhaité
+                </label>
+                <input
+                  id="req-timeline"
+                  type="text"
+                  value={desiredTimeline}
+                  onChange={(e) => setDesiredTimeline(e.target.value)}
+                  placeholder="Ex. Sous 2 semaines, avant fin du mois…"
+                />
+              </div>
+
+              <div className="field kw-field" style={{ animationDelay: '0.42s' }}>
+                <label className="field-label" htmlFor="req-payment-mode">
+                  Modalité de paiement préférée (indicatif)
+                </label>
+                <select
+                  id="req-payment-mode"
+                  value={preferredPaymentMode}
+                  onChange={(e) => setPreferredPaymentMode(e.target.value)}
+                >
+                  <option value="Tout au début (100 % à l'acceptation)">Tout au début (100 % à l'acceptation)</option>
+                  <option value="Tout à la fin (100 % à la fin de la mission)">Tout à la fin (100 % à la fin)</option>
+                  <option value="Moitié / moitié (50 % à mi-parcours, 50 % à la fin)">Moitié / moitié (50 % à mi-parcours, 50 % à la fin)</option>
+                  <option value="Mensuel (montant fixe chaque mois)">Mensuel (montant fixe chaque mois)</option>
+                  <option value="Par étapes / jalons convenus">Par étapes / jalons convenus</option>
+                </select>
+              </div>
+            </div>
+
             <div className="field kw-field" style={{ animationDelay: '0.45s' }}>
               <label className="field-label" htmlFor="req-desc">
                 Description <span className="field-req" aria-hidden="true">*</span>
@@ -543,19 +578,6 @@ export const ClientNewRequest: React.FC = () => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Expliquez ce que vous attendez de nous avec précision."
-              />
-            </div>
-
-            <div className="field kw-field" style={{ animationDelay: '0.55s' }}>
-              <label className="field-label" htmlFor="req-budget">
-                Budget estimé
-              </label>
-              <input
-                id="req-budget"
-                type="text"
-                value={budget}
-                onChange={(e) => setBudget(e.target.value)}
-                placeholder="Ex. : 200 €"
               />
             </div>
 
@@ -641,7 +663,7 @@ export const ClientNewRequest: React.FC = () => {
                 <Icon name={selectedService.icon} size={24} />
               </span>
               <h2>{selectedService.name}</h2>
-              <p className="price">{selectedService.price}</p>
+              <p className="price">Devis personnalisé sous 12h</p>
               <ul className="check-list kw-check">
                 {selectedService.included.map((item, idx) => (
                   <li key={idx} style={{ animationDelay: `${0.5 + idx * 0.1}s` }}>

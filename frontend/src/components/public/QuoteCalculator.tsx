@@ -11,7 +11,6 @@ export const QuoteCalculator: React.FC = () => {
 
   const selectedService = services.find(s => s.id === selectedServiceId) || services[0];
 
-  // Pricing logic
   let estimatedEuro = 150;
   if (selectedServiceId === 'suivi-chantier') {
     estimatedEuro = durationMonths * 150;
@@ -30,84 +29,77 @@ export const QuoteCalculator: React.FC = () => {
   const estimatedFcfa = Math.round(estimatedEuro * 655.957);
 
   return (
-    <section id="simulateur" className="py-20 bg-[#1a4d30] text-white bg-benin-pattern border-b border-[#2d7a52]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
-          {/* Left Intro */}
-          <div className="lg:col-span-5 space-y-4">
-            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 text-[#f5c842] text-xs font-bold uppercase tracking-wider">
-              <Calculator className="w-3.5 h-3.5" />
+    <section id="simulateur" className="border-b border-[#084d82] bg-gradient-to-br from-[#006191] to-[#296197] py-20 text-white">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
+          <div className="space-y-4 lg:col-span-5">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-[#ffdf93]">
+              <Calculator className="h-3.5 w-3.5" />
               <span>Simulateur d'estimation instantanée</span>
             </span>
 
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-white leading-tight">
+            <h2 className="font-display text-3xl font-extrabold leading-tight text-white sm:text-4xl">
               Estimez votre budget sans mauvaise surprise
             </h2>
 
-            <p className="text-sm text-white/80 leading-relaxed">
-              Chez KWABO, pas de commissions dissimulées ni de dépassements de coûts imprévus. Les tarifs sont contractuels et garantis par notre équipe au Bénin.
+            <p className="text-sm leading-relaxed text-[#e8f2ff]">
+              Chez BeniLink, pas de commissions dissimulées ni de dépassements de coûts imprévus. Les tarifs sont contractuels et garantis par notre équipe au Bénin.
             </p>
 
-            <div className="pt-2 space-y-2 text-xs text-white/80">
+            <div className="space-y-2 pt-2 text-xs text-[#e8f2ff]">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#f5c842]" />
+                <CheckCircle2 className="h-4 w-4 text-[#ffdf93]" />
                 <span>Taux de change fixe 1 € = 655,957 FCFA</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#f5c842]" />
+                <CheckCircle2 className="h-4 w-4 text-[#ffdf93]" />
                 <span>Rapports et justificatifs systématiquement inclus</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#f5c842]" />
+                <CheckCircle2 className="h-4 w-4 text-[#ffdf93]" />
                 <span>Paiement échelonné possible selon avancement</span>
               </div>
             </div>
           </div>
 
-          {/* Right Interactive Box */}
-          <div className="lg:col-span-7 bg-white text-[#1a1f1b] rounded-3xl p-6 sm:p-8 shadow-2xl border-4 border-white/20">
-            
-            <h3 className="font-display font-bold text-xl text-[#1a1f1b] mb-6">
+          <div className="rounded-3xl border border-[#d0e3f5] bg-white p-6 text-[#0d1d2b] shadow-2xl sm:p-8 lg:col-span-7">
+            <h3 className="font-display mb-6 text-xl font-bold text-[#0d1d2b]">
               Configurez votre simulation
             </h3>
 
             <div className="space-y-6">
-              {/* Choose Service */}
               <div>
-                <label className="block text-xs font-bold text-[#404844] mb-2 uppercase tracking-wider">
+                <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-[#3f4850]">
                   Type de prestation principale
                 </label>
                 <select
                   value={selectedServiceId}
-                  onChange={(e) => setSelectedServiceId(e.target.value)}
-                  className="w-full p-3.5 rounded-xl border border-neutral-300 text-sm font-semibold focus:ring-2 focus:ring-[#1a5c3a] focus:outline-none bg-white text-[#1a1f1b]"
+                  onChange={e => setSelectedServiceId(e.target.value)}
+                  className="w-full rounded-xl border border-[#d0e3f5] bg-white p-3.5 text-sm font-semibold text-[#0d1d2b] focus:outline-none focus:ring-2 focus:ring-[#1593d6]"
                 >
                   <option value="suivi-chantier">Suivi de chantier (Visites hebdo + vidéo 360°)</option>
                   <option value="fret">Fret Europe → Bénin (Maritime ou Aérien)</option>
-                  <option value="sante">Santé & Médicaments pour proche</option>
+                  <option value="sante">Santé &amp; Médicaments pour proche</option>
                   <option value="faire-venir">Faire venir un proche (Dossier visa complet)</option>
                   <option value="administratif">Assistance administrative (Passeport / Acte)</option>
                 </select>
               </div>
 
-              {/* Dynamic options depending on service */}
               {selectedServiceId === 'suivi-chantier' && (
                 <div>
-                  <div className="flex justify-between text-xs font-bold text-[#404844] mb-2">
+                  <div className="mb-2 flex justify-between text-xs font-bold text-[#3f4850]">
                     <span>Durée du suivi souhaitée</span>
-                    <span className="text-[#1a5c3a]">{durationMonths} mois</span>
+                    <span className="text-[#006191]">{durationMonths} mois</span>
                   </div>
                   <input
                     type="range"
                     min="1"
                     max="12"
                     value={durationMonths}
-                    onChange={(e) => setDurationMonths(Number(e.target.value))}
-                    className="w-full accent-[#1a5c3a] cursor-pointer"
+                    onChange={e => setDurationMonths(Number(e.target.value))}
+                    className="w-full cursor-pointer accent-[#006191]"
                   />
-                  <div className="flex justify-between text-[11px] text-[#56635b] mt-1">
+                  <div className="mt-1 flex justify-between text-[11px] text-[#4c657a]">
                     <span>1 mois (ponctuel)</span>
                     <span>6 mois (gros œuvre)</span>
                     <span>12 mois (clé en main)</span>
@@ -121,10 +113,10 @@ export const QuoteCalculator: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setFretMode('maritime')}
-                      className={`p-3 rounded-xl border text-xs font-bold transition text-left ${
+                      className={`rounded-xl border p-3 text-left text-xs font-bold transition ${
                         fretMode === 'maritime'
-                          ? 'border-[#1a5c3a] bg-[#e8f5ee] text-[#1a5c3a]'
-                          : 'border-neutral-200 text-[#56635b]'
+                          ? 'border-[#006191] bg-[#e3efff] text-[#006191]'
+                          : 'border-[#d0e3f5] text-[#4c657a]'
                       }`}
                     >
                       Maritime (3-4 sem.) · Dès 3,50 €/kg
@@ -132,10 +124,10 @@ export const QuoteCalculator: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setFretMode('aerien')}
-                      className={`p-3 rounded-xl border text-xs font-bold transition text-left ${
+                      className={`rounded-xl border p-3 text-left text-xs font-bold transition ${
                         fretMode === 'aerien'
-                          ? 'border-[#1a5c3a] bg-[#e8f5ee] text-[#1a5c3a]'
-                          : 'border-neutral-200 text-[#56635b]'
+                          ? 'border-[#006191] bg-[#e3efff] text-[#006191]'
+                          : 'border-[#d0e3f5] text-[#4c657a]'
                       }`}
                     >
                       Aérien (5-7 j.) · Dès 9,50 €/kg
@@ -143,9 +135,9 @@ export const QuoteCalculator: React.FC = () => {
                   </div>
 
                   <div>
-                    <div className="flex justify-between text-xs font-bold text-[#404844] mb-2">
+                    <div className="mb-2 flex justify-between text-xs font-bold text-[#3f4850]">
                       <span>Poids estimé des colis</span>
-                      <span className="text-[#1a5c3a]">{fretWeight} kg</span>
+                      <span className="text-[#006191]">{fretWeight} kg</span>
                     </div>
                     <input
                       type="range"
@@ -153,8 +145,8 @@ export const QuoteCalculator: React.FC = () => {
                       max="250"
                       step="5"
                       value={fretWeight}
-                      onChange={(e) => setFretWeight(Number(e.target.value))}
-                      className="w-full accent-[#1a5c3a] cursor-pointer"
+                      onChange={e => setFretWeight(Number(e.target.value))}
+                      className="w-full cursor-pointer accent-[#006191]"
                     />
                   </div>
                 </div>
@@ -162,36 +154,35 @@ export const QuoteCalculator: React.FC = () => {
 
               {selectedServiceId === 'sante' && (
                 <div>
-                  <div className="flex justify-between text-xs font-bold text-[#404844] mb-2">
+                  <div className="mb-2 flex justify-between text-xs font-bold text-[#3f4850]">
                     <span>Durée de prise en charge</span>
-                    <span className="text-[#1a5c3a]">{durationMonths} mois</span>
+                    <span className="text-[#006191]">{durationMonths} mois</span>
                   </div>
                   <input
                     type="range"
                     min="1"
                     max="12"
                     value={durationMonths}
-                    onChange={(e) => setDurationMonths(Number(e.target.value))}
-                    className="w-full accent-[#1a5c3a] cursor-pointer"
+                    onChange={e => setDurationMonths(Number(e.target.value))}
+                    className="w-full cursor-pointer accent-[#006191]"
                   />
                 </div>
               )}
 
-              {/* Estimate Calculation Result Box */}
-              <div className="p-5 rounded-2xl bg-[#f9f7f4] border border-[#e0e8e4] flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-[#d0e3f5] bg-[#edf4ff] p-5 sm:flex-row">
                 <div>
-                  <span className="text-[11px] uppercase font-bold text-[#56635b] tracking-wider block">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-[#4c657a]">
                     Estimation indicative
                   </span>
-                  <div className="flex items-baseline gap-2 mt-1">
-                    <span className="font-display text-3xl font-extrabold text-[#1a5c3a]">
+                  <div className="mt-1 flex items-baseline gap-2 tnum">
+                    <span className="font-display text-3xl font-extrabold text-[#006191]">
                       {Math.round(estimatedEuro)} €
                     </span>
-                    <span className="text-xs font-semibold text-[#56635b]">
+                    <span className="text-xs font-semibold text-[#4c657a]">
                       (~ {estimatedFcfa.toLocaleString('fr-FR')} FCFA)
                     </span>
                   </div>
-                  <span className="text-[11px] text-[#56635b] block mt-0.5">
+                  <span className="mt-0.5 block text-[11px] text-[#4c657a]">
                     Devis définitif transmis gratuitement sous 12h
                   </span>
                 </div>
@@ -199,18 +190,15 @@ export const QuoteCalculator: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => openServiceModal(selectedService)}
-                  className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-[#1a5c3a] hover:bg-[#123f28] text-white text-xs font-bold transition shadow-md flex items-center justify-center gap-2"
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-[#f7c531] px-6 py-3.5 text-xs font-bold text-[#10202e] shadow-md transition hover:bg-[#e0a410] sm:w-auto"
                 >
                   <span>Demander ce devis</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
-
             </div>
           </div>
-
         </div>
-
       </div>
     </section>
   );

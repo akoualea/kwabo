@@ -181,7 +181,11 @@ export function getHashForView(view: string, reqId: string | null = null): strin
 }
 
 export function getViewFromHash(hash: string, userRole: AppRole): { view: string; reqId: string | null } {
-  const clean = (hash || window.location.hash).replace(/^#\/?/, '');
+  const rawHash = hash || window.location.hash;
+  if (rawHash && !rawHash.startsWith('#/') && userRole === 'VISITOR') {
+    return { view: 'public-home', reqId: null };
+  }
+  const clean = rawHash.replace(/^#\/?/, '');
   const [path] = clean.split('?');
   const parts = path ? path.split('/').filter(Boolean) : [];
 
@@ -633,7 +637,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       const payload: Record<string, any> = {
         email: email.trim(),
         password,
-        device_name: 'KWABO Web',
+        device_name: 'BeniLink Web',
       };
       if (options?.code) {
         payload.code = options.code.trim();
@@ -796,6 +800,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       // Ignore
     }
   };
+
+  useEffect(() => {
+    if (role === 'VISITOR' || !currentUser) return undefined;
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        void refreshCounters();
+      }
+    }, 15000);
+    return () => window.clearInterval(timer);
+  }, [role, currentUser, refreshCounters]);
 
   return (
     <AppContext.Provider

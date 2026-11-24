@@ -183,6 +183,6 @@ export async function pingApi(): Promise<{ ok: boolean; message: string }> {
   const res = await api<{ message?: string }>('/ping', { skipAuthRedirect: true });
   return {
     ok: Boolean(res?.message),
-    message: res?.message || 'API KWABO OK',
+    message: res?.message || 'API BeniLink OK',
   };
 }

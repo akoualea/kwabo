@@ -441,10 +441,10 @@ export const AdminClients: React.FC = () => {
       const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = 'kwabo-clients.csv';
+      link.download = 'benilink-clients.csv';
       link.click();
       URL.revokeObjectURL(link.href);
-      addToast('kwabo-clients.csv téléchargé.', 'success');
+      addToast('benilink-clients.csv téléchargé.', 'success');
     } catch {
       addToast("Impossible d'exporter les clients.", 'error');
     }

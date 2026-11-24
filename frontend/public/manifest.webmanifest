@@ -1,0 +1,32 @@
+{
+  "name": "BeniLink · Trust Hub Diaspora",
+  "short_name": "BeniLink",
+  "description": "Plateforme de confiance pour la diaspora béninoise : foncier, suivi de chantier, santé, démarches ANIP et logistique.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "lang": "fr",
+  "background_color": "#f7f9ff",
+  "theme_color": "#006191",
+  "icons": [
+    {
+      "src": "/icons/benilink-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/benilink-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/benilink-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

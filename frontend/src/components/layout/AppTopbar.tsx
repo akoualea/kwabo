@@ -1,18 +1,31 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Download, PanelLeft, PanelLeftClose } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { Icon } from '../common/Icon';
+import { ThemeToggleButton } from '../common/ThemeToggleButton';
 import { api } from '../../services/api';
 import { mapRequest, mapUser } from '../../services/mappers';
 import { RequestItem, User } from '../../types';
+import { usePwaInstall } from '../../utils/pwa';
+import { CURRENCIES, POPULAR_CURRENCY_CODES, useCurrency } from '../../data/worldCountries';
 
 interface TopbarProps {
   title: string;
   subtitle?: string;
   onOpenSidebar: () => void;
+  sidebarCollapsed?: boolean;
+  onToggleCollapse?: () => void;
   actions?: React.ReactNode;
 }
 
-export const AppTopbar: React.FC<TopbarProps> = ({ title, subtitle, onOpenSidebar, actions }) => {
+export const AppTopbar: React.FC<TopbarProps> = ({
+  title,
+  subtitle,
+  onOpenSidebar,
+  sidebarCollapsed = false,
+  onToggleCollapse,
+  actions,
+}) => {
   const {
     role,
     currentView,
@@ -25,6 +38,9 @@ export const AppTopbar: React.FC<TopbarProps> = ({ title, subtitle, onOpenSideba
     navigateFromLink,
     setActiveClientId,
   } = useApp();
+
+  const { canInstall, promptInstall } = usePwaInstall();
+  const { currency, setCurrency } = useCurrency();
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -129,13 +145,20 @@ export const AppTopbar: React.FC<TopbarProps> = ({ title, subtitle, onOpenSideba
           50% { transform: scale(1.16); }
         }
         .topbar-bell-btn {
-          width: 48px;
-          height: 48px;
-          border-radius: 14px;
+          width: 40px;
+          height: 40px;
+          border-radius: 12px;
           transition: background-color 0.2s ease, transform 0.2s ease;
         }
+        @media (min-width: 640px) {
+          .topbar-bell-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+          }
+        }
         .topbar-bell-btn.has-unread {
-          color: #1a5c3a;
+          color: #006191;
         }
         .topbar-bell-btn.has-unread svg {
           transform-origin: 50% 15%;
@@ -147,9 +170,9 @@ export const AppTopbar: React.FC<TopbarProps> = ({ title, subtitle, onOpenSideba
           min-width: 20px;
           height: 20px;
           font-size: 11px;
-          background: #dc2626;
+          background: #ba1a1a;
           color: #fff;
-          box-shadow: 0 0 0 2px #f9f7f4;
+          box-shadow: 0 0 0 2px #f7f9ff;
           animation: kwDotPop 1.8s ease-in-out infinite;
         }
         @media (prefers-reduced-motion: reduce) {
@@ -169,6 +192,22 @@ export const AppTopbar: React.FC<TopbarProps> = ({ title, subtitle, onOpenSideba
         <Icon name="bars-3" size={24} />
       </button>
 
+      {onToggleCollapse && (
+        <button
+          type="button"
+          onClick={onToggleCollapse}
+          aria-label={sidebarCollapsed ? 'Afficher le nom des menus' : 'Réduire le menu aux icônes'}
+          title={sidebarCollapsed ? 'Afficher le nom des menus' : 'Réduire le menu aux icônes'}
+          className="hidden lg:inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#d0e3f5] bg-white text-[#006191] shadow-xs transition hover:bg-[#e3efff] hover:border-[#1593d6]"
+        >
+          {sidebarCollapsed ? (
+            <PanelLeft className="h-5 w-5" aria-hidden="true" />
+          ) : (
+            <PanelLeftClose className="h-5 w-5" aria-hidden="true" />
+          )}
+        </button>
+      )}
+
       {backNav && (
         <button
           type="button"
@@ -187,7 +226,30 @@ export const AppTopbar: React.FC<TopbarProps> = ({ title, subtitle, onOpenSideba
         {subtitle && <p>{subtitle}</p>}
       </div>
 
+
       <div className="topbar-actions">
+        {role === 'USER' && currentView !== 'client-new-request' && (
+          <button
+            type="button"
+            onClick={() => navigate('client-new-request')}
+            className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#f7c531] px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-xs font-bold text-[#10202e] shadow-sm transition hover:bg-[#e0a410]"
+          >
+            <Icon name="plus-circle" size={15} />
+            <span className="sm:hidden">Demande</span>
+            <span className="hidden sm:inline">Nouvelle demande</span>
+          </button>
+        )}
+        {canInstall && (
+          <button
+            type="button"
+            onClick={() => void promptInstall()}
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#d0e3f5] bg-white px-3 py-1.5 text-xs font-semibold text-[#006191] transition hover:bg-[#e3efff]"
+            title="Installer l'application BeniLink"
+          >
+            <Download className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>Installer</span>
+          </button>
+        )}
         {(role === 'ADMIN' || role === 'OPERATOR') && (
           <div className="search admin-search" role="search" ref={searchContainerRef}>
             <Icon name="magnifying-glass" size={18} />
@@ -273,6 +335,25 @@ export const AppTopbar: React.FC<TopbarProps> = ({ title, subtitle, onOpenSideba
 
         {actions}
 
+        {role !== 'OPERATOR' && (
+          <select
+            aria-label="Devise d'affichage"
+            title="Devise d'affichage"
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+            style={{ width: 'auto', minHeight: '36px', padding: '0 8px' }}
+            className="h-9 sm:h-10 rounded-xl border border-[#d0e3f5] bg-white text-[11px] sm:text-xs font-bold text-[#006191] outline-none"
+          >
+            {POPULAR_CURRENCY_CODES.map((code) => (
+              <option key={code} value={code}>
+                {code} ({CURRENCIES[code].symbol})
+              </option>
+            ))}
+          </select>
+        )}
+
+        <ThemeToggleButton />
+
         {/* Notifications Button & Dropdown */}
         <div className="relative" ref={notifRef}>
           <button
@@ -286,15 +367,15 @@ export const AppTopbar: React.FC<TopbarProps> = ({ title, subtitle, onOpenSideba
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-[#e0e8e4] py-2 z-50">
-              <div className="px-4 py-2 border-b border-[#e0e8e4] flex items-center justify-between gap-2">
-                <strong className="text-sm">Notifications</strong>
+            <div className="absolute right-0 mt-2 w-[calc(100vw-24px)] max-w-[360px] sm:w-96 bg-white rounded-2xl shadow-xl border border-[#d0e3f5] py-2 z-50">
+              <div className="px-4 py-2 border-b border-[#d0e3f5] flex items-center justify-between gap-2">
+                <strong className="text-sm text-[#0d1d2b]">Notifications</strong>
                 <div className="flex items-center gap-2">
                   <small className="muted">{unreadCount} non lue{unreadCount > 1 ? 's' : ''}</small>
                   {unreadCount > 0 && (
                     <button
                       type="button"
-                      className="text-xs font-medium text-[#1b4d3e] hover:underline bg-transparent border-0 cursor-pointer p-0"
+                      className="text-xs font-semibold text-[#006191] hover:underline bg-transparent border-0 cursor-pointer p-0"
                       onClick={() => markAllNotificationsRead()}
                     >
                       Tout lire
@@ -303,7 +384,7 @@ export const AppTopbar: React.FC<TopbarProps> = ({ title, subtitle, onOpenSideba
                 </div>
               </div>
 
-              <div className="max-h-80 overflow-y-auto overflow-x-hidden divide-y divide-neutral-100">
+              <div className="max-h-80 overflow-y-auto overflow-x-hidden divide-y divide-[#edf4ff]">
                 {notifications.length === 0 ? (
                   <p className="p-4 text-center muted small">Aucune notification.</p>
                 ) : (
@@ -315,14 +396,14 @@ export const AppTopbar: React.FC<TopbarProps> = ({ title, subtitle, onOpenSideba
                         setShowNotifications(false);
                         navigateFromLink(n.href);
                       }}
-                      className={`px-4 py-3 hover:bg-neutral-50 cursor-pointer transition ${
-                        !n.read ? 'bg-[#fdf6e0]/50' : ''
+                      className={`px-4 py-3 hover:bg-[#edf4ff] cursor-pointer transition ${
+                        !n.read ? 'bg-[#ffdf93]/25' : ''
                       }`}
                     >
-                      <p className={`text-[13px] leading-snug whitespace-normal break-words ${!n.read ? 'font-semibold text-[#1a1f1b]' : 'text-[#56635b]'}`}>
+                      <p className={`text-[13px] leading-snug whitespace-normal break-words ${!n.read ? 'font-semibold text-[#0d1d2b]' : 'text-[#4c657a]'}`}>
                         {n.text}
                       </p>
-                      <span className="text-[11px] text-neutral-400 mt-1 block">
+                      <span className="text-[11px] text-[#6f7881] mt-1 block">
                         {n.at ? new Date(n.at).toLocaleDateString('fr-FR', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' }) : ''}
                       </span>
                     </div>

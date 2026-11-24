@@ -1,19 +1,39 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>KWABO · Services de confiance pour la diaspora béninoise</title>
-    <meta name="description" content="Plateforme web de services de confiance pour la diaspora béninoise : suivi de chantier, santé & famille, démarches administratives et fret logistique." />
-    <meta property="og:title" content="KWABO · Services de confiance pour la diaspora béninoise" />
-    <meta property="og:description" content="Plateforme web de services de confiance pour la diaspora béninoise : suivi de chantier, santé & famille, démarches administratives et fret logistique." />
+    <title>BeniLink · Trust Hub Diaspora — Services de confiance au Bénin</title>
+    <meta name="description" content="BeniLink : plateforme officielle de services de confiance pour la diaspora béninoise. Foncier certifié, suivi de chantier, santé & famille, démarches ANIP et logistique." />
+    <meta name="theme-color" content="#006191" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="BeniLink" />
+    <meta property="og:title" content="BeniLink · Trust Hub Diaspora" />
+    <meta property="og:description" content="Plateforme de services de confiance pour la diaspora béninoise : foncier, suivi de chantier, santé, démarches ANIP et logistique." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet" />
+    <link rel="icon" href="/assets/benilink-favicon.png" type="image/png" sizes="64x64" />
+    <link rel="apple-touch-icon" href="/icons/benilink-apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest?v=4" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('benilink_theme');
+          if (saved === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

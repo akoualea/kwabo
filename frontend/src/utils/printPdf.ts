@@ -43,7 +43,7 @@ const BASE_PRINT_STYLES = `
   }
   html, body {
     background: #ffffff;
-    color: #16241a;
+    color: #0d1d2b;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     font-size: 13px;
     line-height: 1.5;
@@ -56,7 +56,7 @@ const BASE_PRINT_STYLES = `
     padding: 20px 24px 28px;
   }
   .header-band {
-    background: linear-gradient(135deg, #103823 0%, #1a5c38 100%);
+    background: linear-gradient(135deg, #084d82 0%, #006191 100%);
     color: #ffffff;
     border-radius: 14px;
     padding: 24px 28px;
@@ -64,7 +64,7 @@ const BASE_PRINT_STYLES = `
     justify-content: space-between;
     align-items: flex-start;
     gap: 20px;
-    border-bottom: 4px solid #f0c040;
+    border-bottom: 4px solid #f7c531;
   }
   .brand {
     display: flex;
@@ -75,8 +75,8 @@ const BASE_PRINT_STYLES = `
     width: 44px;
     height: 44px;
     border-radius: 11px;
-    background: #f0c040;
-    color: #103823;
+    background: #f7c531;
+    color: #084d82;
     font-family: Georgia, "Times New Roman", serif;
     font-weight: 700;
     font-size: 24px;
@@ -92,11 +92,11 @@ const BASE_PRINT_STYLES = `
     line-height: 1.1;
   }
   .brand-dot {
-    color: #f0c040;
+    color: #f7c531;
   }
   .brand-tag {
     font-size: 11.5px;
-    color: rgba(255, 255, 255, 0.78);
+    color: rgba(255, 255, 255, 0.82);
     margin-top: 3px;
   }
   .doc-meta-top {
@@ -107,7 +107,7 @@ const BASE_PRINT_STYLES = `
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #f5d162;
+    color: #ffdf93;
     margin-bottom: 4px;
   }
   .doc-number {
@@ -133,34 +133,34 @@ const BASE_PRINT_STYLES = `
     letter-spacing: 0.02em;
     border: 1px solid transparent;
   }
-  .pill-paid { background: #e8f5ec; color: #14532d; border-color: #b7dfc4; }
-  .pill-due { background: #fef5df; color: #854d0e; border-color: #f5da91; }
-  .pill-refunded { background: #e8f2fc; color: #1e40af; border-color: #bfdbfe; }
-  .pill-cancelled { background: #fdeaea; color: #991b1b; border-color: #f8c6c6; }
-  .pill-neutral { background: #f3f4f6; color: #374151; border-color: #e5e7eb; }
+  .pill-paid { background: #e3efff; color: #006191; border-color: #9fcaff; }
+  .pill-due { background: #ffdf93; color: #765b00; border-color: #f2c02c; }
+  .pill-refunded { background: #d1e4ff; color: #004b71; border-color: #8fcdff; }
+  .pill-cancelled { background: #ffdad6; color: #93000a; border-color: #ba1a1a; }
+  .pill-neutral { background: #edf4ff; color: #3f4850; border-color: #d0e3f5; }
   .footer {
     margin-top: 28px;
     padding-top: 14px;
-    border-top: 1px solid #e2e7e3;
+    border-top: 1px solid #d0e3f5;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 12px;
     font-size: 11px;
-    color: #5f6f64;
+    color: #4c657a;
   }
   .footer strong {
-    color: #1a5c38;
+    color: #006191;
   }
   .print-hint {
     margin-top: 18px;
     text-align: center;
   }
   .print-btn {
-    background: #1a5c38;
+    background: #006191;
     color: #ffffff;
     border: none;
-    border-radius: 8px;
+    border-radius: 999px;
     padding: 9px 18px;
     font-size: 13px;
     font-weight: 600;
@@ -242,14 +242,14 @@ export const printInvoicePdf = ({
       ? 'Reçu de remboursement'
       : 'Facture officielle';
   const docTitle = isPaid
-    ? `Reçu de paiement ${invNum} — KWABO`
-    : `Facture ${invNum} — KWABO`;
+    ? `Reçu de paiement ${invNum} — BeniLink`
+    : `Facture ${invNum} — BeniLink`;
 
   const extraCss = `
     .receipt-banner {
       margin-top: 18px;
-      background: linear-gradient(135deg, #edf7f1 0%, #f6fbf8 100%);
-      border: 1.5px solid #b7dfc4;
+      background: linear-gradient(135deg, #edf4ff 0%, #f7f9ff 100%);
+      border: 1.5px solid #9fcaff;
       border-radius: 12px;
       padding: 14px 18px;
       display: flex;
@@ -266,7 +266,7 @@ export const printInvoicePdf = ({
       width: 34px;
       height: 34px;
       border-radius: 999px;
-      background: #1a5c38;
+      background: #006191;
       color: #ffffff;
       font-size: 16px;
       font-weight: 700;
@@ -278,11 +278,11 @@ export const printInvoicePdf = ({
     .receipt-banner-title {
       font-size: 13.5px;
       font-weight: 700;
-      color: #14532d;
+      color: #084d82;
     }
     .receipt-banner-sub {
       font-size: 11.5px;
-      color: #3f624c;
+      color: #4c657a;
       margin-top: 2px;
     }
     .receipt-banner-amount {
@@ -293,13 +293,13 @@ export const printInvoicePdf = ({
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: #3f624c;
+      color: #4c657a;
       font-weight: 700;
     }
     .receipt-banner-amount strong {
       font-family: Georgia, "Times New Roman", serif;
       font-size: 20px;
-      color: #14532d;
+      color: #006191;
     }
     .parties {
       display: grid;
@@ -308,8 +308,8 @@ export const printInvoicePdf = ({
       margin-top: 20px;
     }
     .party-card {
-      background: #f9faf8;
-      border: 1px solid #e3e8e4;
+      background: #f7f9ff;
+      border: 1px solid #d0e3f5;
       border-radius: 10px;
       padding: 14px 16px;
     }
@@ -318,18 +318,18 @@ export const printInvoicePdf = ({
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: #5f6f64;
+      color: #4c657a;
       margin-bottom: 6px;
     }
     .party-title {
       font-size: 15px;
       font-weight: 700;
-      color: #16241a;
+      color: #0d1d2b;
       margin-bottom: 3px;
     }
     .party-sub {
       font-size: 12px;
-      color: #4b5a50;
+      color: #3f4850;
       line-height: 1.5;
     }
     .meta-strip {
@@ -339,7 +339,7 @@ export const printInvoicePdf = ({
       margin-top: 16px;
       padding: 13px 16px;
       background: #ffffff;
-      border: 1px solid #e3e8e4;
+      border: 1px solid #d0e3f5;
       border-radius: 10px;
     }
     .meta-item dt {
@@ -347,17 +347,17 @@ export const printInvoicePdf = ({
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: #6b7870;
+      color: #4c657a;
       margin-bottom: 3px;
     }
     .meta-item dd {
       font-size: 12.5px;
       font-weight: 600;
-      color: #16241a;
+      color: #0d1d2b;
     }
     .table-wrap {
       margin-top: 20px;
-      border: 1px solid #dde4df;
+      border: 1px solid #d0e3f5;
       border-radius: 10px;
       overflow: hidden;
     }
@@ -366,15 +366,15 @@ export const printInvoicePdf = ({
       border-collapse: collapse;
     }
     thead th {
-      background: #f1f5f2;
-      color: #1a5c38;
+      background: #edf4ff;
+      color: #006191;
       font-size: 10.5px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       text-align: left;
       padding: 11px 14px;
-      border-bottom: 1px solid #dde4df;
+      border-bottom: 1px solid #d0e3f5;
     }
     thead th.num, tbody td.num {
       text-align: right;
@@ -382,7 +382,7 @@ export const printInvoicePdf = ({
     tbody td {
       padding: 15px 14px;
       vertical-align: top;
-      border-bottom: 1px solid #eef2ef;
+      border-bottom: 1px solid #e3efff;
       font-size: 13px;
     }
     tbody tr:last-child td {
@@ -390,12 +390,12 @@ export const printInvoicePdf = ({
     }
     .item-title {
       font-weight: 700;
-      color: #16241a;
+      color: #0d1d2b;
       font-size: 14px;
     }
     .item-sub {
       font-size: 12px;
-      color: #5f6f64;
+      color: #4c657a;
       margin-top: 3px;
     }
     .summary-row {
@@ -407,23 +407,23 @@ export const printInvoicePdf = ({
     }
     .note-box {
       flex: 1;
-      background: #f9f7f2;
-      border: 1px solid #ebe4d3;
+      background: #f7f9ff;
+      border: 1px solid #d0e3f5;
       border-radius: 10px;
       padding: 12px 15px;
       font-size: 11.5px;
-      color: #57534e;
+      color: #3f4850;
     }
     .note-box strong {
       display: block;
-      color: #16241a;
+      color: #0d1d2b;
       margin-bottom: 3px;
       font-size: 12px;
     }
     .totals-box {
       width: 280px;
-      background: #f4f8f5;
-      border: 1.5px solid #cde0d3;
+      background: #edf4ff;
+      border: 1.5px solid #9fcaff;
       border-radius: 12px;
       padding: 14px 18px;
     }
@@ -431,21 +431,21 @@ export const printInvoicePdf = ({
       display: flex;
       justify-content: space-between;
       font-size: 12.5px;
-      color: #4b5a50;
+      color: #3f4850;
       margin-bottom: 6px;
     }
     .totals-grand {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      border-top: 1.5px solid #bcd4c4;
+      border-top: 1.5px solid #9fcaff;
       padding-top: 10px;
       margin-top: 8px;
     }
     .totals-grand span {
       font-size: 13px;
       font-weight: 700;
-      color: #16241a;
+      color: #0d1d2b;
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }
@@ -453,15 +453,15 @@ export const printInvoicePdf = ({
       font-family: Georgia, "Times New Roman", serif;
       font-size: 24px;
       font-weight: 700;
-      color: #1a5c38;
+      color: #006191;
     }
     .stamp {
       display: inline-block;
       margin-top: 8px;
       padding: 3px 9px;
-      border: 1.5px solid #1a5c38;
+      border: 1.5px solid #006191;
       border-radius: 6px;
-      color: #1a5c38;
+      color: #006191;
       font-size: 10px;
       font-weight: 800;
       letter-spacing: 0.14em;
@@ -476,11 +476,10 @@ export const printInvoicePdf = ({
   const bodyHtml = `
     <header class="header-band">
       <div class="brand">
-        <div class="brand-mark">K</div>
-        <div>
-          <div class="brand-name">KWABO<span class="brand-dot">.</span></div>
-          <div class="brand-tag">Services de confiance pour la diaspora béninoise</div>
+        <div style="background:#ffffff;border-radius:10px;padding:6px 12px;display:inline-flex;align-items:center;">
+          <img src="${window.location.origin}/assets/benilink-logo.png" alt="BeniLink" style="height:28px;width:auto;display:block;object-fit:contain;" />
         </div>
+        <div class="brand-tag">Trust Hub Diaspora · Services de confiance au Bénin</div>
       </div>
       <div class="doc-meta-top">
         <div class="doc-kicker">${docKicker}</div>
@@ -512,15 +511,15 @@ export const printInvoicePdf = ({
     <section class="parties">
       <div class="party-card">
         <div class="party-label">Émetteur</div>
-        <div class="party-title">KWABO Services</div>
+        <div class="party-title">BeniLink Services</div>
         <div class="party-sub">
           Haie Vive, Cotonou — République du Bénin<br />
-          contact@kwabo.bj · Plateforme vérifiée
+          contact@benilink.bj · Plateforme vérifiée
         </div>
       </div>
       <div class="party-card">
         <div class="party-label">Facturé à</div>
-        <div class="party-title">${escapeHtml(clientName || 'Client KWABO')}</div>
+        <div class="party-title">${escapeHtml(clientName || 'Client BeniLink')}</div>
         <div class="party-sub">
           ${clientEmail ? `${escapeHtml(clientEmail)}<br />` : ''}
           ${clientCountry ? `${escapeHtml(clientCountry)}` : 'Client Diaspora'}
@@ -573,9 +572,9 @@ export const printInvoicePdf = ({
       <div class="note-box">
         <strong>Informations &amp; sécurité</strong>
         ${invoice.status === 'paid'
-          ? 'Règlement confirmé. Ce justificatif vaut reçu de paiement pour votre dossier KWABO.'
+          ? 'Règlement confirmé. Ce justificatif vaut reçu de paiement pour votre dossier BeniLink.'
           : invoice.status === 'due'
-            ? 'Facture en attente de règlement. Réglez directement depuis votre espace client KWABO (Carte, Mobile Money ou Wise).'
+            ? 'Facture en attente de règlement. Réglez directement depuis votre espace client BeniLink (Carte, Mobile Money ou Wise).'
             : invoice.status === 'refunded'
               ? 'Cette facture a fait l\'objet d\'un remboursement intégral vers votre moyen de paiement.'
               : 'Cette facture a été annulée et ne donne lieu à aucun prélèvement.'}
@@ -598,7 +597,7 @@ export const printInvoicePdf = ({
     </section>
 
     <footer class="footer">
-      <span><strong>KWABO Services</strong> · Vos affaires au Bénin, entre de bonnes mains.</span>
+      <span><strong>BeniLink Services</strong> · Trust Hub Diaspora · Cotonou, Bénin.</span>
       <span>Document généré automatiquement · Aucune donnée bancaire stockée.</span>
     </footer>
   `;
@@ -657,13 +656,13 @@ export const printRequestsPdf = ({
       font-family: Georgia, "Times New Roman", serif;
       font-size: 20px;
       font-weight: 700;
-      color: #1a5c38;
+      color: #006191;
       margin-top: 2px;
     }
     .filter-bar {
       margin-top: 14px;
       font-size: 12px;
-      color: #4b5a50;
+      color: #4c657a;
       display: flex;
       justify-content: space-between;
       flex-wrap: wrap;
@@ -671,7 +670,7 @@ export const printRequestsPdf = ({
     }
     .table-wrap {
       margin-top: 14px;
-      border: 1px solid #dde4df;
+      border: 1px solid #d0e3f5;
       border-radius: 10px;
       overflow: hidden;
     }
@@ -680,24 +679,24 @@ export const printRequestsPdf = ({
       border-collapse: collapse;
     }
     thead th {
-      background: #f1f5f2;
-      color: #1a5c38;
+      background: #edf4ff;
+      color: #006191;
       font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       text-align: left;
       padding: 10px 11px;
-      border-bottom: 1px solid #dde4df;
+      border-bottom: 1px solid #d0e3f5;
     }
     tbody td {
       padding: 10px 11px;
-      border-bottom: 1px solid #eef2ef;
+      border-bottom: 1px solid #e3efff;
       font-size: 12px;
       vertical-align: top;
     }
     tbody tr:nth-child(even) {
-      background: #fbfcfa;
+      background: #f7f9ff;
     }
     tbody tr:last-child td {
       border-bottom: none;
@@ -732,7 +731,7 @@ export const printRequestsPdf = ({
     ? requests
         .map((r) => {
           const st = REQUEST_STATUS_MAP[r.status] ?? { label: r.status, cls: 'pill-neutral' };
-          const serviceName = r.serviceName || r.service?.name || 'Service KWABO';
+          const serviceName = r.serviceName || r.service?.name || 'Service BeniLink';
           const amountDisplay = r.quote ? formatCurrency(r.quote.amount) : r.budget || 'Sur devis';
           return `
             <tr>
@@ -755,15 +754,14 @@ export const printRequestsPdf = ({
   const bodyHtml = `
     <header class="header-band">
       <div class="brand">
-        <div class="brand-mark">K</div>
-        <div>
-          <div class="brand-name">KWABO<span class="brand-dot">.</span></div>
-          <div class="brand-tag">Services de confiance pour la diaspora béninoise</div>
+        <div style="background:#ffffff;border-radius:10px;padding:6px 12px;display:inline-flex;align-items:center;">
+          <img src="${window.location.origin}/assets/benilink-logo.png" alt="BeniLink" style="height:28px;width:auto;display:block;object-fit:contain;" />
         </div>
+        <div class="brand-tag">Trust Hub Diaspora · Services de confiance au Bénin</div>
       </div>
       <div class="doc-meta-top">
         <div class="doc-kicker">Relevé de demandes</div>
-        <div class="doc-number">${escapeHtml(clientName || 'Client KWABO')}</div>
+        <div class="doc-number">${escapeHtml(clientName || 'Client BeniLink')}</div>
         <div class="doc-date">Exporté le ${escapeHtml(generatedAt)}</div>
       </div>
     </header>
@@ -811,11 +809,11 @@ export const printRequestsPdf = ({
     </div>
 
     <footer class="footer">
-      <span><strong>KWABO Services</strong> · Cotonou, Bénin · contact@kwabo.bj</span>
-      <span>Relevé personnel — Espace client KWABO</span>
+      <span><strong>BeniLink Services</strong> · Cotonou, Bénin · contact@benilink.bj</span>
+      <span>Relevé personnel — Espace client BeniLink</span>
     </footer>
   `;
 
-  return openPrintWindow('Relevé de mes demandes — KWABO', bodyHtml, extraCss);
+  return openPrintWindow('Relevé de mes demandes — BeniLink', bodyHtml, extraCss);
 };
 

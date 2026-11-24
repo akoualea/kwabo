@@ -186,7 +186,7 @@ export function mapMessage(raw: any, fallbackRequestId?: string): MessageItem {
     id,
     requestId: String(raw?.request_id ?? raw?.requestId ?? fallbackRequestId ?? ''),
     from: raw?.from === 'team' ? 'team' : 'client',
-    author: raw?.author ?? (raw?.from === 'team' ? 'Équipe KWABO' : 'Client'),
+    author: raw?.author ?? (raw?.from === 'team' ? 'Équipe BeniLink' : 'Client'),
     text: raw?.text ?? '',
     at: raw?.at ?? raw?.created_at ?? new Date().toISOString(),
     read: Boolean(raw?.read),

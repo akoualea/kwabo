@@ -111,7 +111,7 @@ export const PhotoModal: React.FC = () => {
         <div className="modal-body" style={{ textAlign: 'center', padding: 12 }}>
           {loading ? (
             <div style={{ padding: '48px 16px' }}>
-              <div className="w-8 h-8 rounded-full border-4 border-[#e2ddd5] border-t-[#1d3a2f] animate-spin mx-auto mb-3" />
+              <div className="w-8 h-8 rounded-full border-4 border-[#d0e3f5] border-t-[#006191] animate-spin mx-auto mb-3" />
               <p className="muted">Chargement sécurisé du fichier…</p>
             </div>
           ) : error ? (

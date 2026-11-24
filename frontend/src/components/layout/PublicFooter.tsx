@@ -1,115 +1,151 @@
 import React from 'react';
-import { MessageSquare, ShieldCheck, MapPin, Mail, Phone, Heart } from 'lucide-react';
+import {
+  Building2,
+  CheckCircle2,
+  Globe2,
+  HeartPulse,
+  Lock,
+  Mail,
+  MapPin,
+  MessageSquare,
+  Phone,
+  ShieldCheck,
+  Truck,
+} from 'lucide-react';
 import { WHATSAPP_LINK, WHATSAPP_DISPLAY } from '../../data/kwaboData';
 import { useApp } from '../../context/AppContext';
+import { BrandLogo } from '../common/BrandLogo';
 
 export const PublicFooter: React.FC = () => {
   const { navigate } = useApp();
 
   return (
-    <footer className="public-footer bg-[#123f28] text-white pt-16 pb-12 border-t border-[#1a4d30]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-white/10">
-          {/* Brand Info */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-2.5">
-              <span className="w-9 h-9 rounded-xl bg-[#d4a017] text-[#123f28] flex items-center justify-center font-display font-bold text-2xl shadow-sm">
-                K
-              </span>
-              <span className="font-display font-bold text-2xl tracking-tight text-white">
-                KWABO<span className="text-[#f5c842]">.</span>
-              </span>
-            </div>
-            <p className="text-white/80 text-sm leading-relaxed max-w-sm">
-              Votre présence de confiance au Bénin. Suivi de chantier avec vidéos 360°, soutien médical et familial, démarches administratives et frais sécurisés pour la diaspora béninoise.
+    <footer className="public-footer border-t border-[#d0e3f5] bg-[#edf4ff] pt-14 pb-10 text-[#3f4850]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 pb-12 md:grid-cols-2 lg:grid-cols-4">
+          {/* Col 1: Brand & Univers */}
+          <div className="space-y-4">
+            <BrandLogo subtitle="Trust Hub Diaspora" />
+            <p className="text-sm leading-relaxed text-[#4c657a]">
+              Plateforme officielle d'accompagnement pour la diaspora béninoise : suivi de chantier 360°, santé, démarches ANIP et logistique.
             </p>
-            <div className="pt-2 flex flex-col gap-2 text-xs text-white/70">
-              <span className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-[#f5c842]" />
-                <span>Siège opérationnel : Haie Vive, Cotonou, République du Bénin</span>
-              </span>
-              <span className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-[#f5c842]" />
-                <span>Standard WhatsApp : {WHATSAPP_DISPLAY}</span>
-              </span>
-              <span className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-[#f5c842]" />
-                <span>contact@kwabo.bj</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Univers / Services */}
-          <div className="space-y-3">
-            <h4 className="font-display text-base font-semibold text-[#f5c842] tracking-wide">
-              Nos Pôles d'intervention
-            </h4>
-            <ul className="space-y-2 text-sm text-white/75">
-              <li><a href="#services" className="hover:text-white transition">Suivi de chantier & Villa</a></li>
-              <li><a href="#services" className="hover:text-white transition">Vérification foncière ANDF</a></li>
-              <li><a href="#services" className="hover:text-white transition">Santé & hôpital pour proches</a></li>
-              <li><a href="#services" className="hover:text-white transition">Paiement factures SBEE/SONEB</a></li>
-              <li><a href="#services" className="hover:text-white transition">Visas & inscriptions fac</a></li>
-              <li><a href="#services" className="hover:text-white transition">Création de société APIEx</a></li>
-              <li><a href="#services" className="hover:text-white transition">Frais Europe → Bénin</a></li>
+            <ul className="space-y-2 text-xs font-medium text-[#3f4850]">
+              <li className="flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-[#296197]" aria-hidden="true" />
+                Foncier &amp; BTP Sécurisé
+              </li>
+              <li className="flex items-center gap-2">
+                <HeartPulse className="h-4 w-4 text-[#296197]" aria-hidden="true" />
+                Famille, Santé &amp; Proches Bénin
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-[#296197]" aria-hidden="true" />
+                Démarches &amp; Actes ANIP
+              </li>
+              <li className="flex items-center gap-2">
+                <Truck className="h-4 w-4 text-[#296197]" aria-hidden="true" />
+                Logistique Express &amp; Fret
+              </li>
             </ul>
           </div>
 
-          {/* Garanties & Sécurité */}
+          {/* Col 2: Garanties de Confiance */}
           <div className="space-y-3">
-            <h4 className="font-display text-base font-semibold text-[#f5c842] tracking-wide">
-              Garanties & Transparence
-            </h4>
-            <ul className="space-y-2 text-sm text-white/75">
-              <li className="flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-emerald-400" /> Vidéos & photos horodatées</li>
-              <li className="flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-emerald-400" /> Reçus scannés à l'euro près</li>
-              <li className="flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-emerald-400" /> Contrat de mission signé</li>
-              <li className="flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-emerald-400" /> Devis ferme sans surcoût</li>
-              <li className="flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-emerald-400" /> Paiements Stripe / Wise / MoMo</li>
+            <div className="flex items-center gap-2 text-[#006191]">
+              <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+              <h4 className="font-sans text-sm font-bold uppercase tracking-wider">
+                Garanties de Confiance
+              </h4>
+            </div>
+            <ul className="space-y-2.5 text-sm text-[#3f4850]">
+              <li className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-[#765b00]" aria-hidden="true" />
+                Devis ferme validé avant mission
+              </li>
+              <li className="flex items-center gap-2">
+                <Lock className="h-4 w-4 text-[#765b00]" aria-hidden="true" />
+                Protection des données (RGPD)
+              </li>
+              <li className="flex items-center gap-2">
+                <Globe2 className="h-4 w-4 text-[#765b00]" aria-hidden="true" />
+                Vidéos 360° &amp; photos géolocalisées
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-[#765b00]" aria-hidden="true" />
+                Reçus scannés à l'euro près
+              </li>
             </ul>
           </div>
 
-          {/* Accès rapide */}
+          {/* Col 3: Présence & Couverture */}
           <div className="space-y-3">
-            <h4 className="font-display text-base font-semibold text-[#f5c842] tracking-wide">
-              Espace & Contact
-            </h4>
-            <div className="flex flex-col gap-2.5">
-              <a
-                href={WHATSAPP_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg bg-[#2d7a52] text-sm font-semibold text-white transition hover:bg-[#1a5c3a]"
-              >
-                <MessageSquare className="w-4 h-4 text-white" />
-                <span className="text-white">WhatsApp Direct (+229)</span>
-              </a>
+            <div className="flex items-center gap-2 text-[#006191]">
+              <MapPin className="h-5 w-5" aria-hidden="true" />
+              <h4 className="font-sans text-sm font-bold uppercase tracking-wider">
+                Présence Locale &amp; Diaspora
+              </h4>
             </div>
-            <p className="text-xs text-white/60 pt-2 leading-relaxed">
-              Interventions sur Cotonou, Calavi, Porto-Novo, Ouidah, Parakou et Bohicon.
+            <ul className="space-y-2 text-sm text-[#3f4850]">
+              <li>
+                <strong className="text-[#0d1d2b]">Cotonou HQ :</strong> Quartier Haie Vive, Littoral
+              </li>
+              <li>
+                <strong className="text-[#0d1d2b]">Zones couvertes :</strong> Abomey-Calavi, Porto-Novo, Ouidah, Parakou, Bohicon
+              </li>
+              <li>
+                <strong className="text-[#0d1d2b]">Relais diaspora :</strong> France, Belgique, Canada, États-Unis, Suisse
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 4: Contact Certifié */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-[#006191]">
+              <Phone className="h-5 w-5" aria-hidden="true" />
+              <h4 className="font-sans text-sm font-bold uppercase tracking-wider">
+                Contact &amp; Support
+              </h4>
+            </div>
+            <p className="text-xs leading-relaxed text-[#4c657a]">
+              Guichet d'assistance dédié à la diaspora béninoise et aux porteurs de projets.
             </p>
+            <div className="space-y-1.5 text-xs text-[#0d1d2b]">
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-[#006191]" aria-hidden="true" />
+                <span>contact@benilink.bj</span>
+              </div>
+              <div className="flex items-center gap-2 tnum">
+                <Phone className="h-4 w-4 text-[#006191]" aria-hidden="true" />
+                <span>{WHATSAPP_DISPLAY}</span>
+              </div>
+            </div>
+            <a
+              href={WHATSAPP_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-whatsapp-btn mt-2 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#006191] px-4 py-2.5 text-xs font-bold !text-white shadow-sm transition hover:bg-[#084d82]"
+            >
+              <MessageSquare className="h-4 w-4 shrink-0 text-[#ffdf93]" aria-hidden="true" />
+              <span>WhatsApp Direct ({WHATSAPP_DISPLAY})</span>
+            </a>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-white/60 gap-4">
-          <div className="flex items-center gap-1">
-            <span>© 2026 KWABO. Fait avec</span>
-            <Heart className="w-3.5 h-3.5 text-red-400 inline" />
-            <span>pour la diaspora béninoise dans le monde.</span>
-          </div>
-          <div className="flex items-center gap-6">
+        {/* Bottom Legal Row */}
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-[#d0e3f5] pt-6 text-xs text-[#4c657a] md:flex-row">
+          <span>© {new Date().getFullYear()} BeniLink · Trust Hub Diaspora. Tous droits réservés.</span>
+          <div className="flex items-center gap-6 font-semibold">
             <button
               type="button"
               onClick={() => navigate('cgu')}
-              className="hover:text-white transition cursor-pointer"
+              className="cursor-pointer transition hover:text-[#006191]"
             >
-              Mentions légales & CGU
+              Mentions légales &amp; CGU
             </button>
             <button
               type="button"
               onClick={() => navigate('privacy')}
-              className="hover:text-white transition cursor-pointer"
+              className="cursor-pointer transition hover:text-[#006191]"
             >
               Politique de confidentialité
             </button>

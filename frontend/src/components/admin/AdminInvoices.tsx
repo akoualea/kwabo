@@ -160,10 +160,10 @@ export const AdminInvoices: React.FC = () => {
       const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = 'kwabo-factures.csv';
+      link.download = 'benilink-factures.csv';
       link.click();
       URL.revokeObjectURL(link.href);
-      addToast('kwabo-factures.csv téléchargé.', 'success');
+      addToast('benilink-factures.csv téléchargé.', 'success');
     } catch {
       addToast("Impossible d'exporter les factures.", 'error');
     }

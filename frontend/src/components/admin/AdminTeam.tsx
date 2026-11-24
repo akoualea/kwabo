@@ -4,6 +4,13 @@ import { api, ApiError, getFirstValidationError } from '../../services/api';
 import { mapUser } from '../../services/mappers';
 import { User, UserRole } from '../../types';
 import { Icon } from '../common/Icon';
+import {
+  getMemberInternalProfile,
+  INTERNAL_PROFILES,
+  InternalProfileId,
+  recordActivity,
+  setMemberInternalProfile,
+} from '../../utils/internalOps';
 
 interface TeamMember extends User {
   activeCount: number;
@@ -11,7 +18,7 @@ interface TeamMember extends User {
 }
 
 export const AdminTeam: React.FC = () => {
-  const { addToast, confirm } = useApp();
+  const { addToast, confirm, currentUser } = useApp();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -20,6 +27,9 @@ export const AdminTeam: React.FC = () => {
   const [newLastName, setNewLastName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newPhone, setNewPhone] = useState('');
+  const [newProfileId, setNewProfileId] = useState<InternalProfileId>('agent');
+  const [newAge, setNewAge] = useState('');
+  const [profileTick, setProfileTick] = useState(0);
   const [tempPasswordNote, setTempPasswordNote] = useState<string | null>(null);
 
   const loadTeam = useCallback(async () => {
@@ -67,13 +77,15 @@ export const AdminTeam: React.FC = () => {
 
   const PERMISSIONS: [string, boolean, boolean, boolean][] = [
     ['Voir ses propres demandes et documents', true, true, true],
-    ['Écrire au client sur une demande', true, true, true],
+    ['Écrire au client sur une demande (interdit aux agents)', true, false, true],
+    ['Messagerie interne Agent ↔ Administration', false, true, true],
     ['Déposer rapports, photos, reçus', false, true, true],
     ['Changer le statut d\'une demande attribuée', false, true, true],
+    ['Générer et transmettre son rapport journalier', false, true, true],
     ['Voir toutes les demandes', false, false, true],
     ['Attribuer un agent, envoyer un devis', false, false, true],
-    ['Gérer clients, paiements et avis', false, false, true],
-    ['Gérer le catalogue et l\'équipe', false, false, true],
+    ['Créer les comptes agents (auto-inscription interdite)', false, false, true],
+    ['Gérer clients, paiements, catalogue et archives', false, false, true],
   ];
 
   const handleToggleSuspend = async (id: string, name: string, isSuspended: boolean) => {
@@ -111,8 +123,20 @@ export const AdminTeam: React.FC = () => {
           last_name: newLastName.trim(),
           email: newEmail.trim(),
           phone: newPhone.trim(),
+          internal_profile: newProfileId,
+          ...(newProfileId === 'freelance_student' && newAge ? { age: Number(newAge) } : {}),
         },
       });
+      setMemberInternalProfile(newEmail.trim(), newProfileId);
+      if (currentUser) {
+        recordActivity({
+          actorId: currentUser.id,
+          actorName: `${currentUser.firstName} ${currentUser.lastName}`.trim() || currentUser.email,
+          actorRole: 'Administrateur',
+          action: `Création du compte ${newFirstName.trim()} ${newLastName.trim()}`,
+          details: `Profil : ${INTERNAL_PROFILES.find((p) => p.id === newProfileId)?.label || newProfileId}`,
+        });
+      }
       const generatedPwd = res?.temporary_password ?? res?.password ?? res?.data?.temporary_password;
       if (generatedPwd) {
         setTempPasswordNote(`Mot de passe temporaire pour ${newEmail.trim()} : ${generatedPwd}`);
@@ -123,6 +147,7 @@ export const AdminTeam: React.FC = () => {
       setNewLastName('');
       setNewEmail('');
       setNewPhone('');
+      setNewProfileId('agent');
       await loadTeam();
     } catch (err) {
       addToast(err instanceof ApiError ? getFirstValidationError(err) : "Impossible d'ajouter l'agent.", 'error');
@@ -160,16 +185,17 @@ export const AdminTeam: React.FC = () => {
       {loading && teamMembers.length === 0 ? (
         <div className="empty">Chargement de l'équipe…</div>
       ) : (
-        <ul className="team-grid">
+        <ul className="team-grid" data-profile-tick={profileTick}>
           {teamMembers.map(u => {
             const initials = `${u.firstName[0] || ''}${u.lastName[0] || ''}`.toUpperCase() || '?';
+            const assignedProfile = getMemberInternalProfile(u.email || u.id, u.role);
             return (
               <li key={u.id} className="card">
                 <div className="client-mini">
                   <span className="avatar">{initials}</span>
                   <span>
                     <strong>{u.firstName} {u.lastName}</strong>
-                    <small>{ROLE_LABEL[u.role] || u.role}</small>
+                    <small>{assignedProfile.label || ROLE_LABEL[u.role] || u.role}</small>
                   </span>
                   {u.suspended && <span className="badge badge-red ml-auto">Suspendu</span>}
                 </div>
@@ -184,6 +210,29 @@ export const AdminTeam: React.FC = () => {
                     <span>{u.phone || '—'}</span>
                   </li>
                 </ul>
+
+                <div className="mt-3">
+                  <label className="mb-1 block text-[11px] font-semibold muted" htmlFor={`profile-${u.id}`}>
+                    Profil hiérarchique BeniLink
+                  </label>
+                  <select
+                    id={`profile-${u.id}`}
+                    value={assignedProfile.id}
+                    onChange={(e) => {
+                      const nextId = e.target.value as InternalProfileId;
+                      setMemberInternalProfile(u.email || u.id, nextId);
+                      setProfileTick((t) => t + 1);
+                      addToast(`Profil mis à jour : ${INTERNAL_PROFILES.find((p) => p.id === nextId)?.label || nextId}.`, 'info');
+                    }}
+                    className="w-full rounded-xl border border-[#d0e3f5] bg-white px-2.5 py-1.5 text-xs"
+                  >
+                    {INTERNAL_PROFILES.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
                 {u.role === 'OPERATOR' ? (
                   <p className="team-load">
@@ -207,6 +256,35 @@ export const AdminTeam: React.FC = () => {
           })}
         </ul>
       )}
+
+      {/* Organisation hiérarchique des 5 profils internes + intervenants externes */}
+      <section className="card mt-6">
+        <div className="card-head">
+          <h2>Organisation des profils BeniLink</h2>
+          <span className="badge badge-green">5 profils internes</span>
+        </div>
+        <p className="muted mb-4 text-xs sm:text-sm">
+          Seuls les administrateurs créent les comptes internes. Les prestataires techniques classiques n'ont aucun accès à la plateforme ; les étudiants freelances disposent d'un accès dédié aux livraisons locales.
+        </p>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {INTERNAL_PROFILES.map((profile, idx) => (
+            <div
+              key={profile.id}
+              className="rounded-xl border border-[#d0e3f5] bg-[#f7f9ff] p-3.5"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <strong className="text-xs sm:text-sm text-[#0d1d2b]">
+                  {profile.category === 'interne' ? `${idx + 1}. ` : ''}{profile.label}
+                </strong>
+                <span className={`badge ${profile.category === 'interne' ? 'badge-neutral' : 'badge-gold'}`}>
+                  {profile.category === 'interne' ? 'Interne' : 'Externe'}
+                </span>
+              </div>
+              <p className="mt-1.5 text-xs leading-relaxed text-[#4c657a]">{profile.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* Permissions Matrix Table */}
       <section className="card mt-6">
@@ -294,6 +372,36 @@ export const AdminTeam: React.FC = () => {
                   onChange={(e) => setNewPhone(e.target.value)}
                 />
               </div>
+
+              <div className="field">
+                <label htmlFor="agentProfile">Profil BeniLink</label>
+                <select
+                  id="agentProfile"
+                  value={newProfileId}
+                  onChange={(e) => setNewProfileId(e.target.value as InternalProfileId)}
+                >
+                  {INTERNAL_PROFILES.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {newProfileId === 'freelance_student' && (
+                <div className="field">
+                  <label htmlFor="agentAge">Âge de l'étudiant livreur</label>
+                  <input
+                    id="agentAge"
+                    type="number"
+                    min={18}
+                    max={45}
+                    placeholder="Ex. 22"
+                    value={newAge}
+                    onChange={(e) => setNewAge(e.target.value)}
+                  />
+                </div>
+              )}
 
               <div className="dialog-actions mt-6 flex justify-end gap-3">
                 <button

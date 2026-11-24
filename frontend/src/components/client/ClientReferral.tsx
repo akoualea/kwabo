@@ -47,7 +47,7 @@ export const ClientReferral: React.FC = () => {
         setReferralCode(code);
         setShareText(
           d.share_text ||
-            `Je te recommande KWABO pour tes projets au Bénin. Mon code de parrainage : ${code}`
+            `Je te recommande BeniLink pour tes projets au Bénin. Mon code de parrainage : ${code}`
         );
         setRewardPerActive(Number(d.reward_per_referral ?? 10));
         if (d.stats) {
@@ -70,7 +70,7 @@ export const ClientReferral: React.FC = () => {
         if (!cancelled) {
           const code = currentUser?.referralCode || '';
           setReferralCode(code);
-          setShareText(`Je te recommande KWABO pour tes projets au Bénin. Mon code de parrainage : ${code}`);
+          setShareText(`Je te recommande BeniLink pour tes projets au Bénin. Mon code de parrainage : ${code}`);
         }
       })
       .finally(() => {

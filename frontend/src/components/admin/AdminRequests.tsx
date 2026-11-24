@@ -111,10 +111,9 @@ export const AdminRequests: React.FC<AdminRequestsProps> = ({ isOperatorView }) 
         const opName = r.operator
           ? r.operator.fullName || `${r.operator.firstName} ${r.operator.lastName}`.trim()
           : 'Non attribuée';
-        const row = [r.tracking, r.title, s ? s.name : '', clientName];
-        if (!isOperator) {
-          row.push(opName);
-        }
+        const row = isOperator
+          ? [r.tracking, r.title, s ? s.name : '']
+          : [r.tracking, r.title, s ? s.name : '', clientName, opName];
         row.push(
           STATUS_MAP[r.status].label,
           r.urgency === 'urgent' ? 'Urgent' : 'Normale',
@@ -124,7 +123,7 @@ export const AdminRequests: React.FC<AdminRequestsProps> = ({ isOperatorView }) 
       });
 
       const header = isOperator
-        ? ['Suivi', 'Titre', 'Service', 'Client', 'Statut', 'Urgence', 'Date']
+        ? ['Suivi', 'Mission', 'Service', 'Statut', 'Urgence', 'Date']
         : ['Suivi', 'Titre', 'Service', 'Client', 'Agent', 'Statut', 'Urgence', 'Date'];
       const csvContent = [header, ...rows]
         .map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(';'))
@@ -133,10 +132,10 @@ export const AdminRequests: React.FC<AdminRequestsProps> = ({ isOperatorView }) 
       const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = 'kwabo-demandes.csv';
+      link.download = 'benilink-demandes.csv';
       link.click();
       URL.revokeObjectURL(link.href);
-      addToast('kwabo-demandes.csv téléchargé.', 'success');
+      addToast('benilink-demandes.csv téléchargé.', 'success');
     } catch {
       addToast("Impossible d'exporter les demandes.", 'error');
     }
@@ -319,8 +318,8 @@ export const AdminRequests: React.FC<AdminRequestsProps> = ({ isOperatorView }) 
                   <thead>
                     <tr>
                       <th>Suivi</th>
-                      <th>Demande</th>
-                      <th>Client</th>
+                      <th>{isOperator ? 'Mission' : 'Demande'}</th>
+                      {!isOperator && <th>Client</th>}
                       {!isOperator && <th>Agent</th>}
                       <th>Statut</th>
                       <th>Date</th>
@@ -364,7 +363,7 @@ export const AdminRequests: React.FC<AdminRequestsProps> = ({ isOperatorView }) 
                               </span>
                             )}
                           </td>
-                          <td data-label="Client">{clientName}</td>
+                          {!isOperator && <td data-label="Client">{clientName}</td>}
                           {!isOperator && (
                             <td data-label="Agent">
                               {opName || <span className="muted">Non attribuée</span>}
@@ -458,7 +457,7 @@ export const AdminRequests: React.FC<AdminRequestsProps> = ({ isOperatorView }) 
                         >
                           <strong>{r.title}</strong>
                           <small>{r.tracking}</small>
-                          <small>{clientName}</small>
+                          {!isOperator && <small>{clientName}</small>}
                           <span className="kanban-foot">
                             {r.urgency === 'urgent' && (
                               <span className="badge badge-red">

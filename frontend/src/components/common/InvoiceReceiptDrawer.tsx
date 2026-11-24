@@ -66,37 +66,37 @@ export const InvoiceReceiptDrawer: React.FC<InvoiceReceiptDrawerProps> = ({
     paid: {
       kicker: 'Reçu de paiement',
       badge: 'Paiement confirmé',
-      badgeCls: 'bg-[#e8f5ee] text-[#14532d] border-[#b7dfc4]',
+      badgeCls: 'bg-[#e3efff] text-[#006191] border-[#9fcaff]',
       amountLabel: 'Montant réglé TTC',
-      amountBoxCls: 'bg-gradient-to-br from-[#f2f9f5] to-[#e8f5ee] border-[#b7dfc4]',
-      amountTextCls: 'text-[#14532d]',
+      amountBoxCls: 'bg-gradient-to-br from-[#f7f9ff] to-[#e3efff] border-[#d0e3f5]',
+      amountTextCls: 'text-[#006191]',
       Icon: CheckCircle2,
     },
     due: {
       kicker: 'Facture à régler',
       badge: 'En attente de règlement',
-      badgeCls: 'bg-[#fef5df] text-[#854d0e] border-[#f5da91]',
+      badgeCls: 'bg-[#ffdf93] text-[#765b00] border-[#f2c02c]',
       amountLabel: 'Montant à payer TTC',
-      amountBoxCls: 'bg-gradient-to-br from-[#fdf9ee] to-[#fef5df] border-[#f5da91]',
-      amountTextCls: 'text-[#854d0e]',
+      amountBoxCls: 'bg-gradient-to-br from-[#fffdf5] to-[#ffdf93]/40 border-[#f2c02c]',
+      amountTextCls: 'text-[#765b00]',
       Icon: Clock,
     },
     refunded: {
       kicker: 'Reçu de remboursement',
       badge: 'Remboursée',
-      badgeCls: 'bg-[#e8f2fc] text-[#1e40af] border-[#bfdbfe]',
+      badgeCls: 'bg-[#d1e4ff] text-[#004b71] border-[#8fcdff]',
       amountLabel: 'Montant remboursé TTC',
-      amountBoxCls: 'bg-gradient-to-br from-[#f3f8fe] to-[#e8f2fc] border-[#bfdbfe]',
-      amountTextCls: 'text-[#1e40af]',
+      amountBoxCls: 'bg-gradient-to-br from-[#f7f9ff] to-[#d1e4ff] border-[#8fcdff]',
+      amountTextCls: 'text-[#004b71]',
       Icon: RotateCcw,
     },
     cancelled: {
       kicker: 'Facture annulée',
       badge: 'Annulée',
-      badgeCls: 'bg-[#fdeaea] text-[#991b1b] border-[#f8c6c6]',
+      badgeCls: 'bg-[#ffdad6] text-[#93000a] border-[#ba1a1a]/30',
       amountLabel: 'Montant annulé',
-      amountBoxCls: 'bg-[#f9faf9] border-[#e2e7e3]',
-      amountTextCls: 'text-[#56635b]',
+      amountBoxCls: 'bg-[#f7f9ff] border-[#d0e3f5]',
+      amountTextCls: 'text-[#4c657a]',
       Icon: XCircle,
     },
   } as const;
@@ -124,9 +124,9 @@ export const InvoiceReceiptDrawer: React.FC<InvoiceReceiptDrawerProps> = ({
           const isPaid = invoice.status === 'paid';
 
           return (
-            <div className="flex min-h-full flex-col bg-[#f7f8f6]">
+            <div className="flex min-h-full flex-col bg-[#f7f9ff]">
               {/* Header band */}
-              <div className="relative bg-gradient-to-br from-[#103823] to-[#1a5c38] px-6 pb-6 pt-5 text-white border-b-4 border-[#f0c040]">
+              <div className="relative bg-gradient-to-br from-[#084d82] to-[#006191] px-6 pb-6 pt-5 text-white border-b-4 border-[#f7c531]">
                 <button
                   ref={closeButtonRef}
                   type="button"
@@ -137,23 +137,22 @@ export const InvoiceReceiptDrawer: React.FC<InvoiceReceiptDrawerProps> = ({
                   <X className="h-5 w-5" />
                 </button>
 
-                <div className="flex items-center gap-2.5">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f0c040] font-display text-lg font-bold text-[#103823]">
-                    K
-                  </span>
-                  <div>
-                    <div className="font-display text-base font-bold tracking-wide leading-none">
-                      KWABO<span className="text-[#f0c040]">.</span>
-                    </div>
-                    <div className="mt-0.5 text-[11px] text-white/75">
-                      Services de confiance · Cotonou
-                    </div>
+                <div className="flex items-center gap-3">
+                  <div className="rounded-xl bg-white px-2.5 py-1.5 shadow-sm">
+                    <img
+                      src="/assets/benilink-logo.png"
+                      alt="BeniLink"
+                      className="h-7 w-auto object-contain"
+                    />
+                  </div>
+                  <div className="text-[11px] text-[#cbe6ff]">
+                    Trust Hub Diaspora · Cotonou
                   </div>
                 </div>
 
                 <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
                   <div>
-                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#f5d162]">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#ffdf93]">
                       {cfg.kicker}
                     </p>
                     <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-white">
@@ -173,38 +172,38 @@ export const InvoiceReceiptDrawer: React.FC<InvoiceReceiptDrawerProps> = ({
                 <div className={`rounded-2xl border p-4 shadow-sm ${cfg.amountBoxCls}`}>
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-[#4b5a50]">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-[#4c657a]">
                         {cfg.amountLabel}
                       </p>
-                      <p className={`mt-1 font-display text-3xl font-bold tracking-tight ${cfg.amountTextCls}`}>
+                      <p className={`mt-1 font-display text-3xl font-bold tracking-tight tnum ${cfg.amountTextCls}`}>
                         {formatMoney(invoice.amount)}
                       </p>
                     </div>
                     {isPaid && (
-                      <span className="rounded-lg border-2 border-[#1a5c3a] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#1a5c3a]">
+                      <span className="rounded-lg border-2 border-[#006191] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#006191]">
                         Acquitté
                       </span>
                     )}
                   </div>
                   {isPaid && invoice.paidAt && (
-                    <p className="mt-2.5 border-t border-[#b7dfc4]/70 pt-2 text-xs font-medium text-[#14532d]">
+                    <p className="mt-2.5 border-t border-[#d0e3f5] pt-2 text-xs font-medium text-[#006191]">
                       Règlement validé le {formatDateLong(invoice.paidAt)} via {methodLabel}
                     </p>
                   )}
                 </div>
 
                 {/* Perforated-style Details Card */}
-                <div className="rounded-2xl border border-[#e0e6e2] bg-white p-4 shadow-sm space-y-3.5">
-                  <div className="border-b border-dashed border-[#d7dfd9] pb-3">
-                    <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#5f6f64]">
-                      <FileText className="h-3.5 w-3.5 text-[#1a5c3a]" />
+                <div className="rounded-2xl border border-[#d0e3f5] bg-white p-4 shadow-sm space-y-3.5">
+                  <div className="border-b border-dashed border-[#d0e3f5] pb-3">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#4c657a]">
+                      <FileText className="h-3.5 w-3.5 text-[#006191]" />
                       <span>Prestation réglée</span>
                     </div>
-                    <p className="mt-1 text-sm font-bold text-[#1a1f1b]">
+                    <p className="mt-1 text-sm font-bold text-[#0d1d2b]">
                       {invoice.label}
                     </p>
                     {invoice.request && (
-                      <p className="mt-0.5 text-xs text-[#56635b]">
+                      <p className="mt-0.5 text-xs text-[#4c657a]">
                         Mission : {invoice.request.title} ({invoice.request.tracking})
                       </p>
                     )}
@@ -212,57 +211,57 @@ export const InvoiceReceiptDrawer: React.FC<InvoiceReceiptDrawerProps> = ({
 
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-3.5 text-xs">
                     <div>
-                      <dt className="flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-wider text-[#6b7870]">
+                      <dt className="flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-wider text-[#4c657a]">
                         <UserIcon className="h-3 w-3" /> Client
                       </dt>
-                      <dd className="mt-0.5 font-semibold text-[#1a1f1b]">{clientName}</dd>
+                      <dd className="mt-0.5 font-semibold text-[#0d1d2b]">{clientName}</dd>
                       {(clientEmail || clientCountry) && (
-                        <dd className="mt-0.5 text-[11px] text-[#56635b] break-all">
+                        <dd className="mt-0.5 text-[11px] text-[#4c657a] break-all">
                           {clientEmail || clientCountry}
                         </dd>
                       )}
                     </div>
 
                     <div>
-                      <dt className="flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-wider text-[#6b7870]">
+                      <dt className="flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-wider text-[#4c657a]">
                         <Hash className="h-3 w-3" /> Référence
                       </dt>
-                      <dd className="mt-0.5 font-semibold text-[#1a1f1b]">
+                      <dd className="mt-0.5 font-semibold text-[#0d1d2b]">
                         {invoice.request?.tracking || invNum}
                       </dd>
                     </div>
 
                     <div>
-                      <dt className="flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-wider text-[#6b7870]">
+                      <dt className="flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-wider text-[#4c657a]">
                         <Calendar className="h-3 w-3" /> Date d'émission
                       </dt>
-                      <dd className="mt-0.5 font-semibold text-[#1a1f1b]">
+                      <dd className="mt-0.5 font-semibold text-[#0d1d2b]">
                         {formatDateLong(invoice.createdAt)}
                       </dd>
                     </div>
 
                     <div>
-                      <dt className="flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-wider text-[#6b7870]">
+                      <dt className="flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-wider text-[#4c657a]">
                         <MethodIcon className="h-3 w-3" /> Moyen
                       </dt>
-                      <dd className="mt-0.5 font-semibold text-[#1a1f1b]">{methodLabel}</dd>
+                      <dd className="mt-0.5 font-semibold text-[#0d1d2b]">{methodLabel}</dd>
                     </div>
                   </dl>
                 </div>
 
                 {/* Security / Official Notice */}
-                <div className="flex items-start gap-2.5 rounded-2xl border border-[#e3e7e4] bg-white/80 p-3.5 text-xs text-[#56635b]">
-                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#1a5c3a]" />
+                <div className="flex items-start gap-2.5 rounded-2xl border border-[#d0e3f5] bg-white/90 p-3.5 text-xs text-[#4c657a]">
+                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#006191]" />
                   <p className="leading-relaxed">
                     {isPaid
-                      ? 'Justificatif officiel KWABO Services. Ce reçu atteste du règlement complet de la prestation.'
-                      : 'Document généré par KWABO Services. Aucune donnée bancaire n’est conservée sur la plateforme.'}
+                      ? 'Justificatif officiel BeniLink Services. Ce reçu atteste du règlement complet de la prestation.'
+                      : 'Document généré par BeniLink Services. Aucune donnée bancaire n’est conservée sur la plateforme.'}
                   </p>
                 </div>
               </div>
 
               {/* Sticky Footer Actions */}
-              <div className="sticky bottom-0 flex flex-wrap items-center justify-end gap-2.5 border-t border-[#e0e6e2] bg-white px-5 py-3.5">
+              <div className="sticky bottom-0 flex flex-wrap items-center justify-end gap-2.5 border-t border-[#d0e3f5] bg-white px-5 py-3.5">
                 {invoice.status === 'due' && onPay && (
                   <button
                     type="button"

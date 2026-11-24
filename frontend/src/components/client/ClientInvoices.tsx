@@ -7,6 +7,7 @@ import { InvoiceReceiptDrawer } from '../common/InvoiceReceiptDrawer';
 import { api, ApiError } from '../../services/api';
 import { mapInvoice } from '../../services/mappers';
 import { printInvoicePdf } from '../../utils/printPdf';
+import { formatConvertedMoney, useCurrency } from '../../data/worldCountries';
 
 // Apparition en cascade : chaque bloc monte légèrement en fondu, l'un après l'autre.
 const container: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
@@ -18,6 +19,7 @@ const item: Variants = {
 
 export const ClientInvoices: React.FC = () => {
   const { currentUser, refreshCounters, addToast, confirm } = useApp();
+  const { currency } = useCurrency();
   const reduceMotion = useReducedMotion();
 
   const [invoices, setInvoices] = useState<InvoiceItem[]>([]);
@@ -80,8 +82,7 @@ export const ClientInvoices: React.FC = () => {
   const invoiceCount = metaTotals ? metaTotals.count : invoices.length;
 
   /* ── helpers ── */
-  const money = (n: number) =>
-    new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+  const money = (n: number) => formatConvertedMoney(n, currency);
   const fmtDate = (iso: string) =>
     new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
 
@@ -330,7 +331,7 @@ export const ClientInvoices: React.FC = () => {
           <section className="card card-soft">
             <h2><Icon name="lock-closed" size={20} /> Paiement sécurisé</h2>
             <p className="muted">
-              Le paiement se fait chez Stripe, Flutterwave ou Wise. KWABO ne conserve jamais les données de votre carte bancaire.
+              Le paiement se fait chez Stripe, Flutterwave ou Wise. BeniLink ne conserve jamais les données de votre carte bancaire.
             </p>
           </section>
         </motion.div>
@@ -366,7 +367,7 @@ export const ClientInvoices: React.FC = () => {
                 </fieldset>
 
                 <p className="muted small">
-                  <Icon name="lock-closed" size={16} /> Vous serez redirigé vers le prestataire. KWABO ne voit jamais les données de votre carte.
+                  <Icon name="lock-closed" size={16} /> Vous serez redirigé vers le prestataire. BeniLink ne voit jamais les données de votre carte.
                 </p>
 
                 <div className="dialog-actions">

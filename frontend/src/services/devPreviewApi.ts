@@ -158,7 +158,7 @@ export async function handleDevPreviewRequest(
   const isOperator = activeUser.role === 'operator';
 
   if (path === '/ping') {
-    return { message: 'API KWABO OK' };
+    return { message: 'API BeniLink OK' };
   }
 
   if (path === '/logout') {
@@ -435,7 +435,7 @@ export async function handleDevPreviewRequest(
         role: 'OPERATOR',
         firstName: String(body.first_name || 'Agent'),
         lastName: String(body.last_name || 'Terrain'),
-        email: String(body.email || `agent${Date.now()}@kwabo.bj`),
+        email: String(body.email || `agent${Date.now()}@benilink.bj`),
         phone: String(body.phone || '+229 01 00 00 00 00'),
         country: 'Bénin',
         verified: true,
@@ -665,7 +665,7 @@ export async function handleDevPreviewRequest(
       const sp = usersState.find((u) => u.id === userId) || {
         id: userId,
         firstName: 'Client',
-        lastName: 'KWABO',
+        lastName: 'BeniLink',
         referralCode: 'KW-DEMO',
       };
       const converted = refs.filter((r) => r.status === 'Actif').length;

@@ -11,6 +11,7 @@ import {
   mapServiceItem,
 } from '../../services/mappers';
 import { DocumentItem, InvoiceItem, NotificationItem, RequestItem, Service } from '../../types';
+import { formatConvertedMoney, useCurrency } from '../../data/worldCountries';
 
 /* Animations ajoutées (CSS uniquement, aucune logique modifiée) */
 const DASHBOARD_ANIMATIONS = `
@@ -41,9 +42,9 @@ const DASHBOARD_ANIMATIONS = `
   to   { transform: scale(1.14); }
 }
 @keyframes kwCurrentPulse {
-  0%   { box-shadow: 0 0 0 0 rgba(212, 160, 23, 0.5); }
-  70%  { box-shadow: 0 0 0 10px rgba(212, 160, 23, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(212, 160, 23, 0); }
+  0%   { box-shadow: 0 0 0 0 rgba(247, 197, 49, 0.55); }
+  70%  { box-shadow: 0 0 0 10px rgba(247, 197, 49, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(247, 197, 49, 0); }
 }
 @keyframes kwAlertShake {
   0%, 100% { transform: translateX(0); }
@@ -93,60 +94,11 @@ const DASHBOARD_ANIMATIONS = `
   transform: scale(1.15) rotate(-6deg);
 }
 
-/* Cartes de statistiques : une couleur par carte, texte blanc, sans soulignement */
+/* Cartes de statistiques BeniLink : fond blanc épuré, bordure #d0e3f5, icône colorée */
 .stats .kw-stat {
   position: relative;
   overflow: hidden;
-  border: none !important;
-  box-shadow: 0 8px 20px rgba(18, 63, 40, 0.25);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-.stats .kw-stat::after {
-  content: '';
-  position: absolute;
-  right: -28px;
-  bottom: -34px;
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  pointer-events: none;
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.stats .kw-stat:hover::after {
-  transform: scale(1.35);
-}
-.stats .kw-stat,
-.stats .kw-stat * {
-  color: #ffffff !important;
-}
-.stats .kw-stat a,
-.stats .kw-stat a:hover,
-.stats .kw-stat a:focus {
-  text-decoration: none !important;
-}
-.stats .kw-stat .tile {
-  background: rgba(255, 255, 255, 0.2) !important;
-}
-.stats .kw-stat:hover {
-  box-shadow: 0 14px 28px rgba(18, 63, 40, 0.35);
-}
-
-/* 1. Vert profond */
-.stats .kw-stat:nth-child(1) {
-  background: linear-gradient(135deg, #1a5c38 0%, #123f28 100%) !important;
-}
-/* 2. Vert franc */
-.stats .kw-stat:nth-child(2) {
-  background: linear-gradient(135deg, #3a8a5c 0%, #2a7048 100%) !important;
-}
-/* 3. Or foncé */
-.stats .kw-stat:nth-child(3) {
-  background: linear-gradient(135deg, #b8860b 0%, #8f6a08 100%) !important;
-}
-/* 4. Ardoise */
-.stats .kw-stat:nth-child(4) {
-  background: linear-gradient(135deg, #455a4f 0%, #2f4036 100%) !important;
 }
 
 /* Alerte devis */
@@ -316,9 +268,8 @@ export const ClientDashboard: React.FC = () => {
 
   const userNotifs = dashNotifs.length > 0 ? dashNotifs : globalNotifications.filter(n => !n.read);
 
-  const formatMoney = (n: number) => {
-    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
-  };
+  const { currency } = useCurrency();
+  const formatMoney = (n: number) => formatConvertedMoney(n, currency);
 
   const formatDate = (iso: string) => {
     const d = new Date(iso);
@@ -339,44 +290,35 @@ export const ClientDashboard: React.FC = () => {
     <>
       <style>{DASHBOARD_ANIMATIONS}</style>
 
-      {/* Welcome Banner enrichi avec image de fond & animations */}
-      <section className="welcome relative overflow-hidden shadow-lg border border-[#123f28]/30">
-        <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-          <img
-            src="/assets/photos/cotonou.jpg"
-            alt="Bénin"
-            className="w-full h-full object-cover filter brightness-75 scale-105 kw-welcome-img"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#123f28] via-[#1a4d30] to-transparent" />
-        </div>
+      {/* Compact Welcome Banner BeniLink (sans image de fond ni badge superflu) */}
+      <section className="welcome relative overflow-hidden shadow-md border border-[#084d82]/25">
         <div className="relative z-10">
-       
           <h2 className="kw-greeting" aria-label={`Bonjour ${currentUser?.firstName ?? ''}`}>
             {greetingWords.map((word, i) => (
               <span
                 key={`${word}-${i}`}
                 className="kw-word"
                 aria-hidden="true"
-                style={{ animationDelay: `${0.2 + i * 0.55}s` }}
+                style={{ animationDelay: `${0.15 + i * 0.35}s` }}
               >
                 {word}
               </span>
             ))}
           </h2>
-          <p className="max-w-xl text-sm sm:text-base text-white/90 kw-welcome-text">
+          <p className="max-w-xl text-xs sm:text-sm text-[#e8f2ff] kw-welcome-text">
             {active
               ? `Votre mission « ${active.title} » avance. Tout est à jour ci-dessous.`
               : 'Dites-nous ce dont vous avez besoin au Bénin, nous nous en occupons avec preuves et rigueur.'}
           </p>
         </div>
-        <div className="relative z-10 flex flex-wrap items-center gap-3 kw-welcome-cta">
+        <div className="relative z-10 flex items-center gap-3 kw-welcome-cta">
           <button
-            className="btn btn-gold btn-lg shadow-md hover:shadow-lg transition-transform hover:-translate-y-0.5 active:translate-y-0"
+            className="btn btn-gold shadow-md hover:shadow-lg transition-transform hover:-translate-y-0.5 active:translate-y-0"
             type="button"
             onClick={() => navigate('client-new-request')}
           >
-            <Icon name="plus-circle" size={20} />
-            <span>Nouvelle demande </span>
+            <Icon name="plus-circle" size={18} />
+            <span>Nouvelle demande</span>
           </button>
         </div>
       </section>
@@ -677,7 +619,7 @@ export const ClientDashboard: React.FC = () => {
                   <strong>{s.name}</strong>
                   <span className="muted">{s.short}</span>
                   <span className="service-card-foot">
-                    <span className="price">{s.price}</span>
+                    <span className="price">Sur devis</span>
                     <Icon name="arrow-right" size={18} />
                   </span>
                 </span>

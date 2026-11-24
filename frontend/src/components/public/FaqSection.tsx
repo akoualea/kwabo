@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { FAQ_LIST } from '../../data/kwaboData';
 import { ChevronDown } from 'lucide-react';
 
-const HEADING_WORDS = 'Tout ce que vous devez savoir avant de démarrer'.split(' ');
+const HEADING_WORDS = 'Questions fréquentes de la Diaspora'.split(' ');
 
 export const FaqSection: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -14,97 +14,73 @@ export const FaqSection: React.FC = () => {
   };
 
   return (
-    <section id="faq" className="py-20 bg-white border-b border-[#e0e8e4]">
-      <style>{`
-        @keyframes kwFaqShimmer {
-          0%   { background-position: 120% 50%; }
-          100% { background-position: -120% 50%; }
-        }
-        .kw-faq-headline-word {
-          background-image: linear-gradient(105deg, #1a1f1b 38%, #1a5c3a 50%, #1a1f1b 62%);
-          background-size: 240% 100%;
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-          animation: kwFaqShimmer 4.5s ease-in-out infinite;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .kw-faq-headline-word {
-            background: none;
-            color: #1a1f1b;
-            animation: none;
-          }
-        }
-      `}</style>
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+    <section id="faq" className="border-t border-[#d0e3f5] bg-[#edf4ff] py-20">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 text-center">
           <motion.span
-            initial={reduceMotion ? false : { opacity: 0, y: 10, scale: 0.96 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, amount: 0.6 }}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
-            className="text-sm sm:text-[15px] font-bold uppercase tracking-wider text-[#1a5c3a] bg-[#e8f5ee] px-5 py-2 rounded-full inline-block"
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+            className="inline-block rounded-full bg-[#e3efff] px-4 py-1 text-[11px] font-bold uppercase tracking-wider text-[#006191]"
           >
-            Questions fréquentes
+            Foire aux questions
           </motion.span>
 
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-[44px] font-extrabold text-[#1a1f1b] mt-4 leading-tight tracking-[0.01em] max-w-5xl mx-auto">
+          <h2 className="mx-auto mt-2 max-w-4xl font-display text-3xl font-semibold leading-tight text-[#0d1d2b] sm:text-4xl">
             {HEADING_WORDS.map((word, idx) => (
               <motion.span
                 key={`${word}-${idx}`}
-                initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+                initial={reduceMotion ? false : { opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: false, amount: 0.5 }}
                 transition={{
-                  duration: 0.45,
-                  delay: reduceMotion ? 0 : idx * 0.055,
+                  duration: 0.4,
+                  delay: reduceMotion ? 0 : idx * 0.05,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className={`inline-block mr-[0.26em] last:mr-0 ${reduceMotion ? '' : 'kw-faq-headline-word'}`}
-                style={reduceMotion ? undefined : { animationDelay: `${idx * 0.08}s` }}
+                className="mr-[0.26em] inline-block last:mr-0"
               >
                 {word}
               </motion.span>
             ))}
           </h2>
 
-          <motion.div
-            initial={reduceMotion ? false : { scaleX: 0, opacity: 0 }}
-            whileInView={{ scaleX: 1, opacity: 1 }}
-            viewport={{ once: false, amount: 0.5 }}
-            transition={{ duration: 0.6, delay: 0.25, ease: 'easeOut' }}
-            className="mx-auto mt-3 h-1 w-24 origin-center rounded-full bg-gradient-to-r from-[#1a5c3a] via-[#f0c040] to-[#1a5c3a]"
-          />
+          <div className="mx-auto mt-3 h-1 w-24 rounded-full bg-gradient-to-r from-[#006191] via-[#f7c531] to-[#006191]" />
 
-          <p className="text-sm sm:text-base text-[#56635b] mt-3 max-w-3xl mx-auto">
+          <p className="mx-auto mt-3 max-w-2xl text-sm text-[#3f4850] sm:text-base">
             La transparence est notre premier engagement. Voici les réponses à vos interrogations légitimes.
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto space-y-4">
+        <div className="mx-auto max-w-4xl space-y-3.5">
           {FAQ_LIST.map((item, idx) => {
             const isOpen = openIndex === idx;
             return (
               <div
                 key={idx}
-                className="border border-[#e0e8e4] rounded-2xl overflow-hidden transition-all duration-200"
+                className="overflow-hidden rounded-2xl border border-[#d0e3f5] bg-white shadow-xs transition-all duration-200"
               >
                 <button
                   type="button"
                   onClick={() => toggle(idx)}
-                  className="w-full p-5 text-left flex items-center justify-between gap-4 bg-white hover:bg-[#f9f7f4] transition-colors"
+                  aria-expanded={isOpen}
+                  className="flex w-full items-center justify-between gap-4 bg-white p-5 text-left transition-colors hover:bg-[#edf4ff]/60"
                 >
-                  <span className="font-display font-bold text-sm sm:text-base text-[#1a1f1b]">
+                  <span className="font-sans text-sm font-semibold text-[#0d1d2b] sm:text-base">
                     {item.q}
                   </span>
-                  <div className={`w-7 h-7 rounded-full bg-[#f9f7f4] flex items-center justify-center shrink-0 transition-transform ${isOpen ? 'rotate-180 bg-[#1a5c3a] text-white' : 'text-neutral-500'}`}>
-                    <ChevronDown className="w-4 h-4" />
+                  <div
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-transform ${
+                      isOpen ? 'rotate-180 bg-[#006191] text-white' : 'bg-[#edf4ff] text-[#006191]'
+                    }`}
+                  >
+                    <ChevronDown className="h-4 w-4" aria-hidden="true" />
                   </div>
                 </button>
 
                 {isOpen && (
-                  <div className="p-5 pt-0 bg-white text-xs sm:text-sm text-[#56635b] leading-relaxed border-t border-neutral-100">
+                  <div className="border-t border-[#edf4ff] bg-white px-5 pb-5 text-sm leading-relaxed text-[#3f4850]">
                     <p className="pt-3">{item.a}</p>
                   </div>
                 )}
@@ -112,7 +88,6 @@ export const FaqSection: React.FC = () => {
             );
           })}
         </div>
-
       </div>
     </section>
   );

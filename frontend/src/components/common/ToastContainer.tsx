@@ -5,30 +5,30 @@ import { CheckCircle2, AlertTriangle, XCircle, Info, X } from 'lucide-react';
 const TOAST_META = {
   success: {
     icon: CheckCircle2,
-    iconBox: 'bg-[#e8f5ee] text-[#1a5c3a]',
-    accentBar: 'bg-[#1a5c3a]',
-    border: 'border-[#cfe5d7]',
+    iconBox: 'bg-[#e3efff] text-[#006191]',
+    accentBar: 'bg-[#006191]',
+    border: 'border-[#d0e3f5]',
     durationMs: 4500,
   },
   error: {
     icon: XCircle,
-    iconBox: 'bg-[#fdf0ea] text-[#a8420f]',
-    accentBar: 'bg-[#c9561e]',
-    border: 'border-[#f2d0be]',
+    iconBox: 'bg-[#ffdad6] text-[#93000a]',
+    accentBar: 'bg-[#ba1a1a]',
+    border: 'border-[#ba1a1a]/30',
     durationMs: 6000,
   },
   warning: {
     icon: AlertTriangle,
-    iconBox: 'bg-[#fdf6e0] text-[#8a6200]',
-    accentBar: 'bg-[#d4a017]',
-    border: 'border-[#f1e3ae]',
+    iconBox: 'bg-[#ffdf93] text-[#765b00]',
+    accentBar: 'bg-[#e0a410]',
+    border: 'border-[#f2c02c]',
     durationMs: 5500,
   },
   info: {
     icon: Info,
-    iconBox: 'bg-[#eef4f8] text-[#1d4e6b]',
-    accentBar: 'bg-[#2a6f97]',
-    border: 'border-[#d3e2ec]',
+    iconBox: 'bg-[#d1e4ff] text-[#084d82]',
+    accentBar: 'bg-[#1593d6]',
+    border: 'border-[#9fcaff]',
     durationMs: 4500,
   },
 } as const;
@@ -74,7 +74,7 @@ export const ToastContainer: React.FC = () => {
           <div
             key={t.id}
             role={t.type === 'error' ? 'alert' : 'status'}
-            className={`kw-toast-item pointer-events-auto relative overflow-hidden rounded-2xl border bg-white/95 backdrop-blur-md shadow-[0_14px_36px_rgba(18,63,40,0.16)] ${meta.border}`}
+            className={`kw-toast-item pointer-events-auto relative overflow-hidden rounded-2xl border bg-white/95 backdrop-blur-md shadow-[0_14px_36px_rgba(8,77,130,0.16)] ${meta.border}`}
           >
             <div className="flex items-center gap-3 p-3.5 pr-3">
               <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${meta.iconBox}`}>

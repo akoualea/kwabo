@@ -6,8 +6,8 @@ import { api } from '../../services/api';
 import { mapAudit, mapRequest } from '../../services/mappers';
 import { AuditLogItem, Category, RequestItem } from '../../types';
 
-/* Palette des graphiques */
-const CHART_COLORS = ['#1a5c38', '#d4a017', '#3f8f63', '#8a6d1d', '#6bb38a', '#b8860b', '#2f7a4f', '#e3c14f'];
+/* Palette des graphiques BeniLink */
+const CHART_COLORS = ['#006191', '#e0a410', '#1593d6', '#765b00', '#296197', '#f7c531', '#084d82', '#8fc2fe'];
 
 /* Animations ajoutées (CSS uniquement, aucune logique modifiée) */
 const ADMIN_DASHBOARD_ANIMATIONS = `
@@ -167,60 +167,11 @@ const ADMIN_DASHBOARD_ANIMATIONS = `
   opacity: 0.8;
 }
 
-/* Cartes de statistiques : une couleur par carte, texte blanc, sans soulignement */
+/* Cartes de statistiques BeniLink : fond blanc épuré, bordure #d0e3f5 */
 .stats .kw-stat {
   position: relative;
   overflow: hidden;
-  border: none !important;
-  box-shadow: 0 8px 20px rgba(18, 63, 40, 0.25);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-.stats .kw-stat::after {
-  content: '';
-  position: absolute;
-  right: -28px;
-  bottom: -34px;
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  pointer-events: none;
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.stats .kw-stat:hover::after {
-  transform: scale(1.35);
-}
-.stats .kw-stat,
-.stats .kw-stat * {
-  color: #ffffff !important;
-}
-.stats .kw-stat a,
-.stats .kw-stat a:hover,
-.stats .kw-stat a:focus {
-  text-decoration: none !important;
-}
-.stats .kw-stat .tile {
-  background: rgba(255, 255, 255, 0.2) !important;
-}
-.stats .kw-stat:hover {
-  box-shadow: 0 14px 28px rgba(18, 63, 40, 0.35);
-}
-
-/* 1. Vert profond */
-.stats .kw-stat:nth-child(1) {
-  background: linear-gradient(135deg, #1a5c38 0%, #123f28 100%) !important;
-}
-/* 2. Vert franc */
-.stats .kw-stat:nth-child(2) {
-  background: linear-gradient(135deg, #3a8a5c 0%, #2a7048 100%) !important;
-}
-/* 3. Or foncé */
-.stats .kw-stat:nth-child(3) {
-  background: linear-gradient(135deg, #b8860b 0%, #8f6a08 100%) !important;
-}
-/* 4. Ardoise */
-.stats .kw-stat:nth-child(4) {
-  background: linear-gradient(135deg, #455a4f 0%, #2f4036 100%) !important;
 }
 
 /* Bouton « Voir le graphe » */
@@ -237,24 +188,24 @@ const ADMIN_DASHBOARD_ANIMATIONS = `
   font-size: 0.8rem;
   font-weight: 600;
   line-height: 1;
-  color: #1a5c38;
-  background: rgba(26, 92, 56, 0.08);
-  border: 1px solid rgba(26, 92, 56, 0.25);
+  color: #006191;
+  background: #e3efff;
+  border: 1px solid #d0e3f5;
   border-radius: 999px;
   cursor: pointer;
   transition: transform 0.2s ease, background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
 }
 .kw-toggle-btn:hover {
   transform: translateY(-2px);
-  background: #1a5c38;
+  background: #006191;
   color: #fff;
-  box-shadow: 0 4px 12px rgba(26, 92, 56, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 97, 145, 0.25);
 }
 .kw-toggle-btn:active {
   transform: scale(0.96);
 }
 .kw-toggle-btn:focus-visible {
-  outline: 2px solid #d4a017;
+  outline: 2px solid #f7c531;
   outline-offset: 2px;
 }
 

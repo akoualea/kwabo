@@ -2,9 +2,9 @@ import { Category, Service, User, RequestItem, DocumentItem, MessageItem, Invoic
 
 export const WHATSAPP_NUMBER = '2290166730274';
 export const WHATSAPP_DISPLAY = '+229 01 66 73 02 74';
-export const getWhatsAppLink = (text: string = 'Bonjour KWABO, je souhaite un renseignement') =>
+export const getWhatsAppLink = (text: string = 'Bonjour BeniLink, je souhaite un renseignement') =>
   `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-export const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=Bonjour%20KWABO%2C%20je%20souhaite%20un%20renseignement`;
+export const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=Bonjour%20BeniLink%2C%20je%20souhaite%20un%20renseignement`;
 
 export const CITIES = ['Cotonou', 'Abomey-Calavi', 'Porto-Novo', 'Ouidah', 'Parakou', 'Abomey', 'Bohicon', 'Autre ville'];
 export const COUNTRIES = ['France', 'Belgique', 'Canada', 'États-Unis', 'Allemagne', 'Italie', 'Royaume-Uni', 'Suisse', 'Gabon', 'Côte d\'Ivoire', 'Sénégal', 'Bénin', 'Autre'];
@@ -308,7 +308,7 @@ export const TRUST_POINTS = [
 export const FAQ_LIST = [
   { 
     q: 'Comment être sûr que le travail est réellement effectué sur place ?', 
-    a: 'Pour chaque mission, un agent terrain KWABO dédié se rend physiquement sur place. Vous recevez dans votre espace client des vidéos 360°, des photographies horodatées et géolocalisées, ainsi que les factures et reçus scannés de chaque dépense effectuée.' 
+    a: 'Pour chaque mission, un agent terrain BeniLink dédié se rend physiquement sur place. Vous recevez dans votre espace client des vidéos 360°, des photographies horodatées et géolocalisées, ainsi que les factures et reçus scannés de chaque dépense effectuée.' 
   },
   { 
     q: 'La création de compte et la demande de devis sont-elles gratuites ?', 
@@ -327,7 +327,7 @@ export const FAQ_LIST = [
     a: 'Oui ! Chaque mission dispose d\'un fil de messagerie dédié dans votre espace client. De plus, notre support client est joignable directement par WhatsApp 7j/7.' 
   },
   { 
-    q: 'Où se situe l\'équipe physique de KWABO au Bénin ?', 
+    q: 'Où se situe l\'équipe physique de BeniLink au Bénin ?', 
     a: 'Notre siège opérationnel est situé à Cotonou (Haie Vive), avec des agents mobiles intervenant à Cotonou, Abomey-Calavi, Porto-Novo, Ouidah, Parakou et Bohicon.' 
   },
 ];
@@ -382,8 +382,8 @@ export const SEED_USERS: User[] = [
     id: 'u10',
     role: 'ADMIN',
     firstName: 'Équipe',
-    lastName: 'KWABO',
-    email: 'admin@kwabo.demo',
+    lastName: 'BeniLink',
+    email: 'admin@benilink.demo',
     country: 'Bénin',
     phone: '+229 01 00 00 00 00',
     password: 'demo',
@@ -576,10 +576,10 @@ export const SEED_DOCUMENTS: DocumentItem[] = [
 ];
 
 export const SEED_MESSAGES: MessageItem[] = [
-  { id: 'm1', requestId: 'r0001', from: 'team', author: 'Équipe KWABO', text: 'Bonjour Aïcha, votre rapport de la semaine 4 est déposé dans vos documents avec la vidéo 360°.', at: '2026-11-06T15:30:00Z', read: true },
+  { id: 'm1', requestId: 'r0001', from: 'team', author: 'Équipe BeniLink', text: 'Bonjour Aïcha, votre rapport de la semaine 4 est déposé dans vos documents avec la vidéo 360°.', at: '2026-11-06T15:30:00Z', read: true },
   { id: 'm2', requestId: 'r0001', from: 'client', author: 'Aïcha Sossa', text: 'Merci beaucoup ! La qualité des parpaings a bien été vérifiée par M. Dossou ?', at: '2026-11-07T09:12:00Z', read: true },
   { id: 'm3', requestId: 'r0001', from: 'team', author: 'Maxime Dossou (Agent)', text: 'Oui Aïcha, nous avons vérifié le dosage et le séchage des briques sur place. Le reçu du fournisseur et les photos de contrôle sont dans vos documents.', at: '2026-11-07T10:05:00Z', read: false },
-  { id: 'm4', requestId: 'r0002', from: 'team', author: 'Équipe KWABO', text: 'Votre devis de 45 € est prêt. Dès votre paiement validé, notre agent prend en charge la livraison de l\'ordonnance.', at: '2026-11-09T08:15:00Z', read: false },
+  { id: 'm4', requestId: 'r0002', from: 'team', author: 'Équipe BeniLink', text: 'Votre devis de 45 € est prêt. Dès votre paiement validé, notre agent prend en charge la livraison de l\'ordonnance.', at: '2026-11-09T08:15:00Z', read: false },
   { id: 'm5', requestId: 'r0004', from: 'client', author: 'Romuald Agbo', text: 'Bonjour, pouvez-vous me confirmer la date de départ du prochain bateau pour Cotonou ?', at: '2026-11-09T07:20:00Z', read: false },
 ];
 
@@ -598,11 +598,11 @@ export const SEED_REVIEWS: ReviewItem[] = [
 ];
 
 export const SEED_AUDIT: AuditItem[] = [
-  { id: 'j1', at: '2026-11-09T08:00:00Z', actor: 'Équipe KWABO', text: 'Devis généré pour la demande #KW-2026-0002 (45 €)' },
+  { id: 'j1', at: '2026-11-09T08:00:00Z', actor: 'Équipe BeniLink', text: 'Devis généré pour la demande #KW-2026-0002 (45 €)' },
   { id: 'j2', at: '2026-11-09T04:10:00Z', actor: 'Système', text: 'Nouvelle demande reçue : Frais Europe → Bénin (Romuald Agbo)' },
   { id: 'j3', at: '2026-11-06T15:20:00Z', actor: 'Maxime Dossou', text: 'Dépôt du rapport semaine 4 et vidéo 360° pour la villa Calavi' },
   { id: 'j4', at: '2026-10-29T10:00:00Z', actor: 'Système', text: 'Encaissement 250 € (Mobile Money MTN) pour le dossier visa #KW-2026-0005' },
-  { id: 'j5', at: '2026-10-12T14:00:00Z', actor: 'Équipe KWABO', text: 'Attribution de la mission villa Calavi à Maxime Dossou' },
+  { id: 'j5', at: '2026-10-12T14:00:00Z', actor: 'Équipe BeniLink', text: 'Attribution de la mission villa Calavi à Maxime Dossou' },
 ];
 
 export const SEED_NOTIFICATIONS: NotificationItem[] = [

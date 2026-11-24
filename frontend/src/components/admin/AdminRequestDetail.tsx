@@ -5,6 +5,7 @@ import { Icon } from '../common/Icon';
 import { STATUS_MAP, DOC_TYPE_META } from '../../data/kwaboData';
 import { api, ApiError, getFirstValidationError } from '../../services/api';
 import { mapMessage, mapRequest, mapUser } from '../../services/mappers';
+import { RequestWorkflowPanel } from './RequestWorkflowPanel';
 
 export const AdminRequestDetail: React.FC = () => {
   const {
@@ -86,6 +87,26 @@ export const AdminRequestDetail: React.FC = () => {
     setLoading(true);
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    if (role === 'OPERATOR' || !activeRequestId || loading) return undefined;
+    const timer = window.setInterval(async () => {
+      if (document.visibilityState !== 'visible' || sendingChat) return;
+      try {
+        const msgRes = await api<any>(`/requests/${activeRequestId}/messages`);
+        const rawMsgs = Array.isArray(msgRes?.data) ? msgRes.data : Array.isArray(msgRes) ? msgRes : [];
+        const mapped = rawMsgs.map((m: any) => mapMessage(m, activeRequestId));
+        setReqMsgs(mapped);
+        if (mapped.some((m: { from: string; read: boolean }) => m.from === 'client' && !m.read)) {
+          await api(`/requests/${activeRequestId}/messages/read`, { method: 'POST' }).catch(() => {});
+          await refreshCounters();
+        }
+      } catch {
+        // Keep existing messages during transient poll errors
+      }
+    }, 4000);
+    return () => window.clearInterval(timer);
+  }, [role, activeRequestId, loading, sendingChat, refreshCounters]);
 
   useEffect(() => {
     if (role !== 'ADMIN') return;
@@ -314,14 +335,19 @@ export const AdminRequestDetail: React.FC = () => {
         body = { text: chatText.trim() };
       }
 
-      await api(`/requests/${r.id}/messages`, {
+      const createdRes = await api<any>(`/requests/${r.id}/messages`, {
         method: 'POST',
         body,
       });
+      const createdRaw = createdRes?.data ?? (createdRes?.id ? createdRes : null);
+      if (createdRaw) {
+        const createdMsg = mapMessage(createdRaw, r.id);
+        setReqMsgs(prev => (prev.some(m => m.id === createdMsg.id) ? prev : [...prev, createdMsg]));
+      }
       setChatText('');
       setChatFile(null);
       const msgRes = await api<any>(`/requests/${r.id}/messages`);
-      const rawMsgs = Array.isArray(msgRes?.data) ? msgRes.data : [];
+      const rawMsgs = Array.isArray(msgRes?.data) ? msgRes.data : Array.isArray(msgRes) ? msgRes : [];
       setReqMsgs(rawMsgs.map((m: any) => mapMessage(m, r.id)));
       addToast('Message envoyé.', 'success');
     } catch (err) {
@@ -383,6 +409,16 @@ export const AdminRequestDetail: React.FC = () => {
         )}
       </section>
 
+      {/* BeniLink v1.2 Workflow Panel (16 stages, work order, quote/installments, 3 opinions) */}
+      <RequestWorkflowPanel
+        requestId={r.id}
+        tracking={r.tracking}
+        serviceName={service?.name || r.title}
+        city={r.city}
+        status={r.status}
+        docsCount={reqDocs.length}
+      />
+
       {/* Detail Grid */}
       <div className="detail-grid">
         {/* Left Column: Stack */}
@@ -412,7 +448,7 @@ export const AdminRequestDetail: React.FC = () => {
                   )}
                 </dd>
               </div>
-              {r.budget && (
+              {role !== 'OPERATOR' && r.budget && (
                 <div>
                   <dt>Budget indiqué</dt>
                   <dd>{r.budget}</dd>
@@ -422,13 +458,19 @@ export const AdminRequestDetail: React.FC = () => {
                 <dt>Date de la demande</dt>
                 <dd>{formatDate(r.createdAt)}</dd>
               </div>
-              {r.details && Object.entries(r.details).map(([k, v]) => (
+              {role !== 'OPERATOR' && r.details && Object.entries(r.details).map(([k, v]) => (
                 <div key={k}>
                   <dt className="capitalize">{k}</dt>
                   <dd>{String(v)}</dd>
                 </div>
               ))}
             </dl>
+
+            {role === 'OPERATOR' && (
+              <p className="notice mt-3 text-xs">
+                <strong>Fiche de travail confidentielle :</strong> conformément aux règles BeniLink, aucune donnée personnelle du client ni aucun tarif ne sont visibles sur l'interface agent. Rendez compte exclusivement au Responsable des prestations.
+              </p>
+            )}
 
             {r.description && (
               <>
@@ -663,8 +705,8 @@ export const AdminRequestDetail: React.FC = () => {
 
         {/* Right Column: Aside */}
         <aside className="stack">
-          {/* Fiche Client */}
-          {client && (
+          {/* Fiche Client (strictement réservée à l'Administration — jamais affichée à un Agent) */}
+          {role !== 'OPERATOR' && client && (
             <section className="card">
               <div className="card-head">
                 <h2>Client</h2>

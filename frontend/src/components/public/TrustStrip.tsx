@@ -7,47 +7,47 @@ export const TrustStrip: React.FC = () => {
       icon: Video,
       title: 'Vidéos 360° et photos',
       desc: 'Datées et géolocalisées pour constater l\'avancement réel de vos travaux.',
-      color: 'bg-emerald-50 text-emerald-800 border-emerald-200'
+      color: 'bg-[#e3efff] text-[#006191] border-[#d0e3f5]',
     },
     {
       icon: Receipt,
       title: 'Reçus officiels scannés',
       desc: 'Pour chaque dépense engagée (matériaux, ordonnances, formalités).',
-      color: 'bg-amber-50 text-amber-800 border-amber-200'
+      color: 'bg-[#ffdf93]/60 text-[#765b00] border-[#f2c02c]',
     },
     {
       icon: FileSignature,
       title: 'Contrat de mission signé',
       desc: 'Engagements contractuels clairs et délais fixés avant tout démarrage.',
-      color: 'bg-blue-50 text-blue-800 border-blue-200'
+      color: 'bg-[#d1e4ff] text-[#084d82] border-[#9fcaff]',
     },
     {
       icon: ShieldCheck,
       title: 'Devis clair et transparent',
       desc: 'Chiffré en euros ou FCFA, sans surcoût de dernière minute.',
-      color: 'bg-stone-50 text-stone-800 border-stone-200'
+      color: 'bg-[#edf4ff] text-[#296197] border-[#d0e3f5]',
     },
   ];
 
   return (
-    <section id="garanties" className="py-12 bg-white border-b border-[#e0e8e4]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <section id="garanties-strip" className="border-b border-[#d0e3f5] bg-white py-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {points.map((p, idx) => {
             const Icon = p.icon;
             return (
-              <div 
+              <div
                 key={idx}
-                className="p-5 rounded-2xl border border-neutral-200 bg-[#f9f7f4] flex items-start gap-4 hover:shadow-md transition-shadow"
+                className="flex items-start gap-4 rounded-2xl border border-[#d0e3f5] bg-[#f7f9ff] p-5 transition-shadow hover:shadow-md"
               >
-                <div className={`p-3 rounded-xl ${p.color} border shrink-0`}>
-                  <Icon className="w-5 h-5" />
+                <div className={`shrink-0 rounded-xl border p-3 ${p.color}`}>
+                  <Icon className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-sm text-[#1a1f1b]">
+                  <h3 className="font-display text-sm font-bold text-[#0d1d2b]">
                     {p.title}
                   </h3>
-                  <p className="text-xs text-[#56635b] mt-1 leading-relaxed">
+                  <p className="mt-1 text-xs leading-relaxed text-[#4c657a]">
                     {p.desc}
                   </p>
                 </div>

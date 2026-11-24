@@ -23,20 +23,20 @@ export const ConfirmDialog: React.FC = () => {
   const isWarning = variant === 'warning';
 
   const iconBg = isDanger
-    ? 'bg-[#fdf0ea] text-[#a8420f]'
+    ? 'bg-[#ffdad6] text-[#93000a]'
     : isWarning
-      ? 'bg-[#fdf6e0] text-[#7a5a06]'
-      : 'bg-[#e8f5ee] text-[#1a5c3a]';
+      ? 'bg-[#ffdf93] text-[#765b00]'
+      : 'bg-[#e3efff] text-[#006191]';
 
   const confirmBtnStyle = isDanger
-    ? 'bg-[#a8420f] hover:bg-[#8a3509] text-white shadow-sm'
+    ? 'bg-[#ba1a1a] hover:bg-[#93000a] text-white shadow-sm'
     : isWarning
-      ? 'bg-[#b8860b] hover:bg-[#8f6a08] text-white shadow-sm'
-      : 'bg-[#1a5c3a] hover:bg-[#123f28] text-white shadow-sm';
+      ? 'bg-[#f7c531] hover:bg-[#e0a410] text-[#10202e] shadow-sm'
+      : 'bg-[#006191] hover:bg-[#084d82] text-white shadow-sm';
 
   return (
     <div
-      className="fixed inset-0 z-[2147483646] flex items-center justify-center bg-[#123f28]/45 backdrop-blur-[3px] p-4"
+      className="fixed inset-0 z-[2147483646] flex items-center justify-center bg-[#084d82]/45 backdrop-blur-[3px] p-4"
       role="presentation"
       onClick={() => resolveConfirm(false)}
     >
@@ -53,7 +53,7 @@ export const ConfirmDialog: React.FC = () => {
         aria-describedby="kw-confirm-desc"
         onClick={(e) => e.stopPropagation()}
         style={{ animation: 'kwConfirmIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
-        className="w-full max-w-[440px] rounded-3xl border border-[#e0e8e4] bg-white p-6 shadow-2xl"
+        className="w-full max-w-[440px] rounded-3xl border border-[#d0e3f5] bg-white p-6 shadow-2xl"
       >
         <div className="flex items-start gap-4">
           <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${iconBg}`}>
@@ -95,7 +95,7 @@ export const ConfirmDialog: React.FC = () => {
             type="button"
             autoFocus
             onClick={() => resolveConfirm(false)}
-            className="inline-flex min-h-[42px] items-center justify-center rounded-full border border-[#dce4df] bg-white px-5 text-sm font-semibold text-[#404844] transition hover:border-[#1a5c3a] hover:bg-[#f9f7f4] hover:text-[#1a5c3a]"
+            className="inline-flex min-h-[42px] items-center justify-center rounded-full border border-[#d0e3f5] bg-white px-5 text-sm font-semibold text-[#3f4850] transition hover:border-[#006191] hover:bg-[#edf4ff] hover:text-[#006191]"
           >
             {confirmState.cancelLabel || 'Annuler'}
           </button>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BarChart2, PieChart } from 'lucide-react';
 import type { Category } from '../../types';
 
-const CHART_COLORS = ['#1a5c38', '#d4a017', '#3f8f63', '#8a6d1d', '#6bb38a', '#b8860b', '#2f7a4f', '#e3c14f'];
+const CHART_COLORS = ['#006191', '#e0a410', '#1593d6', '#765b00', '#296197', '#f7c531', '#084d82', '#8fc2fe'];
 
 export interface CategoryBreakdownRow {
   c: Pick<Category, 'id' | 'name' | 'short'>;
@@ -61,7 +61,7 @@ export const CategoryBreakdownCard: React.FC<CategoryBreakdownCardProps> = ({
         <h2>{title}</h2>
 
         <div
-          className="inline-flex items-center rounded-full border border-[#d5dfd8] bg-[#f4f7f5] p-0.5"
+          className="inline-flex items-center rounded-full border border-[#d0e3f5] bg-[#edf4ff] p-0.5"
           role="group"
           aria-label="Mode d'affichage"
         >
@@ -72,8 +72,8 @@ export const CategoryBreakdownCard: React.FC<CategoryBreakdownCardProps> = ({
             title="Afficher en barres horizontales"
             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition ${
               view === 'bars'
-                ? 'bg-[#1a5c3a] text-white shadow-sm'
-                : 'text-[#4b5a50] hover:text-[#1a5c3a]'
+                ? 'bg-[#006191] text-white shadow-sm'
+                : 'text-[#3f4850] hover:text-[#006191]'
             }`}
           >
             <BarChart2 className="h-3.5 w-3.5 rotate-90" aria-hidden="true" />
@@ -86,8 +86,8 @@ export const CategoryBreakdownCard: React.FC<CategoryBreakdownCardProps> = ({
             title="Afficher sous forme de graphe"
             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition ${
               view === 'chart'
-                ? 'bg-[#1a5c3a] text-white shadow-sm'
-                : 'text-[#4b5a50] hover:text-[#1a5c3a]'
+                ? 'bg-[#006191] text-white shadow-sm'
+                : 'text-[#3f4850] hover:text-[#006191]'
             }`}
           >
             <PieChart className="h-3.5 w-3.5" aria-hidden="true" />

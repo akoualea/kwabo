@@ -1,39 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { CheckCircle2, MessageCircle, Phone, Search } from 'lucide-react';
+import {
+  ArrowRight,
+  BadgeCheck,
+  Briefcase,
+  Compass,
+  Lock,
+  MapPin,
+  MessageCircle,
+  Phone,
+  PlayCircle,
+  Search,
+  Zap,
+} from 'lucide-react';
 import { WHATSAPP_LINK } from '../../data/kwaboData';
+import { HowItWorksVideoModal } from './HowItWorksVideoModal';
 
-const suggestedServices = [
-  'Suivi de chantier',
-  'Santé de vos proches',
-  'Dossier visa',
-  'Frais Europe',
-  "Création d'entreprise",
-];
+const QUICK_COMMUNES = ['Cotonou', 'Abomey-Calavi', 'Ouidah', 'Porto-Novo', 'Parakou'];
 
 export const HeroSection: React.FC = () => {
-  const { services, openServiceModal } = useApp();
+  const { services, currentUser, role, openServiceModal, navigate } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
+  const [communeQuery, setCommuneQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
-
-  // Animation d'apparition lettre par lettre (effet machine à écrire jusqu'à la dernière lettre)
-  const line1 = 'Vos projets au Bénin,';
-  const line2 = 'entre de bonnes mains';
-  const totalChars = line1.length + line2.length;
-  const [charCount, setCharCount] = useState(0);
-
-  useEffect(() => {
-    if (charCount < totalChars) {
-      const timer = setTimeout(() => {
-        setCharCount(prev => prev + 1);
-      }, 45);
-      return () => clearTimeout(timer);
-    }
-  }, [charCount, totalChars]);
-
-  const displayedLine1 = charCount <= line1.length ? line1.slice(0, charCount) : line1;
-  const displayedLine2 = charCount > line1.length ? line2.slice(0, charCount - line1.length) : '';
-  const isFinished = charCount >= totalChars;
+  const [videoModalOpen, setVideoModalOpen] = useState(false);
 
   const filteredServices = searchQuery.trim()
     ? services.filter(service =>
@@ -42,7 +32,7 @@ export const HeroSection: React.FC = () => {
       )
     : [];
 
-  const search = (query: string) => {
+  const handleSearch = (query: string) => {
     const normalizedQuery = query.trim().toLocaleLowerCase();
     if (!normalizedQuery) {
       document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
@@ -61,151 +51,417 @@ export const HeroSection: React.FC = () => {
     }
   };
 
+  const handlePrimaryCta = () => {
+    if (!currentUser) {
+      navigate('register');
+    } else if (role === 'USER') {
+      navigate('client-new-request');
+    } else if (role === 'ADMIN') {
+      navigate('admin-dashboard');
+    } else {
+      navigate('operator-dashboard');
+    }
+  };
+
   return (
-    <section className="public-hero relative overflow-hidden bg-[#1a4d30] text-white">
-      {/* Photo de fond authentique Cotonou – lumineuse avec glassmorphisme */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="/assets/photos/cotonou.jpg"
-          alt="Cotonou Bénin"
-          className="h-full w-full object-cover scale-105 filter brightness-[0.52] contrast-[1.05] transition-transform duration-10000"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#123f28]/75 via-[#1a4d30]/65 to-[#123f28]/85 mix-blend-multiply" />
-        <div className="absolute inset-0 bg-benin-pattern opacity-15" />
-      </div>
+    <>
+      {/* Hero Split Section */}
+      <section className="hero-surface relative w-full overflow-hidden bg-gradient-to-b from-[#f7f9ff] via-[#edf4ff] to-[#f7f9ff] px-4 pt-10 pb-14 sm:px-6 lg:px-8 lg:pt-14 lg:pb-16">
+        <div aria-hidden="true" className="hero-glow pointer-events-none absolute -top-28 right-12 h-96 w-96 rounded-full bg-[#ffdf93]/35 blur-3xl" />
+        <div aria-hidden="true" className="hero-glow pointer-events-none absolute top-1/2 -left-24 h-80 w-80 rounded-full bg-[#cbe6ff]/50 blur-3xl" />
 
-      {/* Contenu Hero DIRECTEMENT POSÉ SUR L'IMAGE (aucun cadre interne) */}
-      <div className="relative z-10 w-full flex flex-col items-center justify-center px-4 py-16 text-center sm:px-6 sm:py-24">
-        
-        {/* Titre avec les lettres qui viennent une à une jusqu'à la dernière lettre et s'arrêtent */}
-        <h1 className="max-w-[950px] mx-auto text-4xl font-semibold leading-[1.12] tracking-tight text-white sm:text-6xl md:text-[68px] drop-shadow-md min-h-[1.2em]">
-          <span>{displayedLine1}</span>
-          {charCount > line1.length && <br />}
-          <em className="font-medium text-[#f5c842] not-italic ml-2 sm:ml-0">
-            {displayedLine2}
-          </em>
-          {!isFinished && (
-            <span className="inline-block w-1.5 h-[0.8em] bg-[#f5c842] ml-1.5 align-middle animate-pulse" />
-          )}
-        </h1>
+        <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 lg:grid-cols-12">
+          {/* Left Column (7 cols) directly on background */}
+          <div className="flex flex-col items-start lg:col-span-7">
+            <style>{`
+              @keyframes heroLetterSlideIn {
+                0% { opacity: 0; transform: translateX(-10px); }
+                100% { opacity: 1; transform: translateX(0); }
+              }
+              .hero-letter {
+                display: inline-block;
+                opacity: 0;
+                animation: heroLetterSlideIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+              }
+              @media (prefers-reduced-motion: reduce) {
+                .hero-letter {
+                  opacity: 1 !important;
+                  transform: none !important;
+                  animation: none !important;
+                }
+              }
+            `}</style>
+            <h1
+              aria-label="Connectez vos ambitions au Bénin en toute sérénité."
+              className="font-display text-[30px] font-bold leading-[1.14] tracking-tight text-[#0d1d2b] sm:text-5xl lg:text-[50px]"
+            >
+              {(() => {
+                const words: Array<{ text: string; accent?: boolean }> = [
+                  { text: 'Connectez' },
+                  { text: 'vos' },
+                  { text: 'ambitions' },
+                  { text: 'au' },
+                  { text: 'Bénin' },
+                  { text: 'en' },
+                  { text: 'toute' },
+                  { text: 'sérénité', accent: true },
+                  { text: '.' },
+                ];
+                let charIndex = 0;
+                return words.map((word, wIdx) => (
+                  <React.Fragment key={wIdx}>
+                    <span
+                      aria-hidden="true"
+                      className={`inline-block whitespace-nowrap ${word.accent ? 'italic text-[#006191]' : ''}`}
+                    >
+                      {Array.from(word.text).map((ch, cIdx) => {
+                        const delayMs = charIndex * 32;
+                        charIndex += 1;
+                        return (
+                          <span
+                            key={cIdx}
+                            className="hero-letter"
+                            style={{ animationDelay: `${delayMs}ms` }}
+                          >
+                            {ch}
+                          </span>
+                        );
+                      })}
+                    </span>
+                    {wIdx < words.length - 2 ? ' ' : ''}
+                  </React.Fragment>
+                ));
+              })()}
+            </h1>
 
-        <div className="max-w-[1100px] mx-auto w-full flex flex-col items-center">
-          {/* Sous-titre posé directement sur l'image */}
-          <p className="mt-5 max-w-[700px] text-base leading-relaxed text-white drop-shadow sm:text-lg">
-            Immobilier, famille, démarches, logistique : une équipe sur place à
-            Cotonou, qui prouve son travail par des vidéos, des reçus et des rapports.
-          </p>
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-[#3f4850] sm:text-lg">
+              Foncier certifié, suivi de chantiers, démarches administratives ANIP et soutien médical aux proches : pilotez vos projets à distance sans intermédiaire opaque, avec preuves horodatées et transparence financière.
+            </p>
 
-          <form
-            role="search"
-            onSubmit={event => {
-              event.preventDefault();
-              search(searchQuery);
-            }}
-            className="relative mt-8 mx-auto w-full max-w-[720px]"
-          >
-            <div className="flex min-h-[64px] items-center rounded-full bg-white p-1.5 pl-5 shadow-2xl sm:pl-6 border border-white/40">
-              <Search aria-hidden="true" className="h-5 w-5 shrink-0 text-[#56635b]" />
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={event => {
-                  setSearchQuery(event.target.value);
-                  setShowResults(true);
-                }}
-                onFocus={() => setShowResults(Boolean(searchQuery.trim()))}
-                placeholder="Que cherchez-vous ? Suivi de chantier, visa, santé, frais Europe..."
-                aria-label="Rechercher un service"
-                className="min-w-0 flex-1 bg-transparent px-3 py-3 text-left text-sm text-[#1a1f1b] outline-none placeholder:text-[#68736d] sm:text-base"
-              />
+            {/* Primary CTAs */}
+            <div className="mt-6 flex w-full flex-col items-stretch gap-2.5 sm:mt-7 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
               <button
-                type="submit"
-                className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-[#f5c842] px-4 font-semibold text-[#1a1f1b] transition hover:bg-[#e8b92d] hover:scale-105 active:scale-100 sm:px-6 shadow-md"
+                type="button"
+                onClick={handlePrimaryCta}
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#ffdf93] px-5 py-2.5 text-xs sm:text-sm font-bold text-[#241a00] shadow-md transition hover:bg-[#f7c531]"
               >
-                <Search aria-hidden="true" className="h-4 w-4" />
-                <span className="text-sm sm:text-base">Rechercher</span>
+                <span>Initier une demande sécurisée</span>
+                <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setVideoModalOpen(true)}
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#006191] px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-md transition hover:bg-[#084d82]"
+              >
+                <PlayCircle className="h-4 w-4 shrink-0 text-[#ffdf93]" aria-hidden="true" />
+                <span>Voir comment ça marche (2 min)</span>
               </button>
             </div>
 
-            {showResults && searchQuery.trim() && (
-              <div className="absolute left-0 right-0 top-full z-30 mt-2 max-h-64 overflow-y-auto rounded-2xl border border-[#e0e8e4] bg-white text-left shadow-2xl">
-                {filteredServices.length === 0 ? (
-                  <p className="p-4 text-sm text-[#56635b]">
-                    Aucun service ne correspond à « {searchQuery} ».
-                  </p>
-                ) : (
-                  filteredServices.slice(0, 5).map(service => (
-                    <button
-                      key={service.id}
-                      type="button"
-                      onClick={() => {
-                        openServiceModal(service);
-                        setShowResults(false);
-                      }}
-                      className="flex w-full items-center justify-between gap-4 border-b border-[#eef1ef] px-4 py-3 text-left last:border-0 hover:bg-[#e8f5ee]"
-                    >
-                      <span>
-                        <span className="block text-sm font-semibold text-[#1a1f1b]">{service.name}</span>
-                        <span className="block line-clamp-1 text-xs text-[#56635b]">{service.short}</span>
-                      </span>
-                      <span className="shrink-0 text-sm font-semibold text-[#1a5c3a]">{service.price}</span>
-                    </button>
-                  ))
-                )}
-              </div>
-            )}
-          </form>
-
-          {/* Suggestions de services posées directement sur l'image */}
-          <div className="mt-6 flex max-w-[760px] mx-auto flex-wrap justify-center gap-2.5">
-            {suggestedServices.map(label => (
-              <button
-                key={label}
-                type="button"
-                onClick={() => {
-                  setSearchQuery(label);
-                  search(label);
+            {/* Integrated Glassmorphic Search Card */}
+            <div className="relative mt-8 w-full rounded-2xl border border-white/75 bg-white/80 p-2.5 shadow-[0_16px_40px_-4px_rgba(8,77,130,0.14)] backdrop-blur-xl">
+              <form
+                role="search"
+                onSubmit={event => {
+                  event.preventDefault();
+                  handleSearch(searchQuery);
                 }}
-                className="rounded-full border border-white/40 bg-black/25 backdrop-blur-md px-4 py-2 text-xs sm:text-sm text-white transition hover:bg-white/20 hover:border-white/80 hover:scale-105"
+                className="flex flex-col items-center gap-2 md:flex-row"
               >
-                {label}
-              </button>
-            ))}
+                <div className="flex w-full flex-1 items-center gap-2.5 rounded-xl bg-[#edf4ff] px-3.5 py-2.5">
+                  <Search className="h-5 w-5 shrink-0 text-[#006191]" aria-hidden="true" />
+                  <div className="flex w-full flex-col text-left">
+                    <label htmlFor="hero-service-input" className="text-[11px] font-bold text-[#3f4850]">
+                      Type de prestation
+                    </label>
+                    <input
+                      id="hero-service-input"
+                      type="search"
+                      value={searchQuery}
+                      onChange={event => {
+                        setSearchQuery(event.target.value);
+                        setShowResults(true);
+                      }}
+                      onFocus={() => setShowResults(Boolean(searchQuery.trim()))}
+                      placeholder="Foncier, Acte ANIP, Chantier, Santé..."
+                      className="w-full border-0 bg-transparent p-0 text-sm text-[#0d1d2b] outline-none placeholder:text-[#6f7881]"
+                      style={{ minHeight: '22px' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex w-full flex-1 items-center gap-2.5 rounded-xl bg-[#edf4ff] px-3.5 py-2.5">
+                  <MapPin className="h-5 w-5 shrink-0 text-[#765b00]" aria-hidden="true" />
+                  <div className="flex w-full flex-col text-left">
+                    <label htmlFor="hero-commune-input" className="text-[11px] font-bold text-[#3f4850]">
+                      Commune d'intervention
+                    </label>
+                    <input
+                      id="hero-commune-input"
+                      type="text"
+                      value={communeQuery}
+                      onChange={event => setCommuneQuery(event.target.value)}
+                      placeholder="Cotonou, Calavi, Parakou, Ouidah..."
+                      className="w-full border-0 bg-transparent p-0 text-sm text-[#0d1d2b] outline-none placeholder:text-[#6f7881]"
+                      style={{ minHeight: '22px' }}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#006191] px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#084d82] md:w-auto"
+                >
+                  <Search className="h-4 w-4" aria-hidden="true" />
+                  <span>Rechercher</span>
+                </button>
+              </form>
+
+              {showResults && searchQuery.trim() && (
+                <div className="absolute left-0 right-0 top-full z-30 mt-2 max-h-64 overflow-y-auto rounded-2xl border border-[#d0e3f5] bg-white text-left shadow-2xl">
+                  {filteredServices.length === 0 ? (
+                    <p className="p-4 text-sm text-[#4c657a]">
+                      Aucun service ne correspond à « {searchQuery} ».
+                    </p>
+                  ) : (
+                    filteredServices.slice(0, 5).map(service => (
+                      <button
+                        key={service.id}
+                        type="button"
+                        onClick={() => {
+                          openServiceModal(service);
+                          setShowResults(false);
+                        }}
+                        className="flex w-full items-center justify-between gap-4 border-b border-[#edf4ff] px-4 py-3 text-left last:border-0 hover:bg-[#edf4ff]"
+                      >
+                        <span>
+                          <span className="block text-sm font-semibold text-[#0d1d2b]">{service.name}</span>
+                          <span className="block line-clamp-1 text-xs text-[#4c657a]">{service.short}</span>
+                        </span>
+                        <span className="shrink-0 text-xs font-bold text-[#006191]">Sur devis</span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {/* Quick city chips */}
+              <div className="flex flex-wrap items-center gap-1.5 px-1.5 pt-2.5">
+                <span className="mr-1 text-[11px] font-bold text-[#3f4850]">Villes principales :</span>
+                {QUICK_COMMUNES.map(city => (
+                  <button
+                    key={city}
+                    type="button"
+                    onClick={() => {
+                      setCommuneQuery(city);
+                      document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold transition ${
+                      communeQuery === city
+                        ? 'bg-[#006191] text-white'
+                        : 'bg-[#e3efff] text-[#296197] hover:bg-[#d1e4ff]'
+                    }`}
+                  >
+                    {city}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* Garanties réassurance */}
-          <ul
-            className="flex flex-wrap justify-center gap-x-7 gap-y-3 text-xs sm:text-sm text-white drop-shadow"
-            style={{ marginTop: '2rem' }}
-          >
-            <li className="inline-flex items-center gap-2">
-              <CheckCircle2 aria-hidden="true" className="h-4 w-4 text-[#f5c842]" />
-              Compte gratuit, sans engagement
-            </li>
-            <li className="inline-flex items-center gap-2">
-              <CheckCircle2 aria-hidden="true" className="h-4 w-4 text-[#f5c842]" />
-              Devis sous 12 h
-            </li>
-            <li className="inline-flex items-center gap-2">
-              <CheckCircle2 aria-hidden="true" className="h-4 w-4 text-[#f5c842]" />
-              Satisfait ou remboursé 30 jours
-            </li>
-          </ul>
-        </div>
-      </div>
+          {/* Right Column (5 cols): Animated Photo Collage with local photos & Glassmorphic Badges */}
+          <div className="relative flex min-h-[330px] sm:min-h-[420px] items-center justify-center lg:col-span-5">
+            <style>{`
+              @keyframes heroOrbitSpin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+              }
+              @keyframes heroCardMain {
+                0%, 100% { transform: translateY(0px) rotate(-3deg); }
+                50% { transform: translateY(-10px) rotate(2.5deg); }
+              }
+              @keyframes heroCardTopRight {
+                0%, 100% { transform: translate(0px, 0px) rotate(5deg); }
+                50% { transform: translate(8px, -12px) rotate(11deg); }
+              }
+              @keyframes heroCardBottomLeft {
+                0%, 100% { transform: translate(0px, 0px) rotate(-5deg); }
+                50% { transform: translate(-8px, -10px) rotate(-11deg); }
+              }
+              @keyframes heroBadgeDrift {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-6px); }
+              }
+              @keyframes heroBadgeDriftAlt {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-7px); }
+              }
+              .hero-collage-anim { will-change: transform; }
+              @media (prefers-reduced-motion: reduce) {
+                .hero-collage-anim { animation: none !important; }
+              }
+            `}</style>
 
+            <div
+              aria-hidden="true"
+              style={{ animation: 'heroOrbitSpin 22s linear infinite' }}
+              className="hero-collage-anim pointer-events-none absolute h-[280px] w-[280px] rounded-full border-2 border-dashed border-[#f2c02c]/70 sm:h-[400px] sm:w-[400px]"
+            />
+            <div
+              aria-hidden="true"
+              style={{ animation: 'heroOrbitSpin 32s linear infinite reverse' }}
+              className="hero-collage-anim pointer-events-none absolute h-[220px] w-[220px] rounded-full border border-dashed border-[#1593d6]/40 sm:h-[320px] sm:w-[320px]"
+            />
+
+            {/* Main Card */}
+            <div
+              style={{ animation: 'heroCardMain 6.5s ease-in-out infinite' }}
+              className="hero-collage-anim relative z-20 h-64 w-52 sm:h-80 sm:w-64 overflow-hidden rounded-3xl border-4 border-white shadow-xl"
+            >
+              <img
+                src="/assets/hero-villa.jpg"
+                alt="Villa moderne et suivi de chantier au Bénin"
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0d1d2b]/75 via-transparent to-transparent" />
+              <div className="absolute bottom-3 left-3 right-3 text-white">
+                <span className="rounded-full bg-[#006191]/90 px-2.5 py-0.5 text-[11px] font-bold backdrop-blur-sm">
+                  Chantier Calavi
+                </span>
+                <p className="mt-1 text-xs font-semibold">Contrôle terrain &amp; vidéo 360°</p>
+              </div>
+            </div>
+
+            {/* Top Right Card */}
+            <div
+              style={{ animation: 'heroCardTopRight 7.5s ease-in-out infinite' }}
+              className="hero-collage-anim absolute -top-2 right-0 z-10 h-32 w-32 sm:h-44 sm:w-44 overflow-hidden rounded-2xl border-2 border-white shadow-lg"
+            >
+              <img
+                src="/assets/auth-login.jpg"
+                alt="Suivi de chantier au Bénin avec notre équipe locale"
+                className="h-full w-full object-cover object-top"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0d1d2b]/65 via-transparent to-transparent" />
+              <span className="absolute bottom-2 left-2 rounded-full bg-[#296197]/90 px-2 py-0.5 text-[11px] font-bold text-white backdrop-blur-sm">
+                Littoral Bénin
+              </span>
+            </div>
+
+            {/* Bottom Left Card */}
+            <div
+              style={{ animation: 'heroCardBottomLeft 7s ease-in-out 0.6s infinite' }}
+              className="hero-collage-anim absolute -bottom-4 left-0 z-30 h-32 w-36 sm:h-40 sm:w-48 overflow-hidden rounded-2xl border-2 border-white shadow-lg"
+            >
+              <img
+                src="/assets/hero-ganvie.jpg"
+                alt="Ganvié, patrimoine du Bénin"
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0d1d2b]/65 via-transparent to-transparent" />
+              <span className="absolute bottom-2 left-2 rounded-full bg-[#d3a500]/95 px-2 py-0.5 text-[11px] font-bold text-white backdrop-blur-sm">
+                Patrimoine &amp; Terroir
+              </span>
+            </div>
+
+            {/* Floating Status Cards (crisp text, no sub-pixel rotation blur) */}
+            <div
+              style={{ animation: 'heroBadgeDrift 5s ease-in-out infinite' }}
+              className="absolute top-6 left-0 z-40 flex items-center gap-2.5 rounded-2xl border border-[#d0e3f5] bg-white px-3.5 py-2.5 shadow-lg antialiased sm:-left-4"
+            >
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#ffdf93] text-xs font-bold text-[#241a00]">
+                ⚡
+              </span>
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-bold text-[#0d1d2b]">Devis sur mesure</span>
+                <span className="text-[11px] font-medium text-[#3f4850]">Étude par notre équipe</span>
+              </div>
+            </div>
+
+            <div
+              style={{ animation: 'heroBadgeDriftAlt 5.6s ease-in-out 0.8s infinite' }}
+              className="absolute bottom-14 right-0 z-40 flex items-center gap-2.5 rounded-2xl border border-[#d0e3f5] bg-white px-3.5 py-2.5 shadow-lg antialiased sm:-right-4"
+            >
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#006191] text-xs font-bold text-white">
+                ✓
+              </span>
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-bold text-[#0d1d2b]">Rapport terrain validé</span>
+                <span className="text-[11px] font-medium text-[#3f4850]">Photos HD &amp; Reçus</span>
+              </div>
+            </div>
+
+            <div
+              style={{ animation: 'heroBadgeDrift 6s ease-in-out 1.4s infinite' }}
+              className="absolute -bottom-7 right-12 z-40 hidden items-center gap-2.5 rounded-2xl border border-[#d0e3f5] bg-white px-3.5 py-2.5 shadow-lg antialiased sm:flex"
+            >
+              <Lock className="h-4 w-4 shrink-0 text-[#006191]" aria-hidden="true" />
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-bold text-[#0d1d2b]">Contrat officiel</span>
+                <span className="font-mono text-[11px] font-medium text-[#296197]">Garantie Diaspora Safe</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Key Metrics Bar (Same sleek card shape as dashboards) */}
+      <section className="w-full bg-[#f7f9ff] px-4 py-6 sm:px-6 lg:px-8">
+        <ul className="stats mx-auto max-w-7xl">
+          <li className="stat">
+            <span className="tile tile-sm">
+              <Briefcase className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <strong className="tnum">{services.length || 12} Services</strong>
+            <span>Univers certifiés au Bénin</span>
+          </li>
+
+          <li className="stat">
+            <span className="tile tile-sm">
+              <Compass className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <strong className="tnum">55+ Pays</strong>
+            <span>Diaspora connectée active</span>
+          </li>
+
+          <li className="stat">
+            <span className="tile tile-sm">
+              <Zap className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <strong>Sur mesure</strong>
+            <span>Devis après étude locale</span>
+          </li>
+
+          <li className="stat">
+            <span className="tile tile-sm">
+              <BadgeCheck className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <strong className="tnum">100% Prouvé</strong>
+            <span>Vidéos, reçus &amp; garanties</span>
+          </li>
+        </ul>
+      </section>
+
+      {/* Video Presentation Modal (voiced + animated step illustrations) */}
+      <HowItWorksVideoModal
+        isOpen={videoModalOpen}
+        onClose={() => setVideoModalOpen(false)}
+        onStartProject={handlePrimaryCta}
+      />
+
+      {/* Floating WhatsApp CTA */}
       <a
         href={WHATSAPP_LINK}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Contacter KWABO sur WhatsApp"
-        className="whatsapp-float fixed bottom-5 right-5 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[#2d8a5a] text-white shadow-xl transition hover:bg-[#1a5c3a]"
+        aria-label="Contacter BeniLink sur WhatsApp"
+        className="whatsapp-float fixed bottom-5 right-5 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[#006191] text-white shadow-[0_12px_28px_-4px_rgba(8,77,130,0.4)] transition hover:scale-105 hover:bg-[#084d82]"
       >
         <span className="relative flex h-8 w-8 items-center justify-center">
           <MessageCircle aria-hidden="true" className="absolute inset-0 h-8 w-8 text-white" />
           <Phone aria-hidden="true" className="h-3.5 w-3.5 -rotate-12 text-white" />
         </span>
       </a>
-    </section>
+    </>
   );
 };

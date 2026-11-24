@@ -1,11 +1,1068 @@
 @import "./kwabo-styles.css";
 @import "tailwindcss";
 
-/* Additional helpers if needed */
+@theme {
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --color-primary: #006191;
+  --color-primary-container: #007bb6;
+  --color-navy: #084d82;
+  --color-sky: #1593d6;
+  --color-secondary: #296197;
+  --color-gold: #f7c531;
+  --color-gold-hover: #e0a410;
+  --color-gold-text: #765b00;
+  --color-surface: #f7f9ff;
+  --color-surface-low: #edf4ff;
+  --color-surface-container: #e3efff;
+  --color-surface-high: #d9eafd;
+  --color-ink: #0d1d2b;
+  --color-ink-muted: #4c657a;
+  --color-border: #d0e3f5;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* =========================================================
+   View Transitions API — Circular Theme Reveal
+   ========================================================= */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 9999;
+}
+
+/* =========================================================
+   BeniLink Dark Theme (Deep Navy + Solar Gold)
+   ========================================================= */
+html.dark {
+  color-scheme: dark;
+  --cream: #071422;
+  --surface: #0d2036;
+  --surface-2: #122a45;
+  --border: #1e3b5c;
+  --text: #f0f6fc;
+  --text-mid: #c5d8eb;
+  --muted: #8fa9c4;
+  --green-pale: #132c48;
+  --neutral-pale: #13283f;
+  --gold-pale: #2e240f;
+  --gold-text: #f7c531;
+  --danger-pale: #35161b;
+  --terracotta-pale: #3b171d;
+  --terracotta-text: #ff99a4;
+  --shadow-sm: 0 2px 10px rgba(2, 9, 18, 0.45);
+  --shadow-md: 0 10px 30px rgba(2, 9, 18, 0.55);
+}
+
+html.dark body {
+  background-color: #071422;
+  color: #f0f6fc;
+}
+
+/* Keep BeniLink official logo legible on dark surfaces */
+html.dark img[src="/assets/benilink-logo.png"] {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 4px 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Theme toggle button in dark mode */
+html.dark .theme-toggle-btn {
+  background-color: #122a45 !important;
+  border-color: #264a70 !important;
+  color: #f7c531 !important;
+}
+html.dark .theme-toggle-btn:hover {
+  background-color: #19385a !important;
+  border-color: #f7c531 !important;
+}
+
+/* Core App Shell & Layout */
+html.dark .app-shell,
+html.dark .app-main,
+html.dark .main {
+  background-color: #071422;
+  color: #f0f6fc;
+}
+
+html.dark .sidebar {
+  background-color: #0a192b;
+  border-right-color: #1e3b5c;
+}
+
+html.dark .topbar {
+  background-color: rgba(10, 25, 43, 0.92);
+  border-bottom-color: #1e3b5c;
+}
+
+html.dark .topbar-title h1 {
+  color: #f0f6fc;
+}
+
+html.dark .topbar-title p {
+  color: #8fa9c4;
+}
+
+html.dark .side-user {
+  background-color: #112942;
+  border-color: #1e3b5c;
+}
+
+html.dark .side-user strong {
+  color: #f0f6fc;
+}
+
+html.dark .side-user small {
+  color: #8fa9c4;
+}
+
+html.dark .side-link {
+  color: #c5d8eb;
+}
+
+html.dark .side-link:hover {
+  background-color: #132c48;
+  color: #ffffff;
+}
+
+html.dark .side-link.active,
+html.dark .side-link[aria-current="page"] {
+  background-color: #006191;
+  color: #ffffff;
+}
+
+html.dark .side-whatsapp {
+  background-color: #112942;
+  border-color: #1e3b5c;
+  color: #f0f6fc;
+}
+
+html.dark .side-link.side-logout {
+  background-color: rgba(186, 26, 26, 0.18) !important;
+  border: 1px solid rgba(255, 138, 149, 0.35) !important;
+  color: #ff9aa6 !important;
+}
+
+html.dark .side-link.side-logout:hover {
+  background-color: rgba(186, 26, 26, 0.34) !important;
+  border-color: #ff7a88 !important;
+  color: #ffffff !important;
+}
+
+html.dark .btn-danger-ghost {
+  background-color: rgba(186, 26, 26, 0.16);
+  border-color: rgba(255, 138, 149, 0.35);
+  color: #ff9aa6;
+}
+
+html.dark .btn-danger-ghost:hover {
+  background-color: rgba(186, 26, 26, 0.3);
+  border-color: #ff7a88;
+  color: #ffffff;
+}
+
+html.dark .icon-btn {
+  color: #c5d8eb;
+  background-color: #112942;
+  border-color: #1e3b5c;
+}
+
+html.dark .icon-btn:hover {
+  background-color: #19385a;
+  color: #ffffff;
+}
+
+html.dark .topbar-bell-btn.has-unread {
+  color: #f7c531;
+}
+
+html.dark .topbar-bell-btn .dot-count {
+  box-shadow: 0 0 0 2px #0a192b;
+}
+
+/* Cards, Tables, Modals, Tabs */
+html.dark .card,
+html.dark .panel,
+html.dark .modal-box,
+html.dark .search-results {
+  background-color: #0d2036;
+  border-color: #1e3b5c;
+  color: #f0f6fc;
+}
+
+html.dark .card-head,
+html.dark .card-foot,
+html.dark .table th,
+html.dark .table td {
+  border-color: #1e3b5c;
+}
+
+html.dark .table th {
+  background-color: #112942;
+  color: #c5d8eb;
+}
+
+html.dark .table tbody tr:hover {
+  background-color: #122a45;
+}
+
+html.dark .search-result:hover {
+  background-color: #132c48;
+}
+
+html.dark .search-result strong {
+  color: #f0f6fc;
+}
+
+html.dark .search-result small {
+  color: #8fa9c4;
+}
+
+/* KPI Stat Cards — Clean Rounded Shape with Top-Right Soft Circle Accent (All Dashboards) */
+.stats .stat {
+  position: relative !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  min-height: 136px;
+  padding: 20px 22px !important;
+  border-radius: 22px !important;
+  background: #ffffff !important;
+  border: 1px solid #e3ecf6 !important;
+  box-shadow: 0 6px 24px rgba(8, 77, 130, 0.055) !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+
+.stats .stat:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(8, 77, 130, 0.11) !important;
+  border-color: #c2dcf5 !important;
+}
+
+.stats .stat::after {
+  content: '' !important;
+  position: absolute !important;
+  top: -28px !important;
+  right: -22px !important;
+  bottom: auto !important;
+  width: 112px !important;
+  height: 112px !important;
+  border-radius: 50% !important;
+  pointer-events: none !important;
+  transition: transform 0.3s ease !important;
+}
+
+.stats .stat:hover::after {
+  transform: scale(1.12) !important;
+}
+
+.stats .stat::before {
+  content: '›';
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  z-index: 1;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 400;
+  color: #7c93ac;
+  pointer-events: none;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.stats .stat:hover::before {
+  transform: translateX(3px);
+  color: #006191;
+}
+
+.stats .stat .tile {
+  position: relative;
+  z-index: 1;
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 13px !important;
+  margin-bottom: 18px !important;
+  box-shadow: none !important;
+}
+
+.stats .stat strong {
+  position: relative;
+  z-index: 1;
+  display: block !important;
+  width: 100%;
+  text-align: left !important;
+  font-family: var(--body) !important;
+  font-size: 31px !important;
+  font-weight: 800 !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.02em !important;
+  color: #0d1d2b !important;
+  margin: 0 !important;
+}
+
+.stats .stat > span:last-child {
+  position: relative;
+  z-index: 1;
+  display: block !important;
+  width: 100%;
+  text-align: left !important;
+  margin-top: 6px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  color: #5b6f84 !important;
+}
+
+/* BeniLink 4-Color Accents on Icon Tile & Top-Right Soft Circle (Light Mode) */
+.stats .stat:nth-child(4n+1) .tile {
+  background: #e6f3ff !important;
+  color: #006191 !important;
+}
+.stats .stat:nth-child(4n+1)::after {
+  background: rgba(0, 97, 145, 0.08) !important;
+}
+
+.stats .stat:nth-child(4n+2) .tile {
+  background: #fff4d4 !important;
+  color: #9e7600 !important;
+}
+.stats .stat:nth-child(4n+2)::after {
+  background: rgba(247, 197, 49, 0.16) !important;
+}
+
+.stats .stat:nth-child(4n+3) .tile {
+  background: #e1f5ff !important;
+  color: #007bb6 !important;
+}
+.stats .stat:nth-child(4n+3)::after {
+  background: rgba(21, 147, 214, 0.11) !important;
+}
+
+.stats .stat:nth-child(4n+4) .tile {
+  background: #e8f0fc !important;
+  color: #084d82 !important;
+}
+.stats .stat:nth-child(4n+4)::after {
+  background: rgba(8, 77, 130, 0.09) !important;
+}
+
+/* KPI Stat Cards in Dark Mode (Same Shape + BeniLink Dark Palette) */
+html.dark .stats .stat {
+  background: #0d2036 !important;
+  border-color: #1e3b5c !important;
+  box-shadow: 0 8px 26px rgba(2, 9, 18, 0.45) !important;
+}
+
+html.dark .stats .stat:hover {
+  border-color: #2f5b8a !important;
+  box-shadow: 0 14px 34px rgba(2, 9, 18, 0.6) !important;
+}
+
+html.dark .stats .stat::before {
+  color: #6b89a8;
+}
+
+html.dark .stats .stat:hover::before {
+  color: #f7c531;
+}
+
+html.dark .stats .stat:nth-child(4n+1) .tile {
+  background: rgba(21, 147, 214, 0.18) !important;
+  color: #6cc4f5 !important;
+}
+html.dark .stats .stat:nth-child(4n+1)::after {
+  background: rgba(21, 147, 214, 0.12) !important;
+}
+
+html.dark .stats .stat:nth-child(4n+2) .tile {
+  background: rgba(247, 197, 49, 0.18) !important;
+  color: #f7c531 !important;
+}
+html.dark .stats .stat:nth-child(4n+2)::after {
+  background: rgba(247, 197, 49, 0.12) !important;
+}
+
+html.dark .stats .stat:nth-child(4n+3) .tile {
+  background: rgba(0, 123, 182, 0.22) !important;
+  color: #7dd3fc !important;
+}
+html.dark .stats .stat:nth-child(4n+3)::after {
+  background: rgba(0, 123, 182, 0.14) !important;
+}
+
+html.dark .stats .stat:nth-child(4n+4) .tile {
+  background: rgba(108, 196, 245, 0.16) !important;
+  color: #93c5fd !important;
+}
+html.dark .stats .stat:nth-child(4n+4)::after {
+  background: rgba(108, 196, 245, 0.11) !important;
+}
+
+html.dark .stats .stat > span:last-child,
+html.dark .stats .stat .stat-label,
+html.dark .stats .stat small {
+  color: #b4cbe2 !important;
+}
+
+html.dark .stats .stat .stat-val,
+html.dark .stats .stat strong {
+  color: #ffffff !important;
+}
+
+/* Form Controls & Auth Fields */
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+html.dark select,
+html.dark textarea,
+html.dark .auth-benilink input:not([type="checkbox"]),
+html.dark .auth-benilink select {
+  background-color: #112942 !important;
+  border-color: #25486d !important;
+  color: #f0f6fc !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #7c98b5 !important;
+}
+
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus,
+html.dark .auth-benilink input:not([type="checkbox"]):focus,
+html.dark .auth-benilink select:focus {
+  border-color: #1593d6 !important;
+  box-shadow: 0 0 0 3px rgba(21, 147, 214, 0.25) !important;
+}
+
+html.dark .search {
+  background-color: #112942;
+  border-color: #25486d;
+  color: #f0f6fc;
+}
+
+html.dark .search input {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Buttons, Badges, Notices */
+html.dark .btn-ghost,
+html.dark .btn-outline,
+html.dark .btn-secondary {
+  background-color: #112942;
+  border-color: #25486d;
+  color: #e6f0fa;
+}
+
+html.dark .btn-ghost:hover,
+html.dark .btn-outline:hover,
+html.dark .btn-secondary:hover {
+  background-color: #19385a;
+  color: #ffffff;
+}
+
+html.dark .alert,
+html.dark .notice {
+  background-color: #112942;
+  border-color: #25486d;
+  color: #e6f0fa;
+}
+
+html.dark .msg-bubble.in {
+  background-color: #132c48;
+  color: #f0f6fc;
+  border-color: #25486d;
+}
+
+/* Tailwind Light Utility Overrides for Dark Mode */
+html.dark .bg-white {
+  background-color: #0d2036 !important;
+}
+
+html.dark .bg-white\/90,
+html.dark .bg-white\/95,
+html.dark .bg-white\/85,
+html.dark .bg-white\/80 {
+  background-color: rgba(13, 32, 54, 0.92) !important;
+}
+
+html.dark .bg-\[\#f7f9ff\],
+html.dark .bg-\[\#f7f9ff\]\/90,
+html.dark .bg-\[\#f7f9ff\]\/95 {
+  background-color: rgba(10, 25, 43, 0.94) !important;
+}
+
+html.dark .bg-\[\#edf4ff\],
+html.dark .bg-\[\#e3efff\],
+html.dark .bg-\[\#d9eafd\] {
+  background-color: #122a45 !important;
+}
+
+html.dark .hover\:bg-\[\#edf4ff\]:hover,
+html.dark .hover\:bg-\[\#e3efff\]:hover,
+html.dark .hover\:bg-\[\#d9eafd\]:hover {
+  background-color: #19385a !important;
+}
+
+html.dark .text-\[\#0d1d2b\] {
+  color: #f0f6fc !important;
+}
+
+html.dark .text-\[\#1a1f1b\] {
+  color: #ffffff !important;
+}
+
+html.dark .text-\[\#3f4850\],
+html.dark .text-\[\#4c657a\],
+html.dark .text-\[\#6f7881\],
+html.dark .text-\[\#56635b\] {
+  color: #c5d8eb !important;
+}
+
+/* Toast & Notification readability in Dark Mode */
+html.dark .kw-toast-item {
+  background-color: #0f2540 !important;
+  border-color: #284e77 !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55) !important;
+}
+
+html.dark .kw-toast-item p {
+  color: #ffffff !important;
+}
+
+html.dark .kw-toast-item button {
+  color: #c5d8eb !important;
+}
+
+html.dark .kw-toast-item button:hover {
+  background-color: #19385a !important;
+  color: #ffffff !important;
+}
+
+html.dark .kw-toast-item .bg-\[\#eef1ef\] {
+  background-color: #1e3b5c !important;
+}
+
+html.dark .toast {
+  background-color: #112942 !important;
+  color: #ffffff !important;
+  border: 1px solid #284e77;
+}
+
+html.dark .notif,
+html.dark .notif-text,
+html.dark .notif-list li,
+html.dark .notif-list p {
+  color: #ffffff !important;
+}
+
+html.dark .notif-list small {
+  color: #b4cbe2 !important;
+}
+
+html.dark .text-\[\#084d82\],
+html.dark .text-\[\#006191\] {
+  color: #6cc4f5 !important;
+}
+
+html.dark .border-\[\#d0e3f5\],
+html.dark .border-\[\#edf4ff\] {
+  border-color: #1e3b5c !important;
+}
+
+html.dark .divide-\[\#edf4ff\] > :not(:last-child) {
+  border-color: #1e3b5c !important;
+}
+
+/* Preserve dark text on Solar Gold buttons */
+html.dark .bg-\[\#f7c531\],
+html.dark .bg-\[\#ffdf93\] {
+  color: #10202e !important;
+}
+
+/* Preserve crisp white text on Primary Blue buttons & dark photo overlays */
+html.dark .bg-\[\#006191\],
+html.dark .bg-\[\#084d82\] {
+  color: #ffffff !important;
+}
+
+/* Public Hero, Metric Cards & Light Gradients in Dark Mode */
+html.dark .hero-surface,
+html.dark .hero {
+  background: linear-gradient(180deg, #071422 0%, #0c2138 55%, #071422 100%) !important;
+}
+
+html.dark .hero-glow {
+  opacity: 0.22;
+}
+
+html.dark .hero-metric-1 {
+  background: linear-gradient(135deg, #0e2640 0%, #133457 100%) !important;
+  border-color: #244e78 !important;
+}
+html.dark .hero-metric-2 {
+  background: linear-gradient(135deg, #122342 0%, #19315c 100%) !important;
+  border-color: #2c4c87 !important;
+}
+html.dark .hero-metric-3 {
+  background: linear-gradient(135deg, #2a210d 0%, #3a2d11 100%) !important;
+  border-color: #6b531b !important;
+}
+html.dark .hero-metric-4 {
+  background: linear-gradient(135deg, #0b2938 0%, #113b50 100%) !important;
+  border-color: #1f5c78 !important;
+}
+
+html.dark .hero-metric-card p:first-child {
+  color: #ffffff !important;
+}
+html.dark .hero-metric-card p:last-child {
+  color: #bdd4ea !important;
+}
+html.dark .hero-metric-3 p:first-child {
+  color: #f7c531 !important;
+}
+
+/* Harmonize Transparency Banner & Dashboard Welcome Banner in Dark Mode */
+html.dark .why-banner-card,
+html.dark .trust-section,
+html.dark .welcome,
+html.dark .page-banner {
+  background: linear-gradient(135deg, #0d2036 0%, #122a45 100%) !important;
+  border: 1px solid #1e3b5c !important;
+  box-shadow: 0 18px 42px rgba(2, 9, 18, 0.5) !important;
+}
+
+html.dark .why-whatsapp-link {
+  background-color: #132c48 !important;
+  border-color: #2b5078 !important;
+  color: #f0f6fc !important;
+}
+
+html.dark .why-whatsapp-link:hover {
+  background-color: #19395d !important;
+  border-color: #6cc4f5 !important;
+}
+
+/* Additional kwabo-styles.css & Tailwind Light Surfaces in Dark Mode */
+html.dark .section-white,
+html.dark .service-card,
+html.dark .messenger-list,
+html.dark .messenger-thread,
+html.dark .bubble:not(.bubble-mine),
+html.dark .tabbar,
+html.dark .drawer,
+html.dark .drawer-header,
+html.dark .drawer-actions,
+html.dark .faq details,
+html.dark .trust-strip li,
+html.dark .chip:not([aria-pressed="true"]),
+html.dark .site-nav,
+html.dark dialog {
+  background-color: #0d2036 !important;
+  border-color: #1e3b5c !important;
+  color: #f0f6fc !important;
+}
+
+html.dark .request-row,
+html.dark .doc-item,
+html.dark .doc-preview {
+  background-color: #0f243d;
+  border-color: #1e3b5c;
+  color: #f0f6fc;
+}
+
+html.dark .request-row:hover,
+html.dark .notif:hover,
+html.dark .messenger-list button:hover,
+html.dark .messenger-list a:hover {
+  background-color: #143050 !important;
+}
+
+html.dark .bg-\[\#f7f9ff\]\/60,
+html.dark .bg-\[\#edf4ff\]\/60,
+html.dark .bg-\[\#d1e4ff\],
+html.dark .bg-\[\#fdf6e0\]\/60,
+html.dark .bg-\[\#f8fbff\],
+html.dark .bg-\[\#f7faff\],
+html.dark .bg-\[\#f4f9ff\] {
+  background-color: #112942 !important;
+}
+
+html.dark .text-\[\#296197\],
+html.dark .text-\[\#001d36\],
+html.dark .text-\[\#1b4470\],
+html.dark .text-\[\#00527a\],
+html.dark .text-\[\#2c4e6e\],
+html.dark .text-\[\#304f73\],
+html.dark .text-\[\#215570\] {
+  color: #8fd2ff !important;
+}
+
+html.dark .text-\[\#765b00\],
+html.dark .text-\[\#664e00\],
+html.dark .text-\[\#594400\] {
+  color: #f7c531 !important;
+}
+
+html.dark .border-white,
+html.dark .border-white\/75 {
+  border-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+html.dark .border-\[\#f1e3ae\] {
+  border-color: #5c4918 !important;
+}
+
+html.dark .hover\:bg-\[\#d1e4ff\]:hover {
+  background-color: #19385a !important;
+}
+
+/* =========================================================
+   Global Responsive Safety (All Viewports: Android, iOS, Tablet, Desktop)
+   ========================================================= */
+html,
+body {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+#root,
+.app-wrapper,
+.app,
+.app-main,
+.app-content {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.card-head {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.service-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+}
+
+.service-grid-compact {
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+}
+
+.doc-list-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+}
+
+.info-list {
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+}
+
+.review-list {
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+}
+
+/* Tablet & Mobile App Shell (<= 1023px) — Fix collapsed sidebar 82px bug! */
+@media (max-width: 1023px) {
+  .app,
+  .app.sidebar-collapsed {
+    display: block !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100% !important;
+  }
+
+  .app-main {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .sidebar {
+    position: fixed !important;
+    z-index: 60 !important;
+    left: 0;
+    top: 0;
+    width: min(300px, 85vw) !important;
+    height: 100dvh !important;
+    transform: translateX(-100%);
+    visibility: hidden;
+  }
+
+  .sidebar.open {
+    transform: translateX(0) !important;
+    visibility: visible !important;
+  }
+
+  .sidebar.open ~ .sidebar-overlay {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 55 !important;
+    background: rgba(8, 77, 130, 0.45);
+  }
+
+  .menu-btn,
+  .sidebar-close {
+    display: grid !important;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+  }
+
+  .detail-grid,
+  .detail-grid > aside,
+  .dash-grid,
+  .dash-grid-even,
+  .messenger {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .topbar {
+    width: 100% !important;
+    padding: 10px 14px !important;
+    min-height: 64px !important;
+    gap: 8px 10px !important;
+  }
+
+  .topbar-title {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  .topbar-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+}
+
+/* Mobile / Android Smartphones (<= 640px) */
+@media (max-width: 640px) {
+  .app-content {
+    padding: 14px 14px 32px !important;
+    gap: 14px !important;
+  }
+
+  .topbar {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .topbar-title {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+  }
+
+  .topbar-title h1 {
+    font-size: 18px !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+  }
+
+  .topbar-title p {
+    font-size: 12.5px !important;
+    white-space: normal !important;
+  }
+
+  .topbar-actions {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+  }
+
+  .topbar-actions .admin-search {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .wizard {
+    gap: 8px 14px !important;
+  }
+
+  .wizard li {
+    font-size: 12.5px !important;
+  }
+
+  .status-steps {
+    gap: 4px !important;
+  }
+
+  .status-steps li {
+    font-size: 11px !important;
+  }
+
+  .alert {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    padding: 12px 14px !important;
+  }
+
+  .request-row {
+    flex-wrap: wrap !important;
+    gap: 8px 10px !important;
+    padding: 12px 6px !important;
+  }
+
+  .request-row-side {
+    width: 100%;
+    justify-content: flex-start !important;
+  }
+
+  .tracking {
+    font-size: 18px !important;
+    padding: 6px 12px !important;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .stats .stat {
+    min-height: 114px !important;
+    padding: 14px 14px !important;
+    border-radius: 18px !important;
+  }
+
+  .stats .stat::after {
+    width: 82px !important;
+    height: 82px !important;
+    top: -22px !important;
+    right: -18px !important;
+  }
+
+  .stats .stat::before {
+    top: 14px !important;
+    right: 14px !important;
+    font-size: 16px !important;
+  }
+
+  .stats .stat .tile {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 11px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .stats .stat strong {
+    font-size: 23px !important;
+  }
+
+  .stats .stat > span:last-child {
+    font-size: 12px !important;
+    margin-top: 4px !important;
+  }
+
+  .welcome {
+    padding: 16px !important;
+    gap: 12px !important;
+  }
+
+  .welcome h2 {
+    font-size: 20px !important;
+  }
+
+  .welcome .btn,
+  .welcome .kw-welcome-cta {
+    width: 100%;
+  }
+
+  .welcome .btn {
+    justify-content: center;
+  }
+
+  .btn {
+    min-height: 40px;
+    padding: 8px 14px;
+    font-size: 13px;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .btn-lg {
+    min-height: 44px;
+    padding: 10px 18px;
+    font-size: 13.5px;
+  }
+
+  .btn-sm {
+    min-height: 34px;
+    padding: 6px 11px;
+    font-size: 12px;
+  }
+
+  .chip {
+    min-height: 36px;
+    padding: 6px 12px;
+    font-size: 12.5px;
+  }
+
+  .card {
+    padding: 15px !important;
+    border-radius: 16px !important;
+  }
+
+  .form-grid,
+  .form-grid-auto {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .table-wrap {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .messenger-thread {
+    padding: 12px;
+  }
+
+  .bubble {
+    max-width: 90%;
+  }
+
+  .thread-form-row {
+    flex-wrap: wrap;
+  }
+
+  .thread-form-row .btn {
+    width: 100%;
+  }
+}
+
+/* Ultra-compact Smartphones (<= 350px) */
+@media (max-width: 350px) {
+  .stats {
+    grid-template-columns: 1fr !important;
+  }
 }

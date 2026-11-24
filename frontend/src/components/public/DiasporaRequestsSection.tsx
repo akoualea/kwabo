@@ -20,10 +20,8 @@ const requests = [
   'Factures SBEE',
 ];
 
-// 17 thèmes répartis en 3 rangées
 const rows = [requests.slice(0, 6), requests.slice(6, 12), requests.slice(12)];
 
-// durée (s) et sens de chaque rangée
 const rowConfig = [
   { duration: 35, reverse: false },
   { duration: 42, reverse: true },
@@ -44,7 +42,7 @@ const Chip: React.FC<{
     onClick={onClick}
     tabIndex={hidden ? -1 : 0}
     aria-hidden={hidden || undefined}
-    className="whitespace-nowrap rounded-full border border-[#dce4df] bg-[#f9f8f6] px-4 py-2 text-sm text-[#404844] transition hover:border-[#1a5c3a] hover:bg-[#e8f5ee] hover:text-[#1a5c3a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1a5c3a]"
+    className="whitespace-nowrap rounded-full border border-[#d0e3f5] bg-[#f7f9ff] px-4 py-2 text-sm font-medium text-[#3f4850] transition hover:border-[#006191] hover:bg-[#e3efff] hover:text-[#006191] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006191]"
   >
     {label}
   </button>
@@ -72,17 +70,20 @@ export const DiasporaRequestsSection: React.FC<Props> = ({ onSelectRequest }) =>
     `}</style>
 
     <div className="mx-auto max-w-[1200px]">
-      <h2 className="mb-7 text-center font-display text-3xl font-semibold tracking-tight text-[#1a1f1b] sm:mb-8 sm:text-[40px]">
-        Ce que la diaspora nous demande
-      </h2>
+      <div className="mb-8 text-center">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-[#006191]">
+          Besoins fréquents
+        </span>
+        <h2 className="mt-1 font-display text-3xl font-semibold tracking-tight text-[#0d1d2b] sm:text-[36px]">
+          Ce que la diaspora nous demande
+        </h2>
+      </div>
 
       <div
         className="flex flex-col gap-2.5 overflow-hidden"
         style={{
-          maskImage:
-            'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
-          WebkitMaskImage:
-            'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
+          maskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
+          WebkitMaskImage: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
         }}
       >
         {rows.map((row, i) => (
@@ -96,7 +97,6 @@ export const DiasporaRequestsSection: React.FC<Props> = ({ onSelectRequest }) =>
                 } as React.CSSProperties
               }
             >
-              {/* Copie 1 (visible) + copie 2 (dupliquée pour la boucle sans coupure) */}
               {[false, true].map(isDup => (
                 <ul
                   key={String(isDup)}

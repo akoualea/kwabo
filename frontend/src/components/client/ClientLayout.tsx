@@ -28,7 +28,7 @@ export const ClientLayout: React.FC<{ title?: string; children?: React.ReactNode
   ];
 
   React.useEffect(() => {
-    if (title) document.title = `KWABO – ${title}`;
+    if (title) document.title = `BeniLink – ${title}`;
   }, [title]);
 
   return (
@@ -45,9 +45,9 @@ export const ClientLayout: React.FC<{ title?: string; children?: React.ReactNode
       <header className="site-header">
         <div className="site-header-inner container">
           <a href="#/espace" className="logo">
-            <span className="logo-mark">K</span>
+            <span className="logo-mark">B</span>
             <span className="logo-text">
-              KWABO<span className="logo-dot">.</span>
+              Beni<span className="logo-dot">Link</span>
             </span>
           </a>
           {/* Navigation */}

@@ -4,14 +4,14 @@ import { api, ApiError, getFirstValidationError } from '../../services/api';
 import { mapCatalog, mapServiceItem } from '../../services/mappers';
 import { Service } from '../../types';
 import { Icon } from '../common/Icon';
+import { formatSlaLabel, getServiceSlaDays, setServiceSlaDays } from '../../utils/contractsAndSla';
 
 export const AdminCatalog: React.FC = () => {
   const { categories, addToast, refreshCatalog } = useApp();
   const [catalogServices, setCatalogServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
-  const [editingServiceId, setEditingServiceId] = useState<string | null>(null);
-  const [newPrice, setNewPrice] = useState('');
+  const [slaTick, setSlaTick] = useState(0);
 
   const loadServices = useCallback(async () => {
     setLoading(true);
@@ -59,36 +59,6 @@ export const AdminCatalog: React.FC = () => {
     }
   };
 
-  const handleOpenEditPrice = (s: Service) => {
-    setEditingServiceId(s.id);
-    setNewPrice(s.price);
-  };
-
-  const handleSavePrice = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPrice.trim() || !editingService) return;
-    const targetId = editingService.numericId ?? editingService.id;
-    setSavingId(editingService.id);
-    try {
-      await api(`/admin/services/${targetId}`, {
-        method: 'PATCH',
-        body: { price_label: newPrice.trim() },
-      });
-      setCatalogServices(prev =>
-        prev.map(s => (s.id === editingService.id ? { ...s, price: newPrice.trim() } : s))
-      );
-      setEditingServiceId(null);
-      addToast('Tarif mis à jour.');
-      await refreshCatalog();
-    } catch (err) {
-      addToast(err instanceof ApiError ? getFirstValidationError(err) : 'Mise à jour impossible.', 'error');
-    } finally {
-      setSavingId(null);
-    }
-  };
-
-  const editingService = catalogServices.find(s => s.id === editingServiceId);
-
   if (loading && catalogServices.length === 0) {
     return <div className="empty">Chargement du catalogue…</div>;
   }
@@ -107,14 +77,17 @@ export const AdminCatalog: React.FC = () => {
                 <thead>
                   <tr>
                     <th>Service</th>
-                    <th>Tarif affiché</th>
+                    <th>Mode tarifaire</th>
+                    <th>Délai de réalisation</th>
                     <th>Demandes</th>
                     <th>Disponible</th>
-                    <th><span className="sr-only">Actions</span></th>
                   </tr>
                 </thead>
-                <tbody>
-                  {catServices.map(s => (
+                <tbody data-sla-tick={slaTick}>
+                  {catServices.map(s => {
+                    const slaKey = s.slug || s.id;
+                    const slaDays = getServiceSlaDays(slaKey, s.cat);
+                    return (
                     <tr key={s.id}>
                       <td data-label="Service">
                         <span className="client-mini">
@@ -124,7 +97,30 @@ export const AdminCatalog: React.FC = () => {
                           <strong>{s.name}</strong>
                         </span>
                       </td>
-                      <td data-label="Tarif">{s.price}</td>
+                      <td data-label="Mode tarifaire">
+                        <span className="muted">Sur devis confidentiel</span>
+                      </td>
+                      <td data-label="Délai de réalisation">
+                        <div className="flex flex-wrap items-center justify-end gap-2 lg:justify-start">
+                          <input
+                            type="number"
+                            min={1}
+                            max={90}
+                            value={slaDays}
+                            aria-label={`Délai en jours pour ${s.name}`}
+                            onChange={(e) => {
+                              const val = Number(e.target.value);
+                              if (!Number.isNaN(val) && val >= 1) {
+                                setServiceSlaDays(slaKey, val);
+                                setSlaTick((t) => t + 1);
+                              }
+                            }}
+                            style={{ width: '68px', minHeight: '34px', padding: '4px 8px' }}
+                            className="rounded-lg border border-[#d0e3f5] bg-white text-xs font-semibold"
+                          />
+                          <span className="text-xs muted">{formatSlaLabel(slaDays)}</span>
+                        </div>
+                      </td>
                       <td data-label="Demandes">{s.requestsCount ?? 0}</td>
                       <td data-label="Disponible">
                         <label className="switch switch-inline">
@@ -138,63 +134,14 @@ export const AdminCatalog: React.FC = () => {
                           <span className="switch-track" aria-hidden="true" />
                         </label>
                       </td>
-                      <td className="td-action">
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          type="button"
-                          onClick={() => handleOpenEditPrice(s)}
-                        >
-                          Modifier le tarif
-                        </button>
-                      </td>
                     </tr>
-                  ))}
+                  );})}
                 </tbody>
               </table>
             </div>
           </section>
         );
       })}
-
-      {/* Edit Price Modal Dialog */}
-      {editingService && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-[#e0e8e4]">
-            <h2 className="text-xl font-bold font-display mb-2">{editingService.name}</h2>
-            <form onSubmit={handleSavePrice}>
-              <div className="field">
-                <label htmlFor="servicePrice">Tarif affiché</label>
-                <input
-                  id="servicePrice"
-                  type="text"
-                  required
-                  value={newPrice}
-                  onChange={(e) => setNewPrice(e.target.value)}
-                  placeholder="Dès 80 € / passage"
-                />
-                <p className="muted small-text mt-1">Exemple : Dès 50 €/démarche. Le prix exact figure dans le devis.</p>
-              </div>
-
-              <div className="dialog-actions mt-6 flex justify-end gap-3">
-                <button
-                  className="btn btn-ghost"
-                  type="button"
-                  onClick={() => setEditingServiceId(null)}
-                >
-                  Annuler
-                </button>
-                <button
-                  className="btn btn-primary"
-                  type="submit"
-                  disabled={savingId === editingService.id}
-                >
-                  {savingId === editingService.id ? 'Enregistrement…' : 'Enregistrer'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </>
   );
 };

@@ -1,11 +1,28 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { ArrowRight, Menu, Search, User as UserIcon, X } from 'lucide-react';
+import { ArrowRight, Download, Menu, PlusCircle, Search, User as UserIcon, X } from 'lucide-react';
+import { BrandLogo } from '../common/BrandLogo';
+import { ThemeToggleButton } from '../common/ThemeToggleButton';
+import { usePwaInstall } from '../../utils/pwa';
 
 export const PublicHeader: React.FC = () => {
-  const { navigate, currentUser, role, services, openServiceModal } = useApp();
+  const { navigate, currentView, currentUser, role, services, openServiceModal } = useApp();
+  const { canInstall, promptInstall } = usePwaInstall();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const scrollToSection = (sectionId: string, event?: React.MouseEvent<HTMLAnchorElement>) => {
+    event?.preventDefault();
+    setMobileMenuOpen(false);
+    if (currentView !== 'public-home') {
+      navigate('public-home');
+      window.setTimeout(() => {
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+      }, 80);
+      return;
+    }
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const searchServices = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -32,57 +49,75 @@ export const PublicHeader: React.FC = () => {
     else navigate('client-dashboard');
   };
 
-  return (
-    <header className="public-header sticky top-0 z-40 border-b border-[#e0e8e4] bg-white">
-      <div className="mx-auto flex h-[76px] max-w-[1200px] items-center gap-6 px-5">
-        <button
-          type="button"
-          onClick={() => navigate('public-home')}
-          className="flex shrink-0 items-center gap-2 text-left"
-          aria-label="KWABO, accueil"
-        >
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1a5c3a] font-display text-2xl font-bold text-[#f5c842]">
-            K
-          </span>
-          <span className="font-display text-[25px] font-bold tracking-tight text-[#1a5c3a]">
-            KWABO<span className="text-[#d4a017]">.</span>
-          </span>
-        </button>
+  const goToNewRequest = () => {
+    if (!currentUser) {
+      navigate('register');
+    } else if (role === 'USER') {
+      navigate('client-new-request');
+    } else {
+      goToAccount();
+    }
+  };
 
-        <form onSubmit={searchServices} role="search" className="public-header-search hidden w-[400px] max-w-[400px] shrink-0 md:flex">
+  return (
+    <header className="public-header sticky top-0 z-40 border-b border-[#d0e3f5] bg-[#f7f9ff]/90 backdrop-blur-xl shadow-[0_2px_12px_rgba(8,77,130,0.06)]">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+        <div className="flex shrink-0 items-center">
+          <BrandLogo
+            size="sm"
+            onClick={() => navigate('public-home')}
+          />
+        </div>
+
+        <form onSubmit={searchServices} role="search" className="hidden w-52 shrink-0 xl:flex 2xl:w-64">
           <label htmlFor="header-service-search" className="sr-only">Rechercher un service</label>
-          <div className="flex h-[50px] w-full items-center rounded-full border-[3px] border-[#1a5c3a] bg-white p-1 pl-4 transition focus-within:ring-2 focus-within:ring-[#1a5c3a]/15">
-            <Search aria-hidden="true" className="h-5 w-5 shrink-0 text-[#56635b]" />
+          <div className="flex h-10 w-full items-center rounded-full border border-[#d0e3f5] bg-white px-3.5 shadow-xs transition focus-within:border-[#006191] focus-within:ring-2 focus-within:ring-[#1593d6]/20">
+            <Search aria-hidden="true" className="h-4 w-4 shrink-0 text-[#4c657a]" />
             <input
               id="header-service-search"
               type="search"
               value={searchQuery}
               onChange={event => setSearchQuery(event.target.value)}
-              placeholder="Cherchez un service..."
-              className="min-w-0 flex-1 border-0 bg-transparent px-3 text-sm text-[#1a1f1b] outline-none placeholder:text-[#777]"
+              placeholder="Rechercher un service..."
+              className="min-w-0 flex-1 border-0 bg-transparent px-2.5 text-sm text-[#0d1d2b] outline-none placeholder:text-[#6f7881]"
             />
-            <button
-              type="submit"
-              aria-label="Lancer la recherche"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1a5c3a] text-white transition hover:bg-[#123f28]"
-            >
-              <Search aria-hidden="true" className="h-4 w-4" />
-            </button>
           </div>
         </form>
 
-        <nav aria-label="Navigation principale" className="public-header-nav ml-auto hidden items-center gap-6 text-[15px] font-medium text-[#404844] lg:flex">
-          <a href="#services" className="nav-link-underline hover:text-[#1a5c3a]">Services</a>
-          <a href="#garanties" className="nav-link-underline hover:text-[#1a5c3a]">Confiance</a>
-          <a href="#faq" className="nav-link-underline hover:text-[#1a5c3a]">FAQ</a>
-          <button type="button" onClick={() => navigate('login')} className="nav-link-underline whitespace-nowrap hover:text-[#1a5c3a]">
-            Se connecter
-          </button>
+        <nav aria-label="Navigation principale" className="hidden shrink-0 items-center gap-1 rounded-full bg-[#edf4ff] p-1 lg:flex">
+          <a href="#services" onClick={e => scrollToSection('services', e)} className="rounded-full px-3 py-1.5 text-[13px] font-semibold text-[#3f4850] transition hover:bg-[#e3efff] hover:text-[#006191]">
+            Services
+          </a>
+          <a href="#comment-ca-marche" onClick={e => scrollToSection('comment-ca-marche', e)} className="rounded-full px-3 py-1.5 text-[13px] font-semibold text-[#3f4850] transition hover:bg-[#e3efff] hover:text-[#006191]">
+            Fonctionnement
+          </a>
+          <a href="#garanties" onClick={e => scrollToSection('garanties', e)} className="rounded-full px-3 py-1.5 text-[13px] font-semibold text-[#3f4850] transition hover:bg-[#e3efff] hover:text-[#006191]">
+            Confiance
+          </a>
+          <a href="#faq" onClick={e => scrollToSection('faq', e)} className="rounded-full px-3 py-1.5 text-[13px] font-semibold text-[#3f4850] transition hover:bg-[#e3efff] hover:text-[#006191]">
+            FAQ
+          </a>
+        </nav>
+
+        <div className="hidden shrink-0 items-center gap-2 lg:flex">
+          <ThemeToggleButton className="rounded-full" />
+          {canInstall && (
+            <button
+              type="button"
+              onClick={() => void promptInstall()}
+              className="inline-flex h-10 items-center gap-1.5 rounded-full border border-[#d0e3f5] bg-white px-3 text-xs font-semibold text-[#006191] transition hover:bg-[#e3efff]"
+              title="Installer l'application BeniLink"
+            >
+              <Download className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>App</span>
+            </button>
+          )}
+
           {currentUser ? (
             <button
               type="button"
               onClick={goToAccount}
-              className="inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[#1a5c3a] px-5 font-semibold text-white transition hover:bg-[#123f28]"
+              className="inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-full bg-[#e3efff] px-3.5 text-[13px] font-semibold text-[#006191] transition hover:bg-[#d9eafd]"
             >
               <UserIcon aria-hidden="true" className="h-4 w-4" />
               Mon espace
@@ -90,63 +125,85 @@ export const PublicHeader: React.FC = () => {
           ) : (
             <button
               type="button"
-              onClick={() => navigate('register')}
-              className="h-11 whitespace-nowrap rounded-full bg-[#1a5c3a] px-6 font-semibold text-white transition hover:bg-[#123f28]"
+              onClick={() => navigate('login')}
+              className="inline-flex h-10 items-center whitespace-nowrap rounded-full border border-[#d0e3f5] bg-white px-3.5 text-[13px] font-semibold text-[#084d82] transition hover:bg-[#e3efff]"
             >
-              S'inscrire
+              Connexion
             </button>
           )}
-        </nav>
 
-        <div className="ml-auto hidden shrink-0 items-center gap-3 sm:flex xl:hidden">
-          <button type="button" onClick={() => navigate('login')} className="text-sm font-medium text-[#404844]">
-            Se connecter
-          </button>
           <button
             type="button"
-            onClick={currentUser ? goToAccount : () => navigate('register')}
-            className="rounded-full bg-[#1a5c3a] px-5 py-2.5 text-sm font-semibold text-white"
+            onClick={goToNewRequest}
+            className="inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-full bg-[#f7c531] px-3.5 text-[13px] font-bold text-[#10202e] shadow-[0_4px_16px_rgba(247,197,49,0.28)] transition hover:bg-[#e0a410]"
           >
-            {currentUser ? 'Mon espace' : "S'inscrire"}
+            <PlusCircle aria-hidden="true" className="h-4 w-4" />
+            <span>{currentUser ? 'Nouvelle demande' : 'Initier une demande'}</span>
           </button>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setMobileMenuOpen(open => !open)}
-          className="ml-auto rounded-lg p-2 text-[#1a5c3a] hover:bg-[#e8f5ee] xl:hidden"
-          aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
-          aria-expanded={mobileMenuOpen}
-        >
-          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        <div className="ml-auto flex items-center gap-2 lg:hidden">
+          <ThemeToggleButton className="rounded-full" />
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(open => !open)}
+            className="rounded-full bg-[#edf4ff] p-2.5 text-[#006191] transition hover:bg-[#e3efff]"
+            aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {mobileMenuOpen && (
-        <nav aria-label="Navigation mobile" className="border-t border-[#e0e8e4] bg-white px-5 py-4 shadow-lg xl:hidden">
-          <form onSubmit={searchServices} role="search" className="mb-3 flex items-center rounded-full border border-[#dce4df] px-4 py-2">
-            <Search aria-hidden="true" className="h-4 w-4 text-[#56635b]" />
+        <nav aria-label="Navigation mobile" className="border-t border-[#d0e3f5] bg-white px-5 py-4 shadow-xl lg:hidden">
+          <form onSubmit={searchServices} role="search" className="mb-3 flex items-center rounded-full border border-[#d0e3f5] bg-[#f7f9ff] px-4 py-2">
+            <Search aria-hidden="true" className="h-4 w-4 text-[#4c657a]" />
             <input
               type="search"
               value={searchQuery}
               onChange={event => setSearchQuery(event.target.value)}
               placeholder="Cherchez un service..."
               aria-label="Rechercher un service"
-              className="min-w-0 flex-1 bg-transparent px-3 py-1 text-sm text-[#1a1f1b] outline-none"
+              className="min-w-0 flex-1 bg-transparent px-3 py-1 text-sm text-[#0d1d2b] outline-none"
             />
-            <button type="submit" aria-label="Lancer la recherche"><ArrowRight className="h-4 w-4 text-[#1a5c3a]" /></button>
+            <button type="submit" aria-label="Lancer la recherche">
+              <ArrowRight className="h-4 w-4 text-[#006191]" />
+            </button>
           </form>
-          <a href="#services" onClick={() => setMobileMenuOpen(false)} className="block py-2 font-medium text-[#404844]">Services</a>
-          <a href="#garanties" onClick={() => setMobileMenuOpen(false)} className="block py-2 font-medium text-[#404844]">Confiance</a>
-          <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="block py-2 font-medium text-[#404844]">FAQ</a>
-          <button type="button" onClick={() => { navigate('login'); setMobileMenuOpen(false); }} className="block py-2 font-medium text-[#404844]">Se connecter</button>
-          <button
-            type="button"
-            onClick={() => { currentUser ? goToAccount() : navigate('register'); setMobileMenuOpen(false); }}
-            className="mt-2 w-full rounded-full bg-[#1a5c3a] py-3 font-semibold text-white"
-          >
-            {currentUser ? 'Mon espace' : "S'inscrire"}
-          </button>
+          <div className="grid gap-1">
+            <a href="#services" onClick={e => scrollToSection('services', e)} className="rounded-xl px-3 py-2.5 text-sm font-semibold text-[#3f4850] hover:bg-[#edf4ff]">Services</a>
+            <a href="#comment-ca-marche" onClick={e => scrollToSection('comment-ca-marche', e)} className="rounded-xl px-3 py-2.5 text-sm font-semibold text-[#3f4850] hover:bg-[#edf4ff]">Comment ça marche</a>
+            <a href="#garanties" onClick={e => scrollToSection('garanties', e)} className="rounded-xl px-3 py-2.5 text-sm font-semibold text-[#3f4850] hover:bg-[#edf4ff]">Confiance &amp; Séquestre</a>
+            <a href="#faq" onClick={e => scrollToSection('faq', e)} className="rounded-xl px-3 py-2.5 text-sm font-semibold text-[#3f4850] hover:bg-[#edf4ff]">FAQ</a>
+          </div>
+          <div className="mt-3 grid gap-2 border-t border-[#d0e3f5] pt-3">
+            {canInstall && (
+              <button
+                type="button"
+                onClick={() => { void promptInstall(); setMobileMenuOpen(false); }}
+                className="flex w-full items-center justify-center gap-2 rounded-full border border-[#d0e3f5] bg-[#edf4ff] py-2.5 text-sm font-semibold text-[#006191]"
+              >
+                <Download className="h-4 w-4" aria-hidden="true" />
+                Installer l'application
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => { currentUser ? goToAccount() : navigate('login'); setMobileMenuOpen(false); }}
+              className="w-full rounded-full border border-[#d0e3f5] bg-white py-2.5 text-sm font-semibold text-[#084d82]"
+            >
+              {currentUser ? 'Mon espace client' : 'Se connecter'}
+            </button>
+            <button
+              type="button"
+              onClick={() => { goToNewRequest(); setMobileMenuOpen(false); }}
+              className="w-full rounded-full bg-[#f7c531] py-3 text-sm font-bold text-[#10202e] shadow-sm"
+            >
+              {currentUser ? 'Nouvelle demande' : 'Initier une demande'}
+            </button>
+          </div>
         </nav>
       )}
     </header>

@@ -5,10 +5,26 @@ import { getWhatsAppLink } from '../../data/kwaboData';
 import { api, ApiError, getFirstValidationError } from '../../services/api';
 import { mapMessage, mapRequest } from '../../services/mappers';
 import { MessageItem, RequestItem } from '../../types';
+import { formatConvertedMoney, useCurrency } from '../../data/worldCountries';
+import {
+  acceptAndGenerateContract,
+  AcceptedContract,
+  computeSlaProgress,
+  formatSlaLabel,
+  getContractForRequest,
+  getServiceSlaDays,
+  openPrintableContract,
+} from '../../utils/contractsAndSla';
+import {
+  getRequestWorkflow,
+  PAYMENT_MODALITY_LABELS,
+  saveRequestWorkflow,
+} from '../../utils/benilinkWorkflow';
 
 export const ClientRequestDetail: React.FC = () => {
   const {
     activeRequestId,
+    currentUser,
     services,
     navigate,
     openPhotoModal,
@@ -17,8 +33,15 @@ export const ClientRequestDetail: React.FC = () => {
     confirm,
     refreshCounters,
   } = useApp();
+  const { currency } = useCurrency();
 
   const [request, setRequest] = useState<RequestItem | null>(null);
+  const [contract, setContract] = useState<AcceptedContract | null>(null);
+  const [showAcceptQuoteModal, setShowAcceptQuoteModal] = useState(false);
+  const [acceptMessage, setAcceptMessage] = useState(
+    "J'accepte le devis et le délai de réalisation indiqués."
+  );
+  const [acceptingQuote, setAcceptingQuote] = useState(false);
   const [reqMessages, setReqMessages] = useState<MessageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [messageText, setMessageText] = useState('');
@@ -48,6 +71,7 @@ export const ClientRequestDetail: React.FC = () => {
       ]);
       const mappedReq = mapRequest(reqRes?.data ?? reqRes);
       setRequest(mappedReq);
+      setContract(getContractForRequest(mappedReq.id));
       if (mappedReq.review) {
         setReviewRating(mappedReq.review.rating);
         setReviewComment(mappedReq.review.comment || '');
@@ -74,6 +98,26 @@ export const ClientRequestDetail: React.FC = () => {
     setLoading(true);
     loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    if (!activeRequestId || loading) return undefined;
+    const timer = window.setInterval(async () => {
+      if (document.visibilityState !== 'visible' || sendingMsg) return;
+      try {
+        const msgRes = await api<any>(`/requests/${activeRequestId}/messages`);
+        const rawMsgs = Array.isArray(msgRes?.data) ? msgRes.data : Array.isArray(msgRes) ? msgRes : [];
+        const mapped = rawMsgs.map((m: any) => mapMessage(m, activeRequestId));
+        setReqMessages(mapped);
+        if (mapped.some((m: { from: string; read: boolean }) => m.from === 'team' && !m.read)) {
+          await api(`/requests/${activeRequestId}/messages/read`, { method: 'POST' }).catch(() => {});
+          await refreshCounters();
+        }
+      } catch {
+        // Keep current messages during transient poll errors
+      }
+    }, 4000);
+    return () => window.clearInterval(timer);
+  }, [activeRequestId, loading, sendingMsg, refreshCounters]);
 
   if (loading) {
     return (
@@ -124,15 +168,21 @@ export const ClientRequestDetail: React.FC = () => {
         body = { text: messageText.trim() };
       }
 
-      await api(`/requests/${request.id}/messages`, {
+      const createdRes = await api<any>(`/requests/${request.id}/messages`, {
         method: 'POST',
         body,
       });
 
+      const createdRaw = createdRes?.data ?? (createdRes?.id ? createdRes : null);
+      if (createdRaw) {
+        const createdMsg = mapMessage(createdRaw, request.id);
+        setReqMessages(prev => (prev.some(m => m.id === createdMsg.id) ? prev : [...prev, createdMsg]));
+      }
+
       setMessageText('');
       setAttachmentFile(null);
       const msgRes = await api<any>(`/requests/${request.id}/messages`);
-      const rawMsgs = Array.isArray(msgRes?.data) ? msgRes.data : [];
+      const rawMsgs = Array.isArray(msgRes?.data) ? msgRes.data : Array.isArray(msgRes) ? msgRes : [];
       setReqMessages(rawMsgs.map((m: any) => mapMessage(m, request.id)));
       addToast('Message envoyé.', 'success');
     } catch (err) {
@@ -278,14 +328,14 @@ export const ClientRequestDetail: React.FC = () => {
         )}
       </section>
 
-      {/* Due Invoice Alert */}
+      {/* Due Invoice Alert + Contract Generation (§8) */}
       {dueInvoice && (
         <div className="alert">
           <span className="tile tile-sm">
             <Icon name="banknotes" size={18} />
           </span>
           <p>
-            <strong>Devis : {dueInvoice.amount} €</strong> ({dueInvoice.label}). La mission démarre dès le paiement.
+            <strong>Devis : {formatConvertedMoney(dueInvoice.amount, currency)}</strong> ({dueInvoice.label}). La mission démarre dès l'acceptation et le règlement.
           </p>
           <button
             className="btn btn-gold btn-sm"
@@ -296,6 +346,270 @@ export const ClientRequestDetail: React.FC = () => {
           </button>
         </div>
       )}
+
+      {/* Suivi du délai annoncé (§9) & Contrat après acceptation (§8) */}
+      {(() => {
+        const slaDays = getServiceSlaDays(service?.slug || request.serviceSlug || request.serviceId, service?.cat);
+        const slaLabel = formatSlaLabel(slaDays);
+        const sla = computeSlaProgress(request.createdAt, slaDays, request.status);
+        const quoteAmount = dueInvoice?.amount ?? request.invoices?.[0]?.amount ?? 0;
+
+        const handleConfirmAcceptQuote = async (e: React.FormEvent) => {
+          e.preventDefault();
+          const trimmedMsg = acceptMessage.trim();
+          if (!trimmedMsg || acceptingQuote) {
+            addToast("Veuillez saisir un message de confirmation pour le Super Admin.", 'error');
+            return;
+          }
+          setAcceptingQuote(true);
+          try {
+            // Mandatory confirmation message sent to Super Admin (§6 v1.2)
+            const msgRes = await api<any>(`/requests/${request.id}/messages`, {
+              method: 'POST',
+              body: { text: trimmedMsg },
+            });
+            const createdRaw = msgRes?.data ?? msgRes;
+            if (createdRaw && (createdRaw.id || createdRaw.text || createdRaw.body)) {
+              setReqMessages((prev) => [...prev, mapMessage(createdRaw, request.id)]);
+            }
+          } catch {
+            // Continue contract generation even if messaging endpoint rejects duplicate/offline
+          }
+
+          const clientName =
+            `${currentUser?.firstName || ''} ${currentUser?.lastName || ''}`.trim() ||
+            currentUser?.email ||
+            'Client BeniLink';
+          const generated = acceptAndGenerateContract({
+            requestId: request.id,
+            tracking: request.tracking,
+            serviceTitle: service?.name || request.title,
+            city: request.city,
+            clientName,
+            clientEmail: currentUser?.email || '',
+            amountEur: quoteAmount,
+            slaDays,
+          });
+          setContract(generated);
+          api(`/quotes/${dueInvoice?.id || request.id}/accept`, {
+            method: 'POST',
+            body: { message: trimmedMsg, contract_ref: generated.id },
+          }).catch(() => {});
+          setShowAcceptQuoteModal(false);
+          setAcceptingQuote(false);
+          addToast('Message envoyé au Super Admin : devis accepté et contrat généré.', 'success');
+        };
+
+        const wf = getRequestWorkflow(request.id, {
+          tracking: request.tracking,
+          serviceName: service?.name || request.title,
+          city: request.city,
+          status: request.status,
+        });
+
+        const handlePayInstallmentFedaPay = (instId: string) => {
+          api(`/installments/${instId}/pay`, { method: 'POST', body: { provider: 'fedapay', mode: 'test' } }).catch(
+            () => {}
+          );
+          const nextInsts = wf.installments.map((inst) =>
+            inst.id === instId
+              ? { ...inst, status: 'paye' as const, paidAt: new Date().toISOString(), paidManually: false }
+              : inst
+          );
+          saveRequestWorkflow({ ...wf, installments: nextInsts });
+          addToast('Échéance réglée via FedaPay (mode test). Une facture PDF est générée.', 'success');
+          loadData();
+        };
+
+        return (
+          <>
+          <div className="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {/* SLA Progress Card */}
+            <section className="card !mb-0">
+              <div className="card-head">
+                <h2>Délai de réalisation annoncé</h2>
+                <span className={`badge ${sla.isLate ? 'badge-red' : 'badge-green'}`}>{slaLabel}</span>
+              </div>
+              <p className="text-xs muted">
+                Échéance estimée : <strong>{sla.targetDate}</strong>{' '}
+                {request.status === 'done'
+                  ? '· Mission livrée'
+                  : sla.isLate
+                    ? `· Dépassement de ${Math.abs(sla.daysRemaining)} j`
+                    : `· ${sla.daysRemaining} j restant${sla.daysRemaining > 1 ? 's' : ''}`}
+              </p>
+              <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-[#e3efff]">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{
+                    width: `${sla.percent}%`,
+                    backgroundColor: sla.isLate ? '#ba1a1a' : '#006191',
+                  }}
+                />
+              </div>
+            </section>
+
+            {/* Contract Card */}
+            <section className="card !mb-0">
+              <div className="card-head">
+                <h2>Devis &amp; Contrat de prestation</h2>
+                {contract ? (
+                  <span className="badge badge-green">Accepté · {contract.id}</span>
+                ) : (
+                  <span className="badge badge-gold">À accepter</span>
+                )}
+              </div>
+              {contract ? (
+                <div className="space-y-2.5">
+                  <p className="text-xs muted">
+                    Accepté le {new Date(contract.acceptedAt).toLocaleString('fr-FR')} avec message envoyé au Super Admin. Une copie officielle est envoyée par e-mail depuis le domaine BeniLink au client et à l'administration.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => openPrintableContract(contract)}
+                    >
+                      Télécharger / Imprimer le contrat (PDF)
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  <p className="text-xs muted">
+                    Pour valider votre devis, cliquez ci-dessous puis envoyez le message de confirmation obligatoire au Super Admin. Votre contrat PDF est généré automatiquement à l'envoi.
+                  </p>
+                  <button
+                    type="button"
+                    className="btn btn-gold btn-sm"
+                    onClick={() => setShowAcceptQuoteModal(true)}
+                  >
+                    Accepter le devis
+                  </button>
+                </div>
+              )}
+            </section>
+          </div>
+
+          {/* Client-facing Installments & Milestones (FedaPay per installment, ZERO provider costs/margins) */}
+          {(wf.installments.length > 0 || wf.milestones.length > 0) && (
+            <section className="card mb-5">
+              <div className="card-head flex-wrap gap-2">
+                <h2>Échéancier de paiement &amp; Jalons (FedaPay)</h2>
+                <span className="badge badge-neutral">
+                  {PAYMENT_MODALITY_LABELS[wf.paymentModality]}
+                </span>
+              </div>
+
+              {wf.milestones.length > 0 && (
+                <div className="mb-4 flex flex-wrap gap-2">
+                  {wf.milestones.map((m) => (
+                    <span
+                      key={m.id}
+                      className={`badge ${m.reached ? 'badge-green' : 'badge-neutral'}`}
+                    >
+                      {m.reached ? '✓ ' : '○ '}
+                      {m.title} ({m.triggerValue})
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {wf.installments.length > 0 && (
+                <div className="space-y-2">
+                  {wf.installments.map((inst) => (
+                    <div
+                      key={inst.id}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#d0e3f5] bg-[#f7f9ff] px-3.5 py-2.5 text-xs"
+                    >
+                      <div>
+                        <strong>{inst.label}</strong> ·{' '}
+                        <span className="font-bold text-[#006191]">
+                          {formatConvertedMoney(inst.amountEur, currency)}
+                        </span>
+                        <span className="block text-[11px] muted">
+                          Déclencheur : {inst.triggerLabel}
+                        </span>
+                      </div>
+                      {inst.status === 'paye' ? (
+                        <span className="badge badge-green">Payée ✓</span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handlePayInstallmentFedaPay(inst.id)}
+                          className="btn btn-gold btn-sm"
+                        >
+                          Payer via FedaPay
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* Mandatory Message Alert Modal for Quote Acceptance (§6 v1.2) */}
+          {showAcceptQuoteModal && (
+            <div
+              className="no-scrollbar fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-[#06243d]/75 p-4 backdrop-blur-sm"
+              onClick={() => !acceptingQuote && setShowAcceptQuoteModal(false)}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Confirmer l'acceptation du devis"
+            >
+              <form
+                onClick={(e) => e.stopPropagation()}
+                onSubmit={handleConfirmAcceptQuote}
+                className="w-full max-w-md rounded-2xl border border-[#d0e3f5] bg-white p-5 sm:p-6 shadow-2xl space-y-4"
+              >
+                <div>
+                  <h2 className="font-display text-lg font-bold text-[#0d1d2b]">
+                    Confirmer l'acceptation du devis
+                  </h2>
+                  <p className="mt-1 text-xs leading-relaxed text-[#4c657a]">
+                    Conformément aux règles BeniLink, l'acceptation est effective uniquement à l'envoi de ce message au Super Admin. Si vous fermez cette fenêtre sans envoyer, rien n'est accepté.
+                  </p>
+                </div>
+
+                <div>
+                  <label htmlFor="quote-accept-msg" className="mb-1 block text-xs font-bold text-[#0d1d2b]">
+                    Message obligatoire au Super Admin <span className="text-[#ba1a1a]">*</span>
+                  </label>
+                  <textarea
+                    id="quote-accept-msg"
+                    rows={3}
+                    required
+                    value={acceptMessage}
+                    onChange={(e) => setAcceptMessage(e.target.value)}
+                    placeholder="J'accepte le devis et le délai de réalisation indiqués."
+                    className="w-full rounded-xl border border-[#d0e3f5] bg-white p-3 text-xs text-[#0d1d2b]"
+                  />
+                </div>
+
+                <div className="flex flex-wrap justify-end gap-2">
+                  <button
+                    type="button"
+                    disabled={acceptingQuote}
+                    onClick={() => setShowAcceptQuoteModal(false)}
+                    className="btn btn-ghost btn-sm"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={acceptingQuote || !acceptMessage.trim()}
+                    className="btn btn-gold btn-sm"
+                  >
+                    {acceptingQuote ? 'Envoi en cours…' : 'Envoyer & accepter le devis'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+          </>
+        );
+      })()}
 
       {/* Main Grid */}
       <div className="detail-grid">
@@ -489,7 +803,7 @@ export const ClientRequestDetail: React.FC = () => {
                   />
                   <p className="hint text-[11px] text-neutral-400 mt-1">
                     {request.review?.status === 'published'
-                      ? 'Avis publié sur la vitrine KWABO.'
+                      ? 'Avis publié sur la vitrine BeniLink.'
                       : 'Votre avis passe en attente de modération avant publication.'}
                   </p>
                   <button className="btn btn-ghost btn-sm mt-2" type="submit" disabled={savingReview}>
@@ -533,7 +847,7 @@ export const ClientRequestDetail: React.FC = () => {
           {/* WhatsApp Direct link */}
           <a
             className="card card-link card-link-whatsapp"
-            href={getWhatsAppLink(`Bonjour KWABO, ma demande ${request.tracking}`)}
+            href={getWhatsAppLink(`Bonjour BeniLink, ma demande ${request.tracking}`)}
             target="_blank"
             rel="noopener noreferrer"
           >

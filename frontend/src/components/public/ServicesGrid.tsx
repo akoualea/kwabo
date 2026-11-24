@@ -1,15 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Service } from '../../types';
-import { Check, ArrowRight, Star, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Search, Sparkles } from 'lucide-react';
 
 interface Props {
   selectedCategory: string;
   onSelectCategory: (cat: string) => void;
 }
 
-// Fait apparaître chaque carte (fondu + montée) quand elle entre dans l'écran,
-// avec un décalage selon sa colonne pour qu'elles arrivent une par une.
 const RevealCard: React.FC<{ delay: number; children: React.ReactNode }> = ({ delay, children }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -30,7 +27,7 @@ const RevealCard: React.FC<{ delay: number; children: React.ReactNode }> = ({ de
           observer.disconnect();
         }
       },
-      { threshold: 0.12 }
+      { threshold: 0.1 }
     );
 
     observer.observe(node);
@@ -42,7 +39,7 @@ const RevealCard: React.FC<{ delay: number; children: React.ReactNode }> = ({ de
       ref={ref}
       style={{ transitionDelay: visible ? `${delay}ms` : '0ms' }}
       className={`h-full transition-all duration-700 ease-out motion-reduce:transition-none ${
-        visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
       }`}
     >
       {children}
@@ -56,7 +53,8 @@ export const ServicesGrid: React.FC<Props> = ({ selectedCategory, onSelectCatego
 
   const filteredServices = services.filter(s => {
     const matchesCat = selectedCategory === 'all' || s.cat === selectedCategory;
-    const matchesSearch = !filterQuery.trim() || 
+    const matchesSearch =
+      !filterQuery.trim() ||
       s.name.toLowerCase().includes(filterQuery.toLowerCase()) ||
       s.short.toLowerCase().includes(filterQuery.toLowerCase()) ||
       s.included.some(inc => inc.toLowerCase().includes(filterQuery.toLowerCase()));
@@ -64,44 +62,44 @@ export const ServicesGrid: React.FC<Props> = ({ selectedCategory, onSelectCatego
   });
 
   return (
-    <section id="services" className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+    <section id="services" className="bg-white py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#1a5c3a] bg-[#e8f5ee] px-3.5 py-1.5 rounded-full inline-block">
-              Catalogue officiel 2026
+            <span className="inline-block rounded-full bg-[#e3efff] px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-[#006191]">
+              Catalogue officiel BeniLink
             </span>
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[#1a1f1b] mt-3">
-              Nos 12 services de confiance au Bénin
+            <h2 className="font-display mt-2 text-3xl font-semibold text-[#0d1d2b] sm:text-4xl">
+              Nos {services.length || 12} services de confiance au Bénin
             </h2>
-            <p className="text-sm text-[#56635b] mt-2 max-w-xl">
+            <p className="mt-2 max-w-xl text-sm text-[#3f4850]">
               Chaque prestation est couverte par un contrat officiel, un suivi régulier et des pièces justificatives certifiées.
             </p>
           </div>
 
-          {/* Quick Search */}
-          <div className="w-full md:w-72">
+          <div className="relative w-full md:w-72">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#4c657a]" aria-hidden="true" />
             <input
               type="text"
               value={filterQuery}
-              onChange={(e) => setFilterQuery(e.target.value)}
+              onChange={e => setFilterQuery(e.target.value)}
               placeholder="Filtrer les services..."
-              className="w-full px-4 py-2.5 rounded-xl border border-neutral-300 text-xs text-[#1a1f1b] focus:ring-2 focus:ring-[#1a5c3a] focus:outline-none"
+              aria-label="Filtrer les services"
+              className="w-full rounded-full border border-[#d0e3f5] bg-[#f7f9ff] py-2.5 pl-10 pr-4 text-xs text-[#0d1d2b] outline-none transition focus:border-[#006191] focus:ring-2 focus:ring-[#1593d6]/20"
+              style={{ minHeight: '42px', paddingLeft: '2.5rem', borderRadius: '9999px' }}
             />
           </div>
         </div>
 
         {/* Category Filter Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-10 no-scrollbar">
+        <div className="no-scrollbar mb-10 flex items-center gap-2 overflow-x-auto pb-2">
           <button
             type="button"
             onClick={() => onSelectCategory('all')}
-            className={`px-4 py-2 rounded-full text-xs font-bold transition whitespace-nowrap ${
+            className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition ${
               selectedCategory === 'all'
-                ? 'bg-[#1a5c3a] text-white shadow-sm'
-                : 'bg-[#f9f7f4] text-[#56635b] hover:bg-neutral-200'
+                ? 'bg-[#006191] text-white shadow-sm'
+                : 'border border-[#d0e3f5] bg-[#f7f9ff] text-[#3f4850] hover:bg-[#e3efff] hover:text-[#006191]'
             }`}
           >
             Tous les services ({services.length})
@@ -111,10 +109,10 @@ export const ServicesGrid: React.FC<Props> = ({ selectedCategory, onSelectCatego
               key={cat.id}
               type="button"
               onClick={() => onSelectCategory(cat.id)}
-              className={`px-4 py-2 rounded-full text-xs font-bold transition whitespace-nowrap ${
+              className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition ${
                 selectedCategory === cat.id
-                  ? 'bg-[#1a5c3a] text-white shadow-sm'
-                  : 'bg-[#f9f7f4] text-[#56635b] hover:bg-neutral-200'
+                  ? 'bg-[#006191] text-white shadow-sm'
+                  : 'border border-[#d0e3f5] bg-[#f7f9ff] text-[#3f4850] hover:bg-[#e3efff] hover:text-[#006191]'
               }`}
             >
               {cat.short}
@@ -123,58 +121,52 @@ export const ServicesGrid: React.FC<Props> = ({ selectedCategory, onSelectCatego
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-7 md:grid-cols-2 lg:grid-cols-3">
           {filteredServices.map((service, index) => {
             const cat = categories.find(c => c.id === service.cat);
             return (
-              <RevealCard key={service.id} delay={(index % 3) * 180}>
+              <RevealCard key={service.id} delay={(index % 3) * 140}>
                 <div
                   onClick={() => openServiceModal(service)}
-                  className="group h-full bg-white rounded-3xl overflow-hidden border border-[#e0e8e4] hover:shadow-xl hover:border-[#1a5c3a]/40 transition-all duration-300 flex flex-col justify-between cursor-pointer"
+                  className="group flex h-full cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-[#d0e3f5] bg-white shadow-[0_4px_16px_-2px_rgba(11,111,184,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-[#1593d6] hover:shadow-[0_12px_28px_-4px_rgba(11,111,184,0.12)]"
                 >
                   <div>
-                    {/* Photo with Overlay Badge */}
                     <div className="relative h-48 overflow-hidden">
                       <img
                         src={service.photo}
                         alt={service.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                      
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0d1d2b]/80 via-[#0d1d2b]/15 to-transparent" />
+
                       <div className="absolute top-3 left-3 flex items-center gap-2">
-                        <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-black/60 text-white backdrop-blur-md">
+                        <span className="rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold text-[#006191] backdrop-blur-sm">
                           {cat?.short}
                         </span>
                         {service.popular && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#f5c842] text-[#123f28] shadow-sm">
-                            <Sparkles className="w-3 h-3" />
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[#ffdf93] px-2.5 py-1 text-[10px] font-bold text-[#241a00] shadow-xs">
+                            <Sparkles className="h-3 w-3" aria-hidden="true" />
                             Plébiscité
                           </span>
                         )}
                       </div>
 
-                      <div className="absolute bottom-3 left-3 right-3 text-white">
-                        <span className="text-xs font-bold text-[#f5c842] block">
-                          {service.price}
-                        </span>
-                        <h3 className="font-display text-lg font-bold truncate">
+                      <div className="absolute bottom-3 left-4 right-4 text-white">
+                        <h3 className="font-display truncate text-lg font-bold">
                           {service.name}
                         </h3>
                       </div>
                     </div>
 
-                    {/* Body Content */}
-                    <div className="p-6 space-y-4">
-                      <p className="text-xs text-[#56635b] leading-relaxed line-clamp-2">
+                    <div className="space-y-4 p-6">
+                      <p className="line-clamp-2 text-xs leading-relaxed text-[#4c657a]">
                         {service.short}
                       </p>
 
-                      {/* Included bullets */}
                       <div className="space-y-1.5 pt-1">
                         {service.included.slice(0, 3).map((inc, i) => (
-                          <div key={i} className="flex items-center gap-2 text-xs text-[#404844]">
-                            <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                          <div key={i} className="flex items-center gap-2 text-xs text-[#0d1d2b]">
+                            <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#006191]" aria-hidden="true" />
                             <span className="truncate">{inc}</span>
                           </div>
                         ))}
@@ -182,13 +174,12 @@ export const ServicesGrid: React.FC<Props> = ({ selectedCategory, onSelectCatego
                     </div>
                   </div>
 
-                  {/* Card Action footer */}
-                  <div className="p-6 pt-0 border-t border-neutral-100 mt-2 flex items-center justify-between">
-                    <span className="text-xs font-bold text-[#1a5c3a] group-hover:underline">
-                      Détails & devis
+                  <div className="mt-1 flex items-center justify-between border-t border-[#edf4ff] bg-[#f7f9ff]/60 px-6 py-4">
+                    <span className="text-xs font-bold text-[#006191] group-hover:underline">
+                      Détails &amp; devis
                     </span>
-                    <div className="w-8 h-8 rounded-full bg-[#e8f5ee] group-hover:bg-[#1a5c3a] group-hover:text-white text-[#1a5c3a] flex items-center justify-center transition-colors">
-                      <ArrowRight className="w-4 h-4" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#e3efff] text-[#006191] transition-colors group-hover:bg-[#006191] group-hover:text-white">
+                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </div>
                   </div>
                 </div>

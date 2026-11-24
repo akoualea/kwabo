@@ -56,60 +56,11 @@ const OPERATOR_DASHBOARD_ANIMATIONS = `
   animation: kwValueIn 0.6s ease both;
 }
 
-/* Cartes de statistiques : une couleur par carte, texte blanc, sans soulignement */
+/* Cartes de statistiques BeniLink : fond blanc épuré, bordure #d0e3f5 */
 .stats .kw-stat {
   position: relative;
   overflow: hidden;
-  border: none !important;
-  box-shadow: 0 8px 20px rgba(18, 63, 40, 0.25);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-.stats .kw-stat::after {
-  content: '';
-  position: absolute;
-  right: -28px;
-  bottom: -34px;
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  pointer-events: none;
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.stats .kw-stat:hover::after {
-  transform: scale(1.35);
-}
-.stats .kw-stat,
-.stats .kw-stat * {
-  color: #ffffff !important;
-}
-.stats .kw-stat a,
-.stats .kw-stat a:hover,
-.stats .kw-stat a:focus {
-  text-decoration: none !important;
-}
-.stats .kw-stat .tile {
-  background: rgba(255, 255, 255, 0.2) !important;
-}
-.stats .kw-stat:hover {
-  box-shadow: 0 14px 28px rgba(18, 63, 40, 0.35);
-}
-
-/* 1. Vert profond */
-.stats .kw-stat:nth-child(1) {
-  background: linear-gradient(135deg, #1a5c38 0%, #123f28 100%) !important;
-}
-/* 2. Vert franc */
-.stats .kw-stat:nth-child(2) {
-  background: linear-gradient(135deg, #3a8a5c 0%, #2a7048 100%) !important;
-}
-/* 3. Or foncé */
-.stats .kw-stat:nth-child(3) {
-  background: linear-gradient(135deg, #b8860b 0%, #8f6a08 100%) !important;
-}
-/* 4. Ardoise */
-.stats .kw-stat:nth-child(4) {
-  background: linear-gradient(135deg, #455a4f 0%, #2f4036 100%) !important;
 }
 
 /* Cartes */
