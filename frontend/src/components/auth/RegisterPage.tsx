@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowRight, Eye, EyeOff, Globe, MailCheck } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { api } from '../../services/api';
 import { CURRENCIES, setUserCurrency, WORLD_COUNTRIES } from '../../data/worldCountries';
 import { AuthPageLayout } from './AuthPageLayout';
 
@@ -16,7 +17,17 @@ export const RegisterPage: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [referralCode, setReferralCode] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsVersion, setTermsVersion] = useState('1.2');
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    api<{ data?: { version?: string } }>('/legal/terms', { skipAuthRedirect: true })
+      .then((res) => {
+        if (res?.data?.version) setTermsVersion(String(res.data.version));
+      })
+      .catch(() => {});
+  }, []);
 
   const selectedCountry =
     WORLD_COUNTRIES.find((c) => c.name === countryName) || WORLD_COUNTRIES[0];
@@ -49,11 +60,14 @@ export const RegisterPage: React.FC = () => {
       first_name: firstName.trim(),
       last_name: lastName.trim(),
       email: email.trim(),
-      phone: phone.trim(),
+      phone: `${dialCode} ${phone.trim()}`.trim(),
       dial: dialCode,
-      country: selectedCountry.name,
+      country: selectedCountry.code || selectedCountry.name,
       password,
       sponsor_code: referralCode.trim() || undefined,
+      terms_accepted: termsAccepted,
+      terms_version: termsVersion,
+      preferred_currency: selectedCountry.currency,
     });
 
     setIsLoading(false);
@@ -352,6 +366,8 @@ export const RegisterPage: React.FC = () => {
           <input
             type="checkbox"
             required
+            checked={termsAccepted}
+            onChange={(e) => setTermsAccepted(e.target.checked)}
             className="mt-1 h-4 w-4 shrink-0 accent-[#006191]"
           />
           <span>

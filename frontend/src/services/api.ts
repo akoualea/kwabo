@@ -1,6 +1,6 @@
 import { handleDevPreviewRequest, isDevPreviewToken } from './devPreviewApi';
 
-const RAW_BASE_URL = import.meta.env.VITE_API_URL || '';
+const RAW_BASE_URL = import.meta.env.VITE_API_URL || 'https://kwabo.alwaysdata.net/api';
 const BASE_URL = RAW_BASE_URL.replace(/\/+$/, '');
 
 export const TOKEN_STORAGE_KEY = 'kwabo_token';

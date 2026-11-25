@@ -248,6 +248,7 @@ export const AppSidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, 
           ) : (
             <BrandLogo
               size="sm"
+              light
               onClick={() => {
                 navigate(role === 'ADMIN' ? 'admin-dashboard' : role === 'OPERATOR' ? 'operator-dashboard' : 'client-dashboard');
                 onClose();
@@ -345,8 +346,8 @@ export const AppSidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, 
           </div>
 
           {role === 'ADMIN' && !effectiveCollapsed && (
-            <div className="mb-1.5 rounded-xl border border-[#d0e3f5] bg-[#f7f9ff] px-2.5 py-2">
-              <label htmlFor="subrole-switcher" className="mb-1 block text-[10px] font-bold uppercase tracking-wider muted">
+            <div className="mb-1.5 rounded-xl border border-white/20 bg-white/10 px-2.5 py-2">
+              <label htmlFor="subrole-switcher" className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-white/80">
                 Vue rôle (7 rôles v1.2)
               </label>
               <select
@@ -358,7 +359,7 @@ export const AppSidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, 
                   setSubRoleState(next);
                 }}
                 style={{ minHeight: '32px', padding: '4px 8px' }}
-                className="w-full rounded-lg border border-[#d0e3f5] bg-white text-xs font-semibold"
+                className="w-full rounded-lg border border-white/25 bg-white text-xs font-semibold text-[#0d1d2b]"
               >
                 {(['super_admin', 'admin_general', 'responsable_clientele', 'responsable_prestations'] as BeniLinkRole[]).map(
                   (r) => (

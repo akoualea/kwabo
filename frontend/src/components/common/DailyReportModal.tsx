@@ -47,15 +47,19 @@ export const DailyReportModal: React.FC<DailyReportModalProps> = ({ isOpen, onCl
       note,
     });
 
-    // Best-effort backend transmission
-    api('/admin/daily-reports', {
-      method: 'POST',
-      body: {
-        date: report.date,
-        note: report.note,
-        activities: report.activities,
-      },
-    }).catch(() => {});
+    // Transmission vers POST /me/daily-report (API BeniLink §6)
+    try {
+      await api('/me/daily-report', {
+        method: 'POST',
+        body: {
+          note: report.note || undefined,
+          date: report.date,
+          activities: report.activities,
+        },
+      });
+    } catch {
+      // Conservation locale en fallback si hors ligne
+    }
 
     setSubmittedReport(report);
     setSubmitting(false);

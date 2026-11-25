@@ -61,46 +61,65 @@ export const AuthPageLayout: React.FC<Props> = ({ children }) => {
     <div className="min-h-screen flex flex-col bg-white text-[#0d1d2b]">
       <style>{authFieldsCss}</style>
 
-      {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-40 border-b border-[#d0e3f5] bg-[#f7f9ff]/95 backdrop-blur-xl shadow-[0_1px_8px_rgba(8,77,130,0.04)]">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4">
-            <BrandLogo subtitle="Portail Diaspora" onClick={() => navigate('public-home')} />
+      {/* Top Navigation Bar — Bleu BeniLink, 100% responsive */}
+      <header className="auth-blue-header sticky top-0 z-40 border-b border-white/15 bg-gradient-to-r from-[#004b73] via-[#006191] to-[#0074ad] text-white shadow-[0_4px_20px_rgba(0,75,115,0.22)]">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 px-3 sm:px-6 lg:px-8">
+          <div className="flex min-w-0 shrink items-center">
+            <BrandLogo
+              size="sm"
+              light
+              subtitle="Portail Diaspora"
+              onClick={() => navigate('public-home')}
+              className="max-w-full"
+            />
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-3">
-            <ThemeToggleButton className="h-9 w-9 rounded-full" />
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2.5">
+            <ThemeToggleButton className="h-9 w-9 rounded-full !border-white/25 !bg-white/12 !text-white hover:!bg-white/22" />
             <button
               type="button"
               onClick={() => navigate('public-home')}
-              aria-label="Accueil"
-              className="inline-flex items-center gap-1.5 rounded-full px-2.5 sm:px-3.5 py-2 text-xs font-semibold text-[#3f4850] transition hover:bg-[#d9eafd] hover:text-[#0d1d2b]"
+              aria-label="Retour à l'accueil"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-2.5 sm:px-3.5 text-xs font-semibold text-white transition hover:bg-white/20"
             >
               <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span className="hidden sm:inline">Accueil</span>
             </button>
-            <button
-              type="button"
-              onClick={() => navigate('login')}
-              className="hidden sm:inline-flex items-center rounded-full px-3.5 py-2 text-xs font-semibold text-[#3f4850] transition hover:bg-[#d9eafd] hover:text-[#0d1d2b]"
-            >
-              Connexion
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('register')}
-              className="inline-flex items-center whitespace-nowrap rounded-full bg-[#006191] px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold text-white shadow-sm transition hover:bg-[#084d82]"
-            >
-              Ouvrir un compte
-            </button>
+            {isRegister ? (
+              <button
+                type="button"
+                onClick={() => navigate('login')}
+                className="inline-flex h-9 items-center whitespace-nowrap rounded-full bg-[#f7c531] px-3 sm:px-4 text-xs font-bold text-[#10202e] shadow-sm transition hover:bg-[#ffcf44]"
+              >
+                Connexion
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => navigate('login')}
+                  className="hidden sm:inline-flex h-9 items-center rounded-full border border-white/20 bg-white/10 px-3.5 text-xs font-semibold text-white transition hover:bg-white/20"
+                >
+                  Connexion
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('register')}
+                  className="inline-flex h-9 items-center whitespace-nowrap rounded-full bg-[#f7c531] px-3 sm:px-4 text-xs font-bold text-[#10202e] shadow-sm transition hover:bg-[#ffcf44]"
+                >
+                  <span className="sm:hidden">S'inscrire</span>
+                  <span className="hidden sm:inline">Ouvrir un compte</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
       </header>
 
-      {/* Full-bleed open split layout (no nested card frames) */}
+      {/* Full-bleed open split layout — image visible sur mobile ET desktop */}
       <main className="grid flex-1 grid-cols-1 lg:grid-cols-12">
-        {/* Left contextual full-bleed photo with centered text */}
-        <section className="relative hidden min-h-[560px] flex-col items-center justify-center overflow-hidden p-10 text-center lg:col-span-6 lg:flex xl:p-14">
+        {/* Contextual full-bleed photo with centered text (visible on mobile, tablet & desktop) */}
+        <section className="relative flex min-h-[215px] sm:min-h-[270px] lg:min-h-[560px] flex-col items-center justify-center overflow-hidden px-5 py-8 text-center lg:col-span-6 lg:p-10 xl:p-14">
           <img
             src={panelConfig.photo}
             alt={panelConfig.photoAlt}
@@ -108,21 +127,21 @@ export const AuthPageLayout: React.FC<Props> = ({ children }) => {
           />
           <div
             aria-hidden="true"
-            className="absolute inset-0 bg-gradient-to-b from-[#041d33]/20 via-[#041d33]/30 to-[#041d33]/45"
+            className="absolute inset-0 bg-gradient-to-b from-[#041d33]/35 via-[#041d33]/40 to-[#041d33]/60"
           />
 
-          <div className="relative z-10 flex max-w-md flex-col items-center gap-3">
-            <h1 className="font-display text-3xl font-bold tracking-tight text-white xl:text-[40px] drop-shadow-[0_3px_14px_rgba(0,0,0,0.75)]">
+          <div className="relative z-10 flex max-w-md flex-col items-center gap-2 sm:gap-3">
+            <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-white xl:text-[40px] drop-shadow-[0_3px_14px_rgba(0,0,0,0.75)]">
               {panelConfig.title}
             </h1>
-            <p className="text-sm font-medium leading-relaxed text-white sm:text-base drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]">
+            <p className="text-xs sm:text-sm font-medium leading-relaxed text-white/95 md:text-base drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]">
               {panelConfig.subtitle}
             </p>
           </div>
         </section>
 
-        {/* Right open form area (no card border or frame) */}
-        <section className="flex items-center justify-center bg-white px-5 py-10 sm:px-10 lg:col-span-6 lg:py-12">
+        {/* Right open form area (generous bottom padding so floating buttons never overlap content on mobile) */}
+        <section className="flex items-center justify-center bg-white px-4 pt-7 pb-28 sm:px-10 sm:py-10 lg:col-span-6 lg:py-12">
           <div className="auth-benilink w-full max-w-[460px]">
             {children}
           </div>

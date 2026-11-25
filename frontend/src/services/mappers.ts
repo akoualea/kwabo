@@ -15,9 +15,19 @@ import {
 } from '../types';
 
 export function mapRole(rawRole?: string): UserRole {
-  const r = String(rawRole || 'user').toLowerCase();
-  if (r === 'admin') return 'ADMIN';
-  if (r === 'operator') return 'OPERATOR';
+  const r = String(rawRole || 'client').toLowerCase();
+  if (
+    r === 'admin' ||
+    r === 'super_admin' ||
+    r === 'admin_general' ||
+    r === 'responsable_clientele' ||
+    r === 'responsable_prestations'
+  ) {
+    return 'ADMIN';
+  }
+  if (r === 'operator' || r === 'agent' || r === 'etudiant_livreur') {
+    return 'OPERATOR';
+  }
   return 'USER';
 }
 
@@ -29,12 +39,15 @@ export function mapUser(raw: any): User {
   return {
     id: String(raw?.id ?? ''),
     role: mapRole(raw?.role),
+    rawRole: raw?.role ? String(raw.role).toLowerCase() : undefined,
     firstName,
     lastName,
     fullName,
     email: raw?.email ?? '',
     country: raw?.country ?? '',
     phone: raw?.phone ?? '',
+    age: raw?.age !== undefined && raw?.age !== null ? Number(raw.age) : null,
+    preferredCurrency: raw?.preferred_currency ?? raw?.preferredCurrency ?? undefined,
     verified: Boolean(raw?.email_verified ?? raw?.verified ?? (raw?.state ? raw.state !== 'unverified' : true)),
     twoFactor: Boolean(raw?.two_factor_enabled ?? raw?.twoFactor ?? false),
     prefs: raw?.notification_prefs ?? raw?.prefs ?? {
@@ -84,7 +97,10 @@ export function mapCatalog(rawCategories: any[]): { categories: Category[]; serv
         icon: s.icon ?? oldSrv?.icon ?? 'sparkles',
         popular: Boolean(s.popular),
         available: s.available !== undefined ? Boolean(s.available) : true,
-        price: s.price_label ?? s.price ?? oldSrv?.price ?? '',
+        price: s.price_label ?? s.price ?? '',
+        standardDelayDays: s.standard_delay_days !== undefined ? Number(s.standard_delay_days) : null,
+        requiresDelivery: Boolean(s.requires_delivery),
+        requiresProvider: Boolean(s.requires_provider),
         short: s.short ?? oldSrv?.short ?? '',
         desc: s.desc ?? s.short ?? oldSrv?.desc,
         included: Array.isArray(s.included) ? s.included : oldSrv?.included ?? [],
@@ -151,6 +167,9 @@ export function mapInvoice(raw: any, fallbackRequestId?: string): InvoiceItem {
     client: userObj && typeof userObj === 'object' ? mapUser(userObj) : null,
     label: raw?.label ?? '',
     amount: Number(raw?.amount ?? 0),
+    currency: raw?.currency ?? undefined,
+    provider: raw?.provider ?? null,
+    paymentUrl: raw?.payment_url ?? raw?.paymentUrl ?? null,
     status: raw?.status ?? 'due',
     method: raw?.method ?? null,
     createdAt: raw?.created_at ?? raw?.createdAt ?? new Date().toISOString(),
@@ -238,6 +257,7 @@ export function mapRequest(raw: any): RequestItem {
     serviceName: raw?.service?.name ?? raw?.service_name,
     service: raw?.service && typeof raw.service === 'object' ? mapServiceItem(raw.service) : null,
     status: raw?.status ?? 'pending',
+    internalStep: raw?.internal_step ?? raw?.internalStep ?? null,
     title: raw?.title ?? '',
     city: raw?.city ?? '',
     urgency: raw?.urgency === 'urgent' ? 'urgent' : 'normal',
@@ -247,9 +267,26 @@ export function mapRequest(raw: any): RequestItem {
     operatorId: raw?.operator_id ? String(raw.operator_id) : operatorRaw?.id ? String(operatorRaw.id) : null,
     operator: operatorRaw && typeof operatorRaw === 'object' ? mapUser(operatorRaw) : null,
     client: clientRaw && typeof clientRaw === 'object' ? mapUser(clientRaw) : null,
-    quote: raw?.quote ? { amount: Number(raw.quote.amount), label: raw.quote.label ?? '' } : null,
+    quote: raw?.quote
+      ? {
+          amount: Number(raw.quote.amount ?? 0),
+          currency: raw.quote.currency ?? undefined,
+          label: raw.quote.label ?? '',
+          validUntil: raw.quote.valid_until ?? raw.quote.validUntil ?? null,
+          conditions: raw.quote.conditions ?? null,
+          items: Array.isArray(raw.quote.items) ? raw.quote.items : undefined,
+        }
+      : null,
     rating: raw?.rating !== undefined && raw?.rating !== null ? Number(raw.rating) : null,
     createdAt: raw?.created_at ?? raw?.createdAt ?? new Date().toISOString(),
+    startedAt: raw?.started_at ?? raw?.startedAt ?? null,
+    dueDate: raw?.due_date ?? raw?.dueDate ?? null,
+    isOverdue: Boolean(raw?.is_overdue ?? raw?.isOverdue ?? false),
+    workOrder: raw?.work_order ?? raw?.workOrder ?? null,
+    assignments: raw?.assignments ?? null,
+    teamOpinions: Array.isArray(raw?.team_opinions) ? raw.team_opinions : undefined,
+    missionRoomId: raw?.mission_room_id ?? raw?.missionRoomId ?? null,
+    requestRoomId: raw?.request_room_id ?? raw?.requestRoomId ?? null,
     history: Array.isArray(raw?.history) ? raw.history : [],
     notes: Array.isArray(raw?.notes)
       ? raw.notes.map((n: any, idx: number) => ({
@@ -294,5 +331,6 @@ export function mapCounters(raw: any): Counters {
     unreadNotifications: Number(c.unread_notifications ?? 0),
     dueInvoices: Number(c.due_invoices ?? 0),
     pendingReviews: Number(c.pending_reviews ?? 0),
+    unreportedActions: Number(c.unreported_actions ?? 0),
   };
 }

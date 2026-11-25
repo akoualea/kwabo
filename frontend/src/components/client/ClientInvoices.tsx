@@ -110,10 +110,19 @@ export const ClientInvoices: React.FC = () => {
     if (!selectedInvoice || paying) return;
     setPaying(true);
     try {
-      await api(`/invoices/${selectedInvoice.id}/pay`, {
+      const res = await api<any>(`/invoices/${selectedInvoice.id}/pay`, {
         method: 'POST',
-        body: { method: payMethod },
+        body: {
+          method: payMethod,
+          callback_url: window.location.href,
+        },
       });
+      const paymentUrl = res?.payment_url || res?.data?.payment_url;
+      if (paymentUrl) {
+        addToast('Redirection sécurisée vers FedaPay…', 'info');
+        window.location.href = paymentUrl;
+        return;
+      }
       setSelectedInvoice(null);
       addToast('Paiement confirmé. Merci !', 'success');
       await Promise.all([loadData(), refreshCounters()]);
@@ -187,7 +196,8 @@ export const ClientInvoices: React.FC = () => {
   };
 
   const paymentProviders: Record<string, { label: string; via: string; icon: string }> = {
-    card: { label: 'Carte bancaire', via: 'Stripe (CB, Visa, Mastercard)', icon: 'credit-card' },
+    fedapay: { label: 'FedaPay (Carte & Mobile Money)', via: 'Passerelle sécurisée FedaPay', icon: 'credit-card' },
+    card: { label: 'Carte bancaire', via: 'CB, Visa, Mastercard (via FedaPay)', icon: 'credit-card' },
     momo: { label: 'Mobile Money', via: 'MTN MoMo, Moov Money (Bénin)', icon: 'device-phone-mobile' },
     wise: { label: 'Virement bancaire', via: 'Wise / IBAN européen', icon: 'building-library' },
   };

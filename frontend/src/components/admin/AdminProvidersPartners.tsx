@@ -26,7 +26,53 @@ export const AdminProvidersPartners: React.FC = () => {
   useEffect(() => {
     const sync = () => setItems(getProvidersAndPartners());
     sync();
-    return subscribeWorkflow(sync);
+    const unsub = subscribeWorkflow(sync);
+
+    let cancelled = false;
+    Promise.allSettled([api<any>('/admin/providers'), api<any>('/admin/partners')]).then(
+      ([provRes, partRes]) => {
+        if (cancelled) return;
+        const remote: ProviderPartnerFiche[] = [];
+        const mapRemote = (raw: any, kind: 'prestataire' | 'partenaire'): ProviderPartnerFiche => ({
+          id: `${kind}-${raw.id}`,
+          kind,
+          name: raw.name || 'Sans nom',
+          contact: raw.contact || raw.phone || raw.email || '',
+          country: raw.country || 'Bénin',
+          city: raw.city || 'Cotonou',
+          specialties: Array.isArray(raw.specialties)
+            ? raw.specialties.join(', ')
+            : raw.specialties || raw.specialty || '',
+          notes: raw.notes || undefined,
+          createdAt: raw.created_at || new Date().toISOString(),
+        });
+
+        if (provRes.status === 'fulfilled') {
+          const list = Array.isArray(provRes.value?.data)
+            ? provRes.value.data
+            : Array.isArray(provRes.value)
+              ? provRes.value
+              : [];
+          list.forEach((p: any) => remote.push(mapRemote(p, 'prestataire')));
+        }
+        if (partRes.status === 'fulfilled') {
+          const list = Array.isArray(partRes.value?.data)
+            ? partRes.value.data
+            : Array.isArray(partRes.value)
+              ? partRes.value
+              : [];
+          list.forEach((p: any) => remote.push(mapRemote(p, 'partenaire')));
+        }
+        if (remote.length > 0) {
+          setItems(remote);
+        }
+      }
+    );
+
+    return () => {
+      cancelled = true;
+      unsub();
+    };
   }, []);
 
   const filtered = items.filter((i) => i.kind === tab);

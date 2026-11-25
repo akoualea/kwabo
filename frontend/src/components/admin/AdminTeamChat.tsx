@@ -20,13 +20,39 @@ export const AdminTeamChat: React.FC = () => {
   const [draft, setDraft] = useState('');
   const endRef = useRef<HTMLDivElement | null>(null);
 
+  const [apiRooms, setApiRooms] = useState<{ id: string; label: string }[]>([]);
+  const [apiMessages, setApiMessages] = useState<TeamRoomMessage[]>([]);
+
   useEffect(() => {
     const sync = () => setAllMessages(getTeamRoomMessages());
     sync();
     return subscribeWorkflow(sync);
   }, []);
 
+  // Live GET /team/rooms from BeniLink API
+  useEffect(() => {
+    let cancelled = false;
+    api<any>('/team/rooms')
+      .then((res) => {
+        if (cancelled) return;
+        const rawList = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+        if (rawList.length > 0) {
+          const mapped = rawList.map((r: any) => ({
+            id: String(r.id),
+            label: r.name || r.label || (r.type === 'general' ? 'Groupe général de l’équipe' : `Salon #${r.id}`),
+          }));
+          setApiRooms(mapped);
+          setSelectedRoomId((prev) => (mapped.some((m: any) => m.id === prev) ? prev : mapped[0].id));
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const rooms = useMemo(() => {
+    if (apiRooms.length > 0) return apiRooms;
     const map = new Map<string, string>();
     map.set('general', 'Groupe général de l’équipe');
     allMessages.forEach((m) => {
@@ -35,13 +61,45 @@ export const AdminTeamChat: React.FC = () => {
       }
     });
     return Array.from(map.entries()).map(([id, label]) => ({ id, label }));
-  }, [allMessages]);
+  }, [apiRooms, allMessages]);
 
   const activeRoom = rooms.find((r) => r.id === selectedRoomId) || rooms[0];
-  const visibleMessages = useMemo(
-    () => allMessages.filter((m) => m.roomId === activeRoom.id),
-    [allMessages, activeRoom.id]
-  );
+
+  // Live GET /team/rooms/{room}/messages
+  useEffect(() => {
+    if (!activeRoom?.id || apiRooms.length === 0) {
+      setApiMessages([]);
+      return;
+    }
+    let cancelled = false;
+    api<any>(`/team/rooms/${activeRoom.id}/messages`)
+      .then((res) => {
+        if (cancelled) return;
+        const rawList = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+        setApiMessages(
+          rawList.map((m: any) => ({
+            id: String(m.id ?? Math.random()),
+            roomId: activeRoom.id,
+            roomLabel: activeRoom.label,
+            senderName: m.sender?.full_name || m.sender_name || m.author || 'Équipe BeniLink',
+            senderRoleLabel: m.sender?.role || m.sender_role || 'Équipe',
+            body: m.body || m.text || '',
+            at: m.created_at || m.at || new Date().toISOString(),
+          }))
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setApiMessages([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeRoom?.id, activeRoom?.label, apiRooms.length]);
+
+  const visibleMessages = useMemo(() => {
+    if (apiRooms.length > 0) return apiMessages;
+    return allMessages.filter((m) => m.roomId === activeRoom.id);
+  }, [apiRooms.length, apiMessages, allMessages, activeRoom.id]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -63,10 +121,28 @@ export const AdminTeamChat: React.FC = () => {
       body: text,
     });
 
-    api(`/team/rooms/${activeRoom.id}/messages`, {
+    api<any>(`/team/rooms/${activeRoom.id}/messages`, {
       method: 'POST',
       body: { body: text },
-    }).catch(() => {});
+    })
+      .then((res) => {
+        if (apiRooms.length > 0) {
+          const m = res?.data ?? res;
+          setApiMessages((prev) => [
+            ...prev,
+            {
+              id: String(m?.id ?? `live-${Date.now()}`),
+              roomId: activeRoom.id,
+              roomLabel: activeRoom.label,
+              senderName,
+              senderRoleLabel,
+              body: m?.body || text,
+              at: m?.created_at || new Date().toISOString(),
+            },
+          ]);
+        }
+      })
+      .catch(() => {});
 
     recordActivity({
       actorId: currentUser.id,

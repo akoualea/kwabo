@@ -28,6 +28,8 @@ import {
   Counters,
 } from '../types';
 import { CATEGORIES, SERVICES } from '../data/kwaboData';
+import { setUserCurrency } from '../data/worldCountries';
+import { BeniLinkRole, setActiveSubRole } from '../utils/benilinkWorkflow';
 
 interface Toast {
   id: string;
@@ -64,6 +66,9 @@ export interface RegisterPayload {
   password: string;
   sponsor_code?: string;
   dial?: string;
+  terms_accepted: boolean;
+  terms_version?: string;
+  preferred_currency?: string;
 }
 
 export interface ResetPasswordParams {
@@ -501,6 +506,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     try {
       const res = await api<{ data?: any }>('/me', { skipAuthRedirect: true });
       const user = mapUser(res?.data ?? res);
+      if (user.rawRole && ['super_admin', 'admin_general', 'responsable_clientele', 'responsable_prestations', 'agent', 'etudiant_livreur', 'client'].includes(user.rawRole)) {
+        setActiveSubRole(user.rawRole as BeniLinkRole);
+      }
+      if (user.preferredCurrency) {
+        setUserCurrency(user.preferredCurrency);
+      }
       setCurrentUser(user);
       return user;
     } catch {
@@ -608,6 +619,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const postAuthSuccess = useCallback(async (rawUser: any, token: string) => {
     setToken(token);
     const user = mapUser(rawUser);
+    if (user.rawRole && ['super_admin', 'admin_general', 'responsable_clientele', 'responsable_prestations', 'agent', 'etudiant_livreur', 'client'].includes(user.rawRole)) {
+      setActiveSubRole(user.rawRole as BeniLinkRole);
+    }
+    if (user.preferredCurrency) {
+      setUserCurrency(user.preferredCurrency);
+    }
     setCurrentUser(user);
     await Promise.all([refreshCounters(), refreshNotifications()]);
     addToast(`Bienvenue ${user.firstName} ! Connexion réussie.`);

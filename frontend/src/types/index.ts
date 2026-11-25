@@ -1,5 +1,13 @@
 export type UserRole = 'USER' | 'ADMIN' | 'OPERATOR';
 export type AppRole = 'VISITOR' | UserRole;
+export type BackendRoleCode =
+  | 'client'
+  | 'super_admin'
+  | 'admin_general'
+  | 'responsable_clientele'
+  | 'responsable_prestations'
+  | 'agent'
+  | 'etudiant_livreur';
 
 export interface NotificationPrefs {
   received?: boolean;
@@ -14,12 +22,15 @@ export interface NotificationPrefs {
 export interface User {
   id: string;
   role: UserRole;
+  rawRole?: BackendRoleCode | string;
   firstName: string;
   lastName: string;
   fullName?: string;
   email: string;
   country: string;
   phone: string;
+  age?: number | null;
+  preferredCurrency?: string;
   password?: string;
   verified: boolean;
   twoFactor: boolean;
@@ -62,6 +73,9 @@ export interface Service {
   icon: string;
   popular?: boolean;
   price: string;
+  standardDelayDays?: number | null;
+  requiresDelivery?: boolean;
+  requiresProvider?: boolean;
   short: string;
   desc?: string;
   included: string[];
@@ -79,9 +93,20 @@ export interface RequestHistory {
   text: string;
 }
 
+export interface RequestQuoteItem {
+  service_id?: number | string;
+  description: string;
+  quantity: number;
+  unit_price: number;
+}
+
 export interface RequestQuote {
   amount: number;
+  currency?: string;
   label: string;
+  validUntil?: string | null;
+  conditions?: string | null;
+  items?: RequestQuoteItem[];
 }
 
 export interface RequestNote {
@@ -100,6 +125,7 @@ export interface RequestItem {
   serviceName?: string;
   service?: Service | null;
   status: RequestStatus;
+  internalStep?: string | null;
   title: string;
   city: string;
   urgency: UrgencyLevel;
@@ -112,6 +138,14 @@ export interface RequestItem {
   quote: RequestQuote | null;
   rating: number | null;
   createdAt: string;
+  startedAt?: string | null;
+  dueDate?: string | null;
+  isOverdue?: boolean;
+  workOrder?: any;
+  assignments?: any;
+  teamOpinions?: any[];
+  missionRoomId?: string | number | null;
+  requestRoomId?: string | number | null;
   history: RequestHistory[];
   notes?: RequestNote[];
   documents?: DocumentItem[];
@@ -167,8 +201,11 @@ export interface InvoiceItem {
   client?: User | null;
   label: string;
   amount: number;
+  currency?: string;
+  provider?: string | null;
+  paymentUrl?: string | null;
   status: 'paid' | 'due' | 'refunded' | 'cancelled';
-  method: 'card' | 'momo' | 'wise' | string | null;
+  method: 'card' | 'momo' | 'wise' | 'fedapay' | string | null;
   createdAt: string;
   paidAt: string | null;
   request?: { id: string; tracking: string; title: string } | null;
@@ -228,4 +265,5 @@ export interface Counters {
   unreadNotifications: number;
   dueInvoices: number;
   pendingReviews: number;
+  unreportedActions?: number;
 }

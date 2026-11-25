@@ -10,7 +10,7 @@ interface BrandLogoProps {
 
 const SIZE_MAP: Record<NonNullable<BrandLogoProps['size']>, { imgClass: string; pillClass: string; subClass: string }> = {
   sm: {
-    imgClass: 'h-8 w-auto max-w-[140px]',
+    imgClass: 'h-7 sm:h-8 w-auto max-w-[114px] sm:max-w-[140px]',
     pillClass: 'rounded-lg px-2 py-1',
     subClass: 'text-[10px]',
   },

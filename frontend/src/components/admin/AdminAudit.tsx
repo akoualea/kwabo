@@ -68,7 +68,38 @@ export const AdminAudit: React.FC = () => {
   useEffect(() => {
     const syncReports = () => setDailyReports(getArchivedDailyReports());
     syncReports();
-    return subscribeInternalOps(syncReports);
+    const unsub = subscribeInternalOps(syncReports);
+
+    let cancelled = false;
+    api<any>('/admin/daily-reports')
+      .then((res) => {
+        if (cancelled) return;
+        const list = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+        if (list.length > 0) {
+          const mapped: ArchivedDailyReport[] = list.map((r: any) => ({
+            id: String(r.id),
+            date: r.date || (r.created_at ? String(r.created_at).slice(0, 10) : ''),
+            actorId: String(r.user_id ?? r.author?.id ?? r.actor_id ?? r.id),
+            actorName:
+              r.author?.full_name ||
+              r.actor_name ||
+              `${r.author?.first_name ?? ''} ${r.author?.last_name ?? ''}`.trim() ||
+              'Collaborateur',
+            actorRole: r.author?.role || r.actor_role || 'Équipe',
+            submittedAt: r.submitted_at || r.created_at || new Date().toISOString(),
+            activityCount: Number(r.actions_count ?? r.activity_count ?? (Array.isArray(r.activities) ? r.activities.length : 0)),
+            note: r.note || '',
+            activities: Array.isArray(r.activities) ? r.activities : [],
+          }));
+          setDailyReports(mapped);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+      unsub();
+    };
   }, []);
 
   const actorOptions = useMemo(() => {

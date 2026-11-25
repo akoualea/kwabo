@@ -158,7 +158,7 @@ export const AppTopbar: React.FC<TopbarProps> = ({
           }
         }
         .topbar-bell-btn.has-unread {
-          color: #006191;
+          color: #ffffff;
         }
         .topbar-bell-btn.has-unread svg {
           transform-origin: 50% 15%;
@@ -170,9 +170,9 @@ export const AppTopbar: React.FC<TopbarProps> = ({
           min-width: 20px;
           height: 20px;
           font-size: 11px;
-          background: #ba1a1a;
+          background: #ef4444;
           color: #fff;
-          box-shadow: 0 0 0 2px #f7f9ff;
+          box-shadow: 0 0 0 2px #006191;
           animation: kwDotPop 1.8s ease-in-out infinite;
         }
         @media (prefers-reduced-motion: reduce) {
@@ -198,7 +198,7 @@ export const AppTopbar: React.FC<TopbarProps> = ({
           onClick={onToggleCollapse}
           aria-label={sidebarCollapsed ? 'Afficher le nom des menus' : 'Réduire le menu aux icônes'}
           title={sidebarCollapsed ? 'Afficher le nom des menus' : 'Réduire le menu aux icônes'}
-          className="hidden lg:inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#d0e3f5] bg-white text-[#006191] shadow-xs transition hover:bg-[#e3efff] hover:border-[#1593d6]"
+          className="hidden lg:inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/25 bg-white/12 text-white shadow-xs transition hover:bg-white/22 hover:border-white/40"
         >
           {sidebarCollapsed ? (
             <PanelLeft className="h-5 w-5" aria-hidden="true" />
@@ -243,7 +243,7 @@ export const AppTopbar: React.FC<TopbarProps> = ({
           <button
             type="button"
             onClick={() => void promptInstall()}
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#d0e3f5] bg-white px-3 py-1.5 text-xs font-semibold text-[#006191] transition hover:bg-[#e3efff]"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/12 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-white/22"
             title="Installer l'application BeniLink"
           >
             <Download className="h-3.5 w-3.5" aria-hidden="true" />
@@ -342,7 +342,7 @@ export const AppTopbar: React.FC<TopbarProps> = ({
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
             style={{ width: 'auto', minHeight: '36px', padding: '0 8px' }}
-            className="h-9 sm:h-10 rounded-xl border border-[#d0e3f5] bg-white text-[11px] sm:text-xs font-bold text-[#006191] outline-none"
+            className="h-9 sm:h-10 rounded-xl border border-white/25 bg-white/95 text-[11px] sm:text-xs font-bold text-[#004e78] outline-none shadow-xs"
           >
             {POPULAR_CURRENCY_CODES.map((code) => (
               <option key={code} value={code}>
@@ -352,7 +352,7 @@ export const AppTopbar: React.FC<TopbarProps> = ({
           </select>
         )}
 
-        <ThemeToggleButton />
+        <ThemeToggleButton className="!border-white/25 !bg-white/12 !text-white hover:!bg-white/22" />
 
         {/* Notifications Button & Dropdown */}
         <div className="relative" ref={notifRef}>

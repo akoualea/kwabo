@@ -238,73 +238,66 @@ html.dark .search-result small {
   color: #8fa9c4;
 }
 
-/* KPI Stat Cards — Clean Rounded Shape with Top-Right Soft Circle Accent (All Dashboards) */
+/* KPI Stat Cards — Executive Tactile BeniLink Cards (All Dashboards) */
 .stats .stat {
   position: relative !important;
   overflow: hidden !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
-  justify-content: flex-start !important;
-  min-height: 136px;
-  padding: 20px 22px !important;
-  border-radius: 22px !important;
-  background: #ffffff !important;
-  border: 1px solid #e3ecf6 !important;
-  box-shadow: 0 6px 24px rgba(8, 77, 130, 0.055) !important;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+  justify-content: space-between !important;
+  min-height: 134px;
+  padding: 18px 20px !important;
+  border-radius: 20px !important;
+  background: linear-gradient(145deg, #ffffff 0%, #f4f9ff 100%) !important;
+  border: 1px solid #dce9f7 !important;
+  border-top-width: 3px !important;
+  box-shadow: 0 8px 24px rgba(8, 77, 130, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
 }
 
 .stats .stat:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 32px rgba(8, 77, 130, 0.11) !important;
-  border-color: #c2dcf5 !important;
+  transform: translateY(-4px);
+  box-shadow: 0 16px 34px rgba(8, 77, 130, 0.13) !important;
+}
+
+.stats .stat::before {
+  display: none !important;
+  content: none !important;
 }
 
 .stats .stat::after {
   content: '' !important;
   position: absolute !important;
-  top: -28px !important;
-  right: -22px !important;
-  bottom: auto !important;
-  width: 112px !important;
-  height: 112px !important;
+  top: auto !important;
+  bottom: -36px !important;
+  right: -30px !important;
+  width: 120px !important;
+  height: 120px !important;
   border-radius: 50% !important;
   pointer-events: none !important;
-  transition: transform 0.3s ease !important;
+  opacity: 0.75;
+  transition: transform 0.35s ease, opacity 0.35s ease !important;
 }
 
 .stats .stat:hover::after {
-  transform: scale(1.12) !important;
-}
-
-.stats .stat::before {
-  content: '›';
-  position: absolute;
-  top: 22px;
-  right: 22px;
-  z-index: 1;
-  font-size: 18px;
-  line-height: 1;
-  font-weight: 400;
-  color: #7c93ac;
-  pointer-events: none;
-  transition: transform 0.2s ease, color 0.2s ease;
-}
-
-.stats .stat:hover::before {
-  transform: translateX(3px);
-  color: #006191;
+  transform: scale(1.18) !important;
+  opacity: 1;
 }
 
 .stats .stat .tile {
   position: relative;
   z-index: 1;
-  width: 42px !important;
-  height: 42px !important;
-  border-radius: 13px !important;
-  margin-bottom: 18px !important;
-  box-shadow: none !important;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 14px !important;
+  margin-bottom: 16px !important;
+  transform: none !important;
+  transition: transform 0.25s ease !important;
+}
+
+.stats .stat:hover .tile {
+  transform: scale(1.06) !important;
 }
 
 .stats .stat strong {
@@ -314,11 +307,11 @@ html.dark .search-result small {
   width: 100%;
   text-align: left !important;
   font-family: var(--body) !important;
-  font-size: 31px !important;
+  font-size: 32px !important;
   font-weight: 800 !important;
   line-height: 1.05 !important;
-  letter-spacing: -0.02em !important;
-  color: #0d1d2b !important;
+  letter-spacing: -0.025em !important;
+  color: #08243d !important;
   margin: 0 !important;
 }
 
@@ -329,94 +322,130 @@ html.dark .search-result small {
   width: 100%;
   text-align: left !important;
   margin-top: 6px !important;
-  font-size: 13.5px !important;
-  font-weight: 500 !important;
-  color: #5b6f84 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #4f667d !important;
 }
 
-/* BeniLink 4-Color Accents on Icon Tile & Top-Right Soft Circle (Light Mode) */
+/* 4 Distinct Executive Accents (Light Mode) */
+.stats .stat:nth-child(4n+1) {
+  background: linear-gradient(145deg, #ffffff 0%, #edf6ff 100%) !important;
+  border-color: #d3e5f8 !important;
+  border-top-color: #006191 !important;
+}
 .stats .stat:nth-child(4n+1) .tile {
-  background: #e6f3ff !important;
-  color: #006191 !important;
+  background: linear-gradient(135deg, #0077b3 0%, #004e78 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 14px rgba(0, 97, 145, 0.28) !important;
 }
 .stats .stat:nth-child(4n+1)::after {
-  background: rgba(0, 97, 145, 0.08) !important;
+  background: radial-gradient(circle, rgba(0, 97, 145, 0.13) 0%, rgba(0, 97, 145, 0) 70%) !important;
 }
 
+.stats .stat:nth-child(4n+2) {
+  background: linear-gradient(145deg, #ffffff 0%, #fffaf0 100%) !important;
+  border-color: #f5e2b0 !important;
+  border-top-color: #f7c531 !important;
+}
 .stats .stat:nth-child(4n+2) .tile {
-  background: #fff4d4 !important;
-  color: #9e7600 !important;
+  background: linear-gradient(135deg, #f7c531 0%, #e0a410 100%) !important;
+  color: #10202e !important;
+  box-shadow: 0 6px 14px rgba(247, 197, 49, 0.34) !important;
 }
 .stats .stat:nth-child(4n+2)::after {
-  background: rgba(247, 197, 49, 0.16) !important;
+  background: radial-gradient(circle, rgba(247, 197, 49, 0.2) 0%, rgba(247, 197, 49, 0) 70%) !important;
 }
 
+.stats .stat:nth-child(4n+3) {
+  background: linear-gradient(145deg, #ffffff 0%, #edfaff 100%) !important;
+  border-color: #cceaf9 !important;
+  border-top-color: #0ea5e9 !important;
+}
 .stats .stat:nth-child(4n+3) .tile {
-  background: #e1f5ff !important;
-  color: #007bb6 !important;
+  background: linear-gradient(135deg, #1593d6 0%, #0284c7 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 14px rgba(14, 165, 233, 0.28) !important;
 }
 .stats .stat:nth-child(4n+3)::after {
-  background: rgba(21, 147, 214, 0.11) !important;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, rgba(14, 165, 233, 0) 70%) !important;
 }
 
+.stats .stat:nth-child(4n+4) {
+  background: linear-gradient(145deg, #ffffff 0%, #fffaf0 100%) !important;
+  border-color: #f5e2b0 !important;
+  border-top-color: #f7c531 !important;
+}
 .stats .stat:nth-child(4n+4) .tile {
-  background: #e8f0fc !important;
-  color: #084d82 !important;
+  background: linear-gradient(135deg, #f7c531 0%, #e0a410 100%) !important;
+  color: #10202e !important;
+  box-shadow: 0 6px 14px rgba(247, 197, 49, 0.34) !important;
 }
 .stats .stat:nth-child(4n+4)::after {
-  background: rgba(8, 77, 130, 0.09) !important;
+  background: radial-gradient(circle, rgba(247, 197, 49, 0.2) 0%, rgba(247, 197, 49, 0) 70%) !important;
 }
 
-/* KPI Stat Cards in Dark Mode (Same Shape + BeniLink Dark Palette) */
+/* KPI Stat Cards in Dark Mode */
 html.dark .stats .stat {
-  background: #0d2036 !important;
-  border-color: #1e3b5c !important;
-  box-shadow: 0 8px 26px rgba(2, 9, 18, 0.45) !important;
+  background: linear-gradient(145deg, #0d2138 0%, #112a46 100%) !important;
+  border-color: rgba(120, 180, 235, 0.2) !important;
+  box-shadow: 0 10px 28px rgba(2, 9, 18, 0.45) !important;
 }
 
 html.dark .stats .stat:hover {
-  border-color: #2f5b8a !important;
-  box-shadow: 0 14px 34px rgba(2, 9, 18, 0.6) !important;
+  border-color: rgba(120, 180, 235, 0.36) !important;
+  box-shadow: 0 16px 36px rgba(2, 9, 18, 0.62) !important;
 }
 
-html.dark .stats .stat::before {
-  color: #6b89a8;
+html.dark .stats .stat strong {
+  color: #f4f9ff !important;
 }
 
-html.dark .stats .stat:hover::before {
-  color: #f7c531;
+html.dark .stats .stat > span:last-child {
+  color: #9cb9d6 !important;
 }
 
+html.dark .stats .stat:nth-child(4n+1) {
+  border-top-color: #38bdf8 !important;
+}
 html.dark .stats .stat:nth-child(4n+1) .tile {
-  background: rgba(21, 147, 214, 0.18) !important;
-  color: #6cc4f5 !important;
+  background: linear-gradient(135deg, #0284c7 0%, #005885 100%) !important;
+  color: #ffffff !important;
 }
 html.dark .stats .stat:nth-child(4n+1)::after {
-  background: rgba(21, 147, 214, 0.12) !important;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.16) 0%, transparent 70%) !important;
 }
 
+html.dark .stats .stat:nth-child(4n+2) {
+  border-top-color: #f7c531 !important;
+}
 html.dark .stats .stat:nth-child(4n+2) .tile {
-  background: rgba(247, 197, 49, 0.18) !important;
-  color: #f7c531 !important;
+  background: linear-gradient(135deg, #f7c531 0%, #d4960a 100%) !important;
+  color: #10202e !important;
 }
 html.dark .stats .stat:nth-child(4n+2)::after {
-  background: rgba(247, 197, 49, 0.12) !important;
+  background: radial-gradient(circle, rgba(247, 197, 49, 0.16) 0%, transparent 70%) !important;
 }
 
+html.dark .stats .stat:nth-child(4n+3) {
+  border-top-color: #22d3ee !important;
+}
 html.dark .stats .stat:nth-child(4n+3) .tile {
-  background: rgba(0, 123, 182, 0.22) !important;
-  color: #7dd3fc !important;
+  background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%) !important;
+  color: #ffffff !important;
 }
 html.dark .stats .stat:nth-child(4n+3)::after {
-  background: rgba(0, 123, 182, 0.14) !important;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.16) 0%, transparent 70%) !important;
 }
 
+html.dark .stats .stat:nth-child(4n+4) {
+  border-top-color: #f7c531 !important;
+}
 html.dark .stats .stat:nth-child(4n+4) .tile {
-  background: rgba(108, 196, 245, 0.16) !important;
-  color: #93c5fd !important;
+  background: linear-gradient(135deg, #f7c531 0%, #d4960a 100%) !important;
+  color: #10202e !important;
 }
 html.dark .stats .stat:nth-child(4n+4)::after {
-  background: rgba(108, 196, 245, 0.11) !important;
+  background: radial-gradient(circle, rgba(247, 197, 49, 0.16) 0%, transparent 70%) !important;
 }
 
 html.dark .stats .stat > span:last-child,
@@ -1065,4 +1094,353 @@ body {
   .stats {
     grid-template-columns: 1fr !important;
   }
+}
+
+/* ==========================================================================
+   Executive BeniLink Blue Navigation (Sidebar + Topbar — Light & Dark)
+   ========================================================================== */
+.sidebar {
+  background: linear-gradient(180deg, #00476e 0%, #006191 54%, #003d5e 100%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+  box-shadow: 4px 0 24px rgba(0, 56, 88, 0.14);
+}
+
+.sidebar .sidebar-top {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 14px;
+}
+
+.sidebar .sidebar-close {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 12px;
+}
+
+.sidebar .sidebar-close:hover {
+  background: rgba(255, 255, 255, 0.24) !important;
+}
+
+.sidebar .side-heading {
+  color: rgba(186, 224, 255, 0.78) !important;
+}
+
+.sidebar .side-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  border-radius: 14px;
+}
+
+.sidebar .side-link:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+}
+
+.sidebar .side-link[aria-current="page"] {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 6px 18px rgba(0, 32, 54, 0.22);
+}
+
+.sidebar .side-link[aria-current="page"]::before {
+  background: #f7c531 !important;
+  width: 4px !important;
+}
+
+.sidebar .side-link .count {
+  background: #f7c531 !important;
+  color: #10202e !important;
+  font-weight: 800;
+}
+
+.sidebar .sidebar-foot {
+  border-top: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+.sidebar .side-whatsapp {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+}
+
+.sidebar .side-whatsapp:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.sidebar .side-user {
+  background: rgba(255, 255, 255, 0.11) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+.sidebar .side-user:hover {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+
+.sidebar .side-user strong {
+  color: #ffffff !important;
+}
+
+.sidebar .side-user small {
+  color: rgba(208, 234, 255, 0.85) !important;
+}
+
+.sidebar .side-user .avatar {
+  background: #f7c531 !important;
+  color: #10202e !important;
+  font-weight: 800;
+}
+
+.sidebar .side-link.side-logout {
+  background: rgba(255, 107, 107, 0.2) !important;
+  border: 1px solid rgba(255, 166, 166, 0.34) !important;
+  color: #ffe2e2 !important;
+}
+
+.sidebar .side-link.side-logout:hover {
+  background: rgba(239, 68, 68, 0.34) !important;
+  color: #ffffff !important;
+}
+
+/* Blue Topbar across Client / Admin / Operator workspaces */
+.topbar {
+  background: linear-gradient(90deg, #004e78 0%, #006191 58%, #0074ad 100%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 18px rgba(0, 75, 115, 0.16);
+}
+
+.topbar-title h1 {
+  color: #ffffff !important;
+}
+
+.topbar-title p {
+  color: rgba(214, 238, 255, 0.88) !important;
+}
+
+.topbar .icon-btn,
+.topbar .menu-btn,
+.topbar .topbar-bell-btn {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+  border-radius: 12px;
+}
+
+.topbar .icon-btn:hover,
+.topbar .menu-btn:hover,
+.topbar .topbar-bell-btn:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+}
+
+.topbar .admin-search {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  color: #0d1d2b !important;
+}
+
+.topbar .admin-search input {
+  color: #0d1d2b !important;
+}
+
+/* Harmonious deep midnight blue in Dark Mode */
+html.dark .sidebar {
+  background: linear-gradient(180deg, #061c33 0%, #0a2d4f 55%, #05182b 100%) !important;
+  border-right-color: rgba(120, 180, 235, 0.16) !important;
+}
+
+html.dark .topbar,
+html.dark .public-header,
+html.dark .auth-blue-header {
+  background: linear-gradient(90deg, #061c33 0%, #0a2f52 58%, #0d3b66 100%) !important;
+  border-bottom-color: rgba(120, 180, 235, 0.18) !important;
+}
+
+/* Dark mode polish for Popular Service Cards */
+html.dark .popular-service-card {
+  background: #0d2036 !important;
+  border-color: rgba(120, 180, 235, 0.2) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.32) !important;
+}
+
+html.dark .popular-service-card:hover {
+  border-color: rgba(56, 189, 248, 0.5) !important;
+}
+
+html.dark .popular-service-title {
+  color: #f1f7ff !important;
+}
+
+html.dark .popular-service-desc {
+  color: #9bb8d3 !important;
+}
+
+html.dark .popular-service-foot {
+  border-top-color: rgba(120, 180, 235, 0.16) !important;
+}
+
+html.dark .popular-service-price {
+  background: rgba(247, 197, 49, 0.14) !important;
+  border-color: rgba(247, 197, 49, 0.34) !important;
+  color: #f7c531 !important;
+}
+
+/* ==========================================================================
+   Executive Dashboard Content Cards (.card, .card-head, .request-row)
+   ========================================================================== */
+.app-content .card {
+  border-radius: 22px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #fafdff 100%) !important;
+  border: 1px solid #d7e6f5 !important;
+  box-shadow: 0 10px 30px rgba(8, 77, 130, 0.065), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.app-content .card:hover {
+  border-color: #bdd8f2 !important;
+  box-shadow: 0 14px 36px rgba(8, 77, 130, 0.1) !important;
+}
+
+.app-content .card-head {
+  padding-bottom: 13px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e6f0fa;
+  align-items: center;
+}
+
+.app-content .card-head h2,
+.app-content .card-head h3 {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #08243d;
+}
+
+.app-content .card-head h2::before,
+.app-content .card-head h3::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 20px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #006191 0%, #f7c531 100%);
+  flex-shrink: 0;
+}
+
+.app-content .card-head > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 13px;
+  border-radius: 999px;
+  background: #edf5ff;
+  border: 1px solid #d0e4f7;
+  color: #006191 !important;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none !important;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.app-content .card-head > a:hover {
+  background: #006191;
+  border-color: #006191;
+  color: #ffffff !important;
+}
+
+.app-content .card-head > .muted,
+.app-content .card-head > small {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: #f1f6fc;
+  border: 1px solid #dce8f5;
+  color: #4c657a;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.app-content .request-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.app-content .request-row {
+  border-radius: 15px !important;
+  padding: 12px 14px !important;
+  border: 1px solid #e6f0fa !important;
+  background: #f8fbff !important;
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.app-content .request-row:hover {
+  background: #ffffff !important;
+  border-color: #b7d7f5 !important;
+  transform: translateX(3px);
+  box-shadow: 0 6px 18px rgba(8, 77, 130, 0.08);
+}
+
+.app-content .request-row .tile {
+  background: linear-gradient(135deg, #e6f3ff 0%, #d4ebff 100%);
+  color: #006191;
+  border-radius: 12px;
+}
+
+/* Dark Mode for Executive Dashboard Content Cards */
+html.dark .app-content .card {
+  background: linear-gradient(180deg, #0d2036 0%, #0b1c30 100%) !important;
+  border-color: rgba(120, 180, 235, 0.2) !important;
+  box-shadow: 0 12px 32px rgba(2, 9, 18, 0.45) !important;
+}
+
+html.dark .app-content .card:hover {
+  border-color: rgba(120, 180, 235, 0.34) !important;
+}
+
+html.dark .app-content .card-head {
+  border-bottom-color: rgba(120, 180, 235, 0.16);
+}
+
+html.dark .app-content .card-head h2,
+html.dark .app-content .card-head h3 {
+  color: #f1f7ff;
+}
+
+html.dark .app-content .card-head > a {
+  background: rgba(56, 189, 248, 0.14);
+  border-color: rgba(56, 189, 248, 0.28);
+  color: #7dd3fc !important;
+}
+
+html.dark .app-content .card-head > a:hover {
+  background: #006191;
+  border-color: #38bdf8;
+  color: #ffffff !important;
+}
+
+html.dark .app-content .card-head > .muted,
+html.dark .app-content .card-head > small {
+  background: rgba(120, 180, 235, 0.12);
+  border-color: rgba(120, 180, 235, 0.22);
+  color: #a9c5e0;
+}
+
+html.dark .app-content .request-row {
+  background: rgba(17, 41, 66, 0.65) !important;
+  border-color: rgba(120, 180, 235, 0.16) !important;
+}
+
+html.dark .app-content .request-row:hover {
+  background: #143050 !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+}
+
+html.dark .app-content .request-row .tile {
+  background: rgba(21, 147, 214, 0.2);
+  color: #7dd3fc;
 }

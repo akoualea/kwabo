@@ -127,10 +127,10 @@ const hasTopicWord = (words: string[], keywords: string[]): boolean =>
   words.some((w) => keywords.some((kw) => isCloseWord(w, kw)));
 
 const QUICK_PROMPTS = [
-  { label: 'Nos services', query: 'Quels services proposez-vous ?' },
-  { label: 'Obtenir un devis', query: 'Comment obtenir un devis ?' },
-  { label: 'Nos délais', query: 'Quels sont vos délais ?' },
-  { label: 'Devises & paiements', query: 'Devises & paiements' },
+  { label: 'Services', query: 'Quels services proposez-vous ?' },
+  { label: 'Devis', query: 'Comment obtenir un devis ?' },
+  { label: 'Délais', query: 'Quels sont vos délais ?' },
+  { label: 'Paiements', query: 'Devises & paiements' },
 ];
 
 export const BeniLinkChatbot: React.FC = () => {
@@ -440,18 +440,11 @@ export const BeniLinkChatbot: React.FC = () => {
         <div
           role="dialog"
           aria-label="Assistant BeniLink"
-          style={{
-            height: isPublic
-              ? 'min(610px, calc(100dvh - 154px))'
-              : 'min(650px, calc(100dvh - 102px))',
-          }}
-          className={`fixed right-3 left-3 sm:left-auto sm:right-5 sm:w-[420px] md:w-[440px] z-[999] flex flex-col overflow-hidden rounded-2xl border border-[#d0e3f5] bg-white shadow-2xl ${
-            isPublic ? 'bottom-[138px]' : 'bottom-[78px]'
-          }`}
+          className="fixed inset-x-2 top-2 bottom-2 sm:inset-auto sm:right-5 sm:bottom-5 sm:w-[460px] md:w-[500px] sm:h-[min(740px,calc(100dvh-32px))] z-[999] flex flex-col overflow-hidden rounded-2xl border border-[#d0e3f5] bg-white shadow-[0_24px_60px_rgba(4,29,51,0.34)]"
         >
           {/* Header */}
-          <div className="flex shrink-0 items-center justify-between gap-2 bg-gradient-to-r from-[#084d82] to-[#006191] px-4 py-2.5 text-white">
-            <div className="flex items-center gap-2.5">
+          <div className="flex shrink-0 items-center justify-between gap-2 bg-gradient-to-r from-[#004b73] via-[#006191] to-[#0074ad] px-4 py-3 text-white">
+            <div className="flex items-center gap-2.5 min-w-0">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white p-1.5 shadow-sm">
                 <img
                   src="/assets/benilink-mark.png"
@@ -459,30 +452,30 @@ export const BeniLinkChatbot: React.FC = () => {
                   className="h-full w-full object-contain"
                 />
               </span>
-              <div>
-                <p className="text-sm font-bold leading-tight">Assistant BeniLink</p>
-                <p className="text-[11px] text-[#cbe6ff]">Orientation services &amp; questions</p>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold leading-tight">Assistant BeniLink</p>
+                <p className="truncate text-[11px] text-[#cbe6ff]">Orientation services &amp; questions</p>
               </div>
             </div>
             <button
               type="button"
               onClick={() => setOpen(false)}
               aria-label="Fermer"
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25"
             >
-              <X className="h-4 w-4" />
+              <X className="h-4.5 w-4.5" />
             </button>
           </div>
 
-          {/* Messages */}
-          <div className="no-scrollbar min-h-[120px] flex-1 space-y-2.5 overflow-y-auto bg-[#f7f9ff] p-3">
+          {/* Messages — large spacious reading area */}
+          <div className="no-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto bg-[#f7f9ff] p-3.5 sm:p-4">
             {messages.map((m) => (
               <div
                 key={m.id}
                 className={`flex flex-col ${m.sender === 'user' ? 'items-end' : 'items-start'}`}
               >
                 <div
-                  className={`max-w-[88%] rounded-2xl px-3 py-2 text-xs leading-relaxed ${
+                  className={`max-w-[90%] sm:max-w-[86%] rounded-2xl px-3.5 py-2.5 text-[13px] sm:text-[13.5px] leading-relaxed shadow-2xs ${
                     m.sender === 'user'
                       ? 'rounded-br-sm bg-[#006191] text-white'
                       : 'rounded-bl-sm border border-[#d0e3f5] bg-white text-[#0d1d2b]'
@@ -530,14 +523,14 @@ export const BeniLinkChatbot: React.FC = () => {
             <div ref={endRef} />
           </div>
 
-          {/* Quick prompts — exactement 2 lignes (grille 2x2) */}
-          <div className="grid shrink-0 grid-cols-2 gap-1.5 border-t border-[#d0e3f5] bg-white px-3 py-2">
+          {/* Quick prompts — 4 cadres alignés sur 1 seule ligne sur mobile et PC */}
+          <div className="grid shrink-0 grid-cols-4 gap-1 border-t border-[#d0e3f5] bg-white px-2.5 py-2">
             {QUICK_PROMPTS.map((q) => (
               <button
                 key={q.label}
                 type="button"
                 onClick={() => handleSend(q.query)}
-                className="rounded-full border border-[#d0e3f5] bg-[#edf4ff] px-2.5 py-1.5 text-center text-[11px] font-semibold leading-tight text-[#006191] transition hover:bg-[#d9eafd]"
+                className="truncate rounded-full border border-[#d0e3f5] bg-[#edf4ff] px-1.5 py-1.5 text-center text-[10px] sm:text-[11px] font-semibold leading-none text-[#006191] transition hover:bg-[#d9eafd]"
               >
                 {q.label}
               </button>
@@ -557,20 +550,20 @@ export const BeniLinkChatbot: React.FC = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Posez votre question…"
-              style={{ minHeight: '38px' }}
-              className="flex-1 rounded-full border border-[#d0e3f5] bg-[#f7f9ff] px-3.5 py-1.5 text-xs text-[#0d1d2b] outline-none focus:border-[#006191]"
+              style={{ minHeight: '42px' }}
+              className="min-w-0 flex-1 rounded-full border border-[#d0e3f5] bg-[#f7f9ff] px-4 py-2 text-[13px] text-[#0d1d2b] outline-none focus:border-[#006191]"
             />
             <button
               type="submit"
               disabled={!input.trim()}
               aria-label="Envoyer"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#006191] text-white transition hover:bg-[#084d82] disabled:opacity-45"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#006191] text-white transition hover:bg-[#084d82] disabled:opacity-45"
             >
               <Send className="h-4 w-4" />
             </button>
           </form>
 
-          <div className="flex shrink-0 items-center justify-between border-t border-[#d0e3f5] bg-[#edf4ff] px-3.5 py-2.5 text-xs">
+          <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t border-[#d0e3f5] bg-[#edf4ff] px-3.5 py-2.5 text-xs">
             <button
               type="button"
               onClick={handleStartRequest}

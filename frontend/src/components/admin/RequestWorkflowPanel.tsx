@@ -260,7 +260,19 @@ export const RequestWorkflowPanel: React.FC<Props> = ({
       installments: generateDefaultInstallments(nextTotal, wf.paymentModality),
     };
     commitWorkflow(next, `Ligne ajoutée au devis (${newLine.label})`);
-    api(`/requests/${requestId}/quote`, { method: 'PUT', body: next }).catch(() => {});
+    api(`/admin/requests/${requestId}/quote`, {
+      method: 'POST',
+      body: {
+        currency,
+        label: `Devis ${serviceName}`,
+        amount: nextTotal,
+        items: nextLines.map((l) => ({
+          description: l.label,
+          quantity: l.qty,
+          unit_price: Math.round(l.clientPrice / Math.max(1, l.qty)),
+        })),
+      },
+    }).catch(() => {});
     setLineLabel('');
   };
 
