@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, Mail, CheckCircle2, Info } from 'lucide-react';
+import { Eye, EyeOff, Mail, CheckCircle2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { api, ApiError } from '../../services/api';
 import { AuthPageLayout } from './AuthPageLayout';
@@ -176,13 +176,6 @@ export const ForgotPasswordPage: React.FC = () => {
               ← Revenir à la connexion
             </button>
           </p>
-
-          <div className="mt-6 flex items-start gap-2.5 rounded-2xl bg-[#d9eafd] p-4 text-xs leading-relaxed text-[#3f4850]">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#006191]" aria-hidden="true" />
-            <p>
-              <strong className="font-semibold text-[#0d1d2b]">Sécurité :</strong> les conseillers BeniLink ne vous demanderont jamais votre mot de passe ni vos codes de vérification par téléphone ou WhatsApp.
-            </p>
-          </div>
         </div>
       ) : step === 'sent' ? (
         <div className="text-center">
