@@ -1245,6 +1245,40 @@ body {
   color: #0d1d2b !important;
 }
 
+/* Crisp White Contrast on Blue Navbars (PublicHeader, AuthHeader, Topbar) */
+.public-header nav a,
+.public-header button:not(.bg-\[\#f7c531\]):not([type="submit"]),
+.auth-blue-header button:not(.bg-\[\#f7c531\]),
+.topbar .theme-toggle-btn {
+  color: #ffffff !important;
+}
+
+.public-header nav a:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+}
+
+.public-header .theme-toggle-btn,
+.auth-blue-header .theme-toggle-btn,
+.topbar .theme-toggle-btn {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+}
+
+.public-header .theme-toggle-btn:hover,
+.auth-blue-header .theme-toggle-btn:hover,
+.topbar .theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.24) !important;
+  color: #ffffff !important;
+}
+
+.public-header button.bg-\[\#f7c531\],
+.auth-blue-header button.bg-\[\#f7c531\],
+.topbar button.bg-\[\#f7c531\] {
+  color: #10202e !important;
+}
+
 /* Harmonious deep midnight blue in Dark Mode */
 html.dark .sidebar {
   background: linear-gradient(180deg, #061c33 0%, #0a2d4f 55%, #05182b 100%) !important;

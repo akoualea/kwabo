@@ -88,7 +88,7 @@ export const ThemeToggleButton: React.FC<ThemeToggleButtonProps> = ({ className 
       {isDark ? (
         <Sun className="h-[18px] w-[18px] text-[#f7c531]" aria-hidden="true" />
       ) : (
-        <Moon className="h-[18px] w-[18px] text-[#006191]" aria-hidden="true" />
+        <Moon className="h-[18px] w-[18px] text-current" aria-hidden="true" />
       )}
     </button>
   );
