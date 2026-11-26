@@ -95,12 +95,14 @@ export function canAccessAdminView(realRole: BeniLinkRole, viewId: string): bool
     case 'admin-request-detail':
     case 'admin-team-chat':
     case 'admin-internal-messages':
-    case 'admin-providers':
       return (
         realRole === 'admin_general' ||
         realRole === 'responsable_clientele' ||
         realRole === 'responsable_prestations'
       );
+
+    case 'admin-providers':
+      return realRole === 'responsable_prestations'; // + super_admin (already true above)
 
     case 'admin-messages':
       return false; // Réservé exclusivement au super_admin

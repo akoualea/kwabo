@@ -14,6 +14,20 @@ import {
   UserRole,
 } from '../types';
 
+export function extractPersonName(raw: any, fallback: string): string {
+  if (!raw) return fallback;
+  if (typeof raw === 'string') return raw;
+  if (typeof raw === 'object') {
+    const full =
+      raw.full_name ??
+      raw.fullName ??
+      raw.name ??
+      `${raw.first_name ?? raw.firstName ?? ''} ${raw.last_name ?? raw.lastName ?? ''}`.trim();
+    if (typeof full === 'string' && full.trim()) return full.trim();
+  }
+  return fallback;
+}
+
 export function mapRole(rawRole?: string): UserRole {
   const r = String(rawRole || 'client').toLowerCase();
   if (
@@ -205,7 +219,7 @@ export function mapMessage(raw: any, fallbackRequestId?: string): MessageItem {
     id,
     requestId: String(raw?.request_id ?? raw?.requestId ?? fallbackRequestId ?? ''),
     from: raw?.from === 'team' ? 'team' : 'client',
-    author: raw?.author ?? (raw?.from === 'team' ? 'Équipe BeniLink' : 'Client'),
+    author: extractPersonName(raw?.author ?? raw?.sender, raw?.from === 'team' ? 'Équipe BeniLink' : 'Client'),
     text: raw?.text ?? '',
     at: raw?.at ?? raw?.created_at ?? new Date().toISOString(),
     read: Boolean(raw?.read),
@@ -291,8 +305,8 @@ export function mapRequest(raw: any): RequestItem {
     notes: Array.isArray(raw?.notes)
       ? raw.notes.map((n: any, idx: number) => ({
           id: String(n?.id ?? idx),
-          author: n?.author ?? 'Équipe',
-          text: n?.text ?? '',
+          author: extractPersonName(n?.author ?? n?.user, 'Équipe'),
+          text: typeof n?.text === 'string' ? n.text : String(n?.text ?? ''),
           at: n?.at ?? n?.created_at ?? new Date().toISOString(),
         }))
       : undefined,
@@ -319,8 +333,8 @@ export function mapAudit(raw: any): AuditItem {
   return {
     id: String(raw?.id ?? ''),
     at: raw?.at ?? raw?.created_at ?? new Date().toISOString(),
-    actor: raw?.actor ?? 'Système',
-    text: raw?.text ?? '',
+    actor: extractPersonName(raw?.actor ?? raw?.user, 'Système'),
+    text: typeof raw?.text === 'string' ? raw.text : String(raw?.text ?? ''),
   };
 }
 

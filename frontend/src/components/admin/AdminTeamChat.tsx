@@ -77,15 +77,35 @@ export const AdminTeamChat: React.FC = () => {
         if (cancelled) return;
         const rawList = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
         setApiMessages(
-          rawList.map((m: any) => ({
-            id: String(m.id ?? Math.random()),
-            roomId: activeRoom.id,
-            roomLabel: activeRoom.label,
-            senderName: m.sender?.full_name || m.sender_name || m.author || 'Équipe BeniLink',
-            senderRoleLabel: m.sender?.role || m.sender_role || 'Équipe',
-            body: m.body || m.text || '',
-            at: m.created_at || m.at || new Date().toISOString(),
-          }))
+          rawList.map((m: any) => {
+            const person =
+              (m.sender && typeof m.sender === 'object' ? m.sender : null) ||
+              (m.author && typeof m.author === 'object' ? m.author : null) ||
+              (m.user && typeof m.user === 'object' ? m.user : null);
+            const rawName =
+              person?.full_name ||
+              `${person?.first_name ?? ''} ${person?.last_name ?? ''}`.trim() ||
+              person?.name ||
+              (typeof m.sender_name === 'string' ? m.sender_name : '') ||
+              (typeof m.author === 'string' ? m.author : '') ||
+              'Équipe BeniLink';
+            const rawRoleKey =
+              (typeof person?.role === 'string' ? person.role : '') ||
+              (typeof m.sender_role === 'string' ? m.sender_role : '');
+            const roleLabel =
+              (rawRoleKey && (BENILINK_ROLE_META as Record<string, { label: string }>)[rawRoleKey]?.label) ||
+              rawRoleKey ||
+              'Équipe';
+            return {
+              id: String(m.id ?? Math.random()),
+              roomId: activeRoom.id,
+              roomLabel: activeRoom.label,
+              senderName: String(rawName),
+              senderRoleLabel: String(roleLabel),
+              body: typeof m.body === 'string' ? m.body : typeof m.text === 'string' ? m.text : '',
+              at: String(m.created_at || m.at || new Date().toISOString()),
+            };
+          })
         );
       })
       .catch(() => {

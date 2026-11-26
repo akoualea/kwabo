@@ -32,6 +32,12 @@ export const AdminProvidersPartners: React.FC = () => {
     sync();
     const unsub = subscribeWorkflow(sync);
 
+    if (!canEdit) {
+      return () => {
+        unsub();
+      };
+    }
+
     let cancelled = false;
     Promise.allSettled([api<any>('/admin/providers'), api<any>('/admin/partners')]).then(
       ([provRes, partRes]) => {

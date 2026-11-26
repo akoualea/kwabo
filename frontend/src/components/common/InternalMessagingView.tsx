@@ -105,11 +105,22 @@ export const InternalMessagingView: React.FC = () => {
     setMessages((prev) => [...prev, msg]);
     setDraft('');
 
-    // Best-effort sync with backend if endpoint exists
-    api('/internal/messages', {
-      method: 'POST',
-      body: { agent_id: activeAgentId, body: text },
-    }).catch(() => {});
+    // Sync with live BeniLink /team/rooms API if a mission room exists
+    api<any>('/team/rooms')
+      .then((res) => {
+        const rooms = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+        const targetRoom =
+          rooms.find((r: any) => r.type === 'mission') ||
+          rooms.find((r: any) => r.type === 'general') ||
+          rooms[0];
+        if (targetRoom?.id) {
+          return api(`/team/rooms/${targetRoom.id}/messages`, {
+            method: 'POST',
+            body: { body: text },
+          });
+        }
+      })
+      .catch(() => {});
 
     addToast('Message interne envoyé.', 'success');
   };
