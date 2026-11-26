@@ -67,6 +67,18 @@ export const HeroSection: React.FC = () => {
     <>
       {/* Hero Split Section */}
       <section className="hero-surface relative w-full overflow-hidden bg-gradient-to-b from-[#f7f9ff] via-[#edf4ff] to-[#f7f9ff] px-4 pt-10 pb-14 sm:px-6 lg:px-8 lg:pt-14 lg:pb-16">
+        {/* Crisp background villa photo */}
+        <img
+          src="/assets/hero-bg-villa.jpg"
+          alt=""
+          aria-hidden="true"
+          className="hero-bg-photo pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
+        />
+        {/* Subtle left readability veil (sharp villa + legible text) */}
+        <div
+          aria-hidden="true"
+          className="hero-bg-veil pointer-events-none absolute inset-0 bg-gradient-to-r from-[#f7f9ff]/72 via-[#edf4ff]/38 to-transparent"
+        />
         <div aria-hidden="true" className="hero-glow pointer-events-none absolute -top-28 right-12 h-96 w-96 rounded-full bg-[#ffdf93]/35 blur-3xl" />
         <div aria-hidden="true" className="hero-glow pointer-events-none absolute top-1/2 -left-24 h-80 w-80 rounded-full bg-[#cbe6ff]/50 blur-3xl" />
 
