@@ -4,9 +4,9 @@ import { useApp } from '../../context/AppContext';
 import { api } from '../../services/api';
 import {
   BENILINK_ROLE_META,
-  getActiveSubRole,
   getTeamRoomMessages,
   postTeamRoomMessage,
+  resolveRealBeniLinkRole,
   subscribeWorkflow,
   TeamRoomMessage,
 } from '../../utils/benilinkWorkflow';
@@ -14,7 +14,7 @@ import { recordActivity } from '../../utils/internalOps';
 
 export const AdminTeamChat: React.FC = () => {
   const { currentUser, role, addToast } = useApp();
-  const subRole = getActiveSubRole(role);
+  const subRole = resolveRealBeniLinkRole(currentUser?.rawRole, role);
   const [selectedRoomId, setSelectedRoomId] = useState<string>('general');
   const [allMessages, setAllMessages] = useState<TeamRoomMessage[]>([]);
   const [draft, setDraft] = useState('');

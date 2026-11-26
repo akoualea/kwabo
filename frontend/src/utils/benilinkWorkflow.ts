@@ -56,6 +56,99 @@ export const BENILINK_ROLE_META: Record<
   },
 };
 
+/**
+ * Resolves the strict real BeniLink role from the authenticated backend user's rawRole.
+ * Never falls back to a fake client-side role switcher.
+ */
+export function resolveRealBeniLinkRole(
+  rawRole?: string | null,
+  fallbackAppRole?: 'VISITOR' | 'USER' | 'ADMIN' | 'OPERATOR'
+): BeniLinkRole {
+  const r = String(rawRole || '').toLowerCase().trim();
+  if (
+    r === 'super_admin' ||
+    r === 'admin_general' ||
+    r === 'responsable_clientele' ||
+    r === 'responsable_prestations' ||
+    r === 'agent' ||
+    r === 'etudiant_livreur' ||
+    r === 'client'
+  ) {
+    return r;
+  }
+  if (r === 'admin') return 'super_admin';
+  if (r === 'operator') return 'agent';
+  if (fallbackAppRole === 'ADMIN') return 'super_admin';
+  if (fallbackAppRole === 'OPERATOR') return 'agent';
+  return 'client';
+}
+
+/**
+ * Strict RBAC view permissions for the 4 management roles (aligned with API.md §4–§7).
+ */
+export function canAccessAdminView(realRole: BeniLinkRole, viewId: string): boolean {
+  if (realRole === 'super_admin') return true;
+
+  switch (viewId) {
+    case 'admin-dashboard':
+    case 'admin-requests':
+    case 'admin-request-detail':
+    case 'admin-team-chat':
+    case 'admin-internal-messages':
+    case 'admin-providers':
+      return (
+        realRole === 'admin_general' ||
+        realRole === 'responsable_clientele' ||
+        realRole === 'responsable_prestations'
+      );
+
+    case 'admin-messages':
+      return false; // Réservé exclusivement au super_admin
+
+    case 'admin-kpis':
+    case 'admin-invoices':
+    case 'admin-team':
+    case 'admin-audit':
+      return realRole === 'admin_general';
+
+    case 'admin-clients':
+    case 'admin-reviews':
+    case 'admin-referrals':
+      return realRole === 'admin_general' || realRole === 'responsable_clientele';
+
+    case 'admin-catalog':
+      return realRole === 'admin_general' || realRole === 'responsable_prestations';
+
+    default:
+      return false;
+  }
+}
+
+export function canEditProvidersPartners(realRole: BeniLinkRole): boolean {
+  return realRole === 'super_admin' || realRole === 'responsable_prestations';
+}
+
+export function canViewDailyReportsArchives(realRole: BeniLinkRole): boolean {
+  return realRole === 'super_admin';
+}
+
+export function getCreatableTeamRoles(realRole: BeniLinkRole): BeniLinkRole[] {
+  if (realRole === 'super_admin') {
+    return [
+      'admin_general',
+      'responsable_clientele',
+      'responsable_prestations',
+      'agent',
+      'etudiant_livreur',
+      'super_admin',
+    ];
+  }
+  if (realRole === 'admin_general') {
+    return ['agent', 'etudiant_livreur'];
+  }
+  return [];
+}
+
 export type InternalStage =
   | 'nouvelle'
   | 'en_discussion'

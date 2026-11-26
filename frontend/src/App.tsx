@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { recordActivity } from './utils/internalOps';
+import {
+  BENILINK_ROLE_META,
+  canAccessAdminView,
+  resolveRealBeniLinkRole,
+} from './utils/benilinkWorkflow';
 import { PublicHeader } from './components/layout/PublicHeader';
 import { PublicFooter } from './components/layout/PublicFooter';
 import { AppSidebar } from './components/layout/AppSidebar';
@@ -69,6 +74,16 @@ const MainAppContent: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedRequest, setSelectedRequest] = useState('Dossier visa');
+
+  const realRole = resolveRealBeniLinkRole(currentUser?.rawRole, role);
+  const realRoleLabel = BENILINK_ROLE_META[realRole]?.label || 'Administration';
+
+  // Strict RBAC route guard: redirect management users if they try to open a forbidden admin view
+  useEffect(() => {
+    if (role === 'ADMIN' && currentView.startsWith('admin-') && !canAccessAdminView(realRole, currentView)) {
+      navigate('admin-dashboard');
+    }
+  }, [role, realRole, currentView, navigate]);
 
   // Automatic background activity logging for operational & admin accounts (§10.1)
   useEffect(() => {
@@ -202,7 +217,7 @@ const MainAppContent: React.FC = () => {
       case 'client-profile': return { title: 'Mon profil', subtitle: 'Paramètres du compte diaspora' };
       
       // Admin
-      case 'admin-dashboard': return { title: 'Vue d\'ensemble', subtitle: 'Supervision générale BeniLink' };
+      case 'admin-dashboard': return { title: 'Vue d\'ensemble', subtitle: `Espace ${realRoleLabel} · BeniLink` };
       case 'admin-requests': return { title: 'Demandes de service', subtitle: 'Validation et attribution' };
       case 'admin-request-detail': return { title: 'Gestion du dossier', subtitle: 'Devis, agent et documents' };
       case 'admin-messages': return { title: 'Messagerie clients', subtitle: 'Discussions Super Admin ↔ Clients' };
@@ -263,22 +278,22 @@ const MainAppContent: React.FC = () => {
             {currentView === 'client-referral' && <ClientReferral />}
             {currentView === 'client-profile' && <ClientProfile />}
 
-            {/* ADMIN VIEWS */}
-            {currentView === 'admin-dashboard' && <AdminDashboard />}
-            {currentView === 'admin-requests' && <AdminRequests />}
-            {currentView === 'admin-request-detail' && <AdminRequestDetail />}
-            {currentView === 'admin-messages' && <AdminMessages />}
-            {currentView === 'admin-team-chat' && <AdminTeamChat />}
-            {currentView === 'admin-internal-messages' && <InternalMessagingView />}
-            {currentView === 'admin-providers' && <AdminProvidersPartners />}
-            {currentView === 'admin-kpis' && <AdminKpis />}
-            {currentView === 'admin-clients' && <AdminClients />}
-            {currentView === 'admin-invoices' && <AdminInvoices />}
-            {currentView === 'admin-reviews' && <AdminReviews />}
-            {currentView === 'admin-referrals' && <AdminReferrals />}
-            {currentView === 'admin-catalog' && <AdminCatalog />}
-            {currentView === 'admin-team' && <AdminTeam />}
-            {currentView === 'admin-audit' && <AdminAudit />}
+            {/* ADMIN VIEWS (strictly guarded by real backend role) */}
+            {role === 'ADMIN' && currentView === 'admin-dashboard' && <AdminDashboard />}
+            {role === 'ADMIN' && currentView === 'admin-requests' && canAccessAdminView(realRole, 'admin-requests') && <AdminRequests />}
+            {role === 'ADMIN' && currentView === 'admin-request-detail' && canAccessAdminView(realRole, 'admin-request-detail') && <AdminRequestDetail />}
+            {role === 'ADMIN' && currentView === 'admin-messages' && canAccessAdminView(realRole, 'admin-messages') && <AdminMessages />}
+            {role === 'ADMIN' && currentView === 'admin-team-chat' && canAccessAdminView(realRole, 'admin-team-chat') && <AdminTeamChat />}
+            {role === 'ADMIN' && currentView === 'admin-internal-messages' && canAccessAdminView(realRole, 'admin-internal-messages') && <InternalMessagingView />}
+            {role === 'ADMIN' && currentView === 'admin-providers' && canAccessAdminView(realRole, 'admin-providers') && <AdminProvidersPartners />}
+            {role === 'ADMIN' && currentView === 'admin-kpis' && canAccessAdminView(realRole, 'admin-kpis') && <AdminKpis />}
+            {role === 'ADMIN' && currentView === 'admin-clients' && canAccessAdminView(realRole, 'admin-clients') && <AdminClients />}
+            {role === 'ADMIN' && currentView === 'admin-invoices' && canAccessAdminView(realRole, 'admin-invoices') && <AdminInvoices />}
+            {role === 'ADMIN' && currentView === 'admin-reviews' && canAccessAdminView(realRole, 'admin-reviews') && <AdminReviews />}
+            {role === 'ADMIN' && currentView === 'admin-referrals' && canAccessAdminView(realRole, 'admin-referrals') && <AdminReferrals />}
+            {role === 'ADMIN' && currentView === 'admin-catalog' && canAccessAdminView(realRole, 'admin-catalog') && <AdminCatalog />}
+            {role === 'ADMIN' && currentView === 'admin-team' && canAccessAdminView(realRole, 'admin-team') && <AdminTeam />}
+            {role === 'ADMIN' && currentView === 'admin-audit' && canAccessAdminView(realRole, 'admin-audit') && <AdminAudit />}
 
             {/* OPERATOR VIEWS */}
             {currentView === 'operator-dashboard' && <OperatorDashboard />}

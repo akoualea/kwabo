@@ -12,9 +12,15 @@ import {
   getArchivedDailyReports,
   subscribeInternalOps,
 } from '../../utils/internalOps';
+import {
+  canViewDailyReportsArchives,
+  resolveRealBeniLinkRole,
+} from '../../utils/benilinkWorkflow';
 
 export const AdminAudit: React.FC = () => {
-  const { addToast } = useApp();
+  const { addToast, currentUser, role } = useApp();
+  const realRole = resolveRealBeniLinkRole(currentUser?.rawRole, role);
+  const canSeeReports = canViewDailyReportsArchives(realRole);
   const [activeTab, setActiveTab] = useState<'logs' | 'reports'>('logs');
 
   // Activity logs state
@@ -173,14 +179,16 @@ export const AdminAudit: React.FC = () => {
           <FileText className="h-4 w-4" aria-hidden="true" />
           <span>Journal d'activité ({total})</span>
         </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('reports')}
-          className={`btn btn-sm ${activeTab === 'reports' ? 'btn-primary' : 'btn-ghost'}`}
-        >
-          <ClipboardList className="h-4 w-4" aria-hidden="true" />
-          <span>Rapports journaliers &amp; Archives ({dailyReports.length})</span>
-        </button>
+        {canSeeReports && (
+          <button
+            type="button"
+            onClick={() => setActiveTab('reports')}
+            className={`btn btn-sm ${activeTab === 'reports' ? 'btn-primary' : 'btn-ghost'}`}
+          >
+            <ClipboardList className="h-4 w-4" aria-hidden="true" />
+            <span>Rapports journaliers &amp; Archives ({dailyReports.length})</span>
+          </button>
+        )}
       </div>
 
       {activeTab === 'logs' ? (

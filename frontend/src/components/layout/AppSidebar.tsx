@@ -6,10 +6,8 @@ import { DailyReportModal } from '../common/DailyReportModal';
 import { WHATSAPP_LINK } from '../../data/kwaboData';
 import {
   BENILINK_ROLE_META,
-  BeniLinkRole,
-  getActiveSubRole,
-  setActiveSubRole,
-  subscribeWorkflow,
+  canAccessAdminView,
+  resolveRealBeniLinkRole,
 } from '../../utils/benilinkWorkflow';
 
 interface SidebarProps {
@@ -164,43 +162,63 @@ export const AppSidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, 
     role, currentUser, currentView, counters, navigate, logout
   } = useApp();
   const [dailyReportOpen, setDailyReportOpen] = useState(false);
-  const [subRole, setSubRoleState] = useState<BeniLinkRole>(() => getActiveSubRole(role));
+
+  // Strict real role from authenticated backend user (no manual role switching)
+  const realRole = resolveRealBeniLinkRole(currentUser?.rawRole, role);
+  const realRoleLabel = BENILINK_ROLE_META[realRole]?.label || 'Utilisateur';
 
   // On mobile/tablet drawer (when isOpen is true), always display full labels even if desktop sidebar was collapsed
   const effectiveCollapsed = collapsed && !isOpen;
-
-  React.useEffect(() => {
-    setSubRoleState(getActiveSubRole(role));
-    return subscribeWorkflow(() => setSubRoleState(getActiveSubRole(role)));
-  }, [role]);
 
   const unreadCount = counters.unreadMessages;
   const dueInvoicesCount = counters.dueInvoices;
   const pendingReviewsCount = counters.pendingReviews;
 
-  // Admin navigation as defined in admin.js
-  const adminNav: NavSection[] = [
-    { heading: 'Pilotage' },
-    { id: 'admin-dashboard', label: "Vue d'ensemble", icon: 'squares-2x2', exact: true },
-    { id: 'admin-kpis', label: 'Indicateurs', icon: 'chart-bar' },
-    { heading: 'Opérations' },
-    { id: 'admin-requests', label: 'Demandes', icon: 'clipboard-document-list' },
-    ...(subRole === 'super_admin'
-      ? [{ id: 'admin-messages', label: 'Messagerie clients', icon: 'chat-bubble-left-right', badge: unreadCount || undefined }]
-      : []),
-    { id: 'admin-team-chat', label: "Groupe d'équipe", icon: 'users' },
-    { id: 'admin-internal-messages', label: 'Messagerie interne', icon: 'user-group' },
-    { id: 'admin-providers', label: 'Prestataires & Partenaires', icon: 'briefcase' },
-    { id: 'admin-invoices', label: 'Paiements', icon: 'banknotes' },
-    { heading: 'Clients' },
-    { id: 'admin-clients', label: 'Clients', icon: 'users' },
-    { id: 'admin-reviews', label: 'Avis', icon: 'star', badge: pendingReviewsCount || undefined },
-    { id: 'admin-referrals', label: 'Parrainage', icon: 'gift' },
-    { heading: 'Configuration' },
-    { id: 'admin-catalog', label: 'Catalogue', icon: 'adjustments-horizontal' },
-    { id: 'admin-team', label: 'Équipe et rôles', icon: 'user-group' },
-    { id: 'admin-audit', label: "Journal d'activité", icon: 'document-check' },
+  // Strict RBAC navigation per real backend role (API.md §4–§7)
+  const rawAdminSections: { heading: string; items: NavSection[] }[] = [
+    {
+      heading: 'Pilotage',
+      items: [
+        { id: 'admin-dashboard', label: "Vue d'ensemble", icon: 'squares-2x2', exact: true },
+        { id: 'admin-kpis', label: 'Indicateurs', icon: 'chart-bar' },
+      ],
+    },
+    {
+      heading: 'Opérations',
+      items: [
+        { id: 'admin-requests', label: 'Demandes', icon: 'clipboard-document-list' },
+        { id: 'admin-messages', label: 'Messagerie clients', icon: 'chat-bubble-left-right', badge: unreadCount || undefined },
+        { id: 'admin-team-chat', label: "Groupe d'équipe", icon: 'users' },
+        { id: 'admin-internal-messages', label: 'Messagerie interne', icon: 'user-group' },
+        { id: 'admin-providers', label: 'Prestataires & Partenaires', icon: 'briefcase' },
+        { id: 'admin-invoices', label: 'Paiements', icon: 'banknotes' },
+      ],
+    },
+    {
+      heading: 'Clients',
+      items: [
+        { id: 'admin-clients', label: 'Clients', icon: 'users' },
+        { id: 'admin-reviews', label: 'Avis', icon: 'star', badge: pendingReviewsCount || undefined },
+        { id: 'admin-referrals', label: 'Parrainage', icon: 'gift' },
+      ],
+    },
+    {
+      heading: 'Configuration',
+      items: [
+        { id: 'admin-catalog', label: 'Catalogue', icon: 'adjustments-horizontal' },
+        { id: 'admin-team', label: 'Équipe et rôles', icon: 'user-group' },
+        { id: 'admin-audit', label: "Journal d'activité", icon: 'document-check' },
+      ],
+    },
   ];
+
+  const adminNav: NavSection[] = rawAdminSections.flatMap((section) => {
+    const allowedItems = section.items.filter(
+      (item) => item.id && canAccessAdminView(realRole, item.id)
+    );
+    if (allowedItems.length === 0) return [];
+    return [{ heading: section.heading }, ...allowedItems];
+  });
 
   // Operator navigation (direct client messaging disabled; internal Admin channel enabled)
   const operatorNav: NavSection[] = [
@@ -333,44 +351,17 @@ export const AppSidebar: React.FC<SidebarProps> = ({ isOpen, collapsed = false, 
             title={effectiveCollapsed ? `${currentUser?.firstName || ''} ${currentUser?.lastName || ''}`.trim() : undefined}
             onClick={() => {
               if (role === 'USER') navigate('client-profile');
-              else if (role === 'ADMIN') navigate('admin-team');
+              else if (role === 'ADMIN' && canAccessAdminView(realRole, 'admin-team')) navigate('admin-team');
             }}
           >
             <span className="avatar">{initials}</span>
             {!effectiveCollapsed && (
               <span>
                 <strong>{currentUser?.firstName} {currentUser?.lastName}</strong>
-                <small>{currentUser?.email}</small>
+                <small>{role === 'USER' ? currentUser?.email : realRoleLabel}</small>
               </span>
             )}
           </div>
-
-          {role === 'ADMIN' && !effectiveCollapsed && (
-            <div className="mb-1.5 rounded-xl border border-white/20 bg-white/10 px-2.5 py-2">
-              <label htmlFor="subrole-switcher" className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-white/80">
-                Vue rôle (7 rôles v1.2)
-              </label>
-              <select
-                id="subrole-switcher"
-                value={subRole}
-                onChange={(e) => {
-                  const next = e.target.value as BeniLinkRole;
-                  setActiveSubRole(next);
-                  setSubRoleState(next);
-                }}
-                style={{ minHeight: '32px', padding: '4px 8px' }}
-                className="w-full rounded-lg border border-white/25 bg-white text-xs font-semibold text-[#0d1d2b]"
-              >
-                {(['super_admin', 'admin_general', 'responsable_clientele', 'responsable_prestations'] as BeniLinkRole[]).map(
-                  (r) => (
-                    <option key={r} value={r}>
-                      {BENILINK_ROLE_META[r].label}
-                    </option>
-                  )
-                )}
-              </select>
-            </div>
-          )}
 
           {(role === 'ADMIN' || role === 'OPERATOR') && (
             <button

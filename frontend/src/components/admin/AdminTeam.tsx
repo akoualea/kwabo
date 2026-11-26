@@ -1,24 +1,44 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { Copy, Eye, EyeOff, KeyRound, Sparkles } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { api, ApiError, getFirstValidationError } from '../../services/api';
 import { mapUser } from '../../services/mappers';
 import { User, UserRole } from '../../types';
 import { Icon } from '../common/Icon';
+import { INTERNAL_PROFILES, recordActivity } from '../../utils/internalOps';
 import {
-  getMemberInternalProfile,
-  INTERNAL_PROFILES,
-  InternalProfileId,
-  recordActivity,
-  setMemberInternalProfile,
-} from '../../utils/internalOps';
+  BENILINK_ROLE_META,
+  BeniLinkRole,
+  getCreatableTeamRoles,
+  resolveRealBeniLinkRole,
+} from '../../utils/benilinkWorkflow';
 
 interface TeamMember extends User {
   activeCount: number;
   totalCount: number;
 }
 
+interface CreatedCredentials {
+  fullName: string;
+  email: string;
+  roleLabel: string;
+  password: string;
+  loginUrl: string;
+}
+
+function generateStrongPassword(): string {
+  const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const lower = 'abcdefghjkmnpqrstuvwxyz';
+  const digits = '23456789';
+  const pick = (s: string) => s[Math.floor(Math.random() * s.length)];
+  return `Beni${pick(upper)}${pick(lower)}${pick(lower)}${pick(digits)}${pick(digits)}${pick(upper)}`;
+}
+
 export const AdminTeam: React.FC = () => {
-  const { addToast, confirm, currentUser } = useApp();
+  const { addToast, confirm, currentUser, role } = useApp();
+  const realRole = resolveRealBeniLinkRole(currentUser?.rawRole, role);
+  const creatableRoles = getCreatableTeamRoles(realRole);
+
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -27,10 +47,11 @@ export const AdminTeam: React.FC = () => {
   const [newLastName, setNewLastName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newPhone, setNewPhone] = useState('');
-  const [newProfileId, setNewProfileId] = useState<InternalProfileId>('agent');
+  const [newRole, setNewRole] = useState<BeniLinkRole>(creatableRoles[0] || 'agent');
+  const [newPassword, setNewPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(true);
   const [newAge, setNewAge] = useState('');
-  const [profileTick, setProfileTick] = useState(0);
-  const [tempPasswordNote, setTempPasswordNote] = useState<string | null>(null);
+  const [createdCreds, setCreatedCreds] = useState<CreatedCredentials | null>(null);
 
   const loadTeam = useCallback(async () => {
     setLoading(true);
@@ -113,89 +134,147 @@ export const AdminTeam: React.FC = () => {
 
   const handleAddOperator = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newFirstName.trim() || !newLastName.trim() || !newEmail.trim()) return;
+    if (!newFirstName.trim() || !newLastName.trim() || !newEmail.trim() || !newPassword.trim()) return;
     setSubmitting(true);
     try {
-      const res = await api<any>('/admin/operators', {
+      const chosenPassword = newPassword.trim();
+      const res = await api<any>('/admin/users', {
         method: 'POST',
         body: {
           first_name: newFirstName.trim(),
           last_name: newLastName.trim(),
           email: newEmail.trim(),
           phone: newPhone.trim(),
-          internal_profile: newProfileId,
-          ...(newProfileId === 'freelance_student' && newAge ? { age: Number(newAge) } : {}),
+          role: newRole,
+          password: chosenPassword,
+          ...(newRole === 'etudiant_livreur' && newAge ? { age: Number(newAge) } : {}),
         },
       });
-      setMemberInternalProfile(newEmail.trim(), newProfileId);
+      const roleMeta = BENILINK_ROLE_META[newRole];
       if (currentUser) {
         recordActivity({
           actorId: currentUser.id,
           actorName: `${currentUser.firstName} ${currentUser.lastName}`.trim() || currentUser.email,
-          actorRole: 'Administrateur',
+          actorRole: BENILINK_ROLE_META[realRole]?.label || 'Administrateur',
           action: `Création du compte ${newFirstName.trim()} ${newLastName.trim()}`,
-          details: `Profil : ${INTERNAL_PROFILES.find((p) => p.id === newProfileId)?.label || newProfileId}`,
+          details: `Rôle : ${roleMeta?.label || newRole}`,
         });
       }
-      const generatedPwd = res?.temporary_password ?? res?.password ?? res?.data?.temporary_password;
-      if (generatedPwd) {
-        setTempPasswordNote(`Mot de passe temporaire pour ${newEmail.trim()} : ${generatedPwd}`);
-      }
-      addToast(`Agent ${newFirstName.trim()} ${newLastName.trim()} ajouté avec succès.`);
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://benilink-app.vercel.app';
+      const isFieldRole = newRole === 'agent' || newRole === 'etudiant_livreur';
+      const loginUrl = `${origin}/#/${isFieldRole ? 'agent' : 'admin'}/connexion`;
+      const finalPwd = res?.temporary_password ?? res?.password ?? res?.data?.temporary_password ?? chosenPassword;
+
+      setCreatedCreds({
+        fullName: `${newFirstName.trim()} ${newLastName.trim()}`,
+        email: newEmail.trim(),
+        roleLabel: roleMeta?.label || newRole,
+        password: String(finalPwd),
+        loginUrl,
+      });
+
+      addToast(`Compte ${roleMeta?.label || newRole} créé pour ${newFirstName.trim()} ${newLastName.trim()}.`, 'success');
       setShowAddModal(false);
       setNewFirstName('');
       setNewLastName('');
       setNewEmail('');
       setNewPhone('');
-      setNewProfileId('agent');
+      setNewPassword('');
+      setNewAge('');
+      setNewRole(creatableRoles[0] || 'agent');
       await loadTeam();
     } catch (err) {
-      addToast(err instanceof ApiError ? getFirstValidationError(err) : "Impossible d'ajouter l'agent.", 'error');
+      addToast(err instanceof ApiError ? getFirstValidationError(err) : "Impossible de créer le compte.", 'error');
     } finally {
       setSubmitting(false);
     }
   };
 
+  const handleCopyCredentials = async () => {
+    if (!createdCreds) return;
+    const text = [
+      `Bienvenue dans l'équipe BeniLink (${createdCreds.roleLabel})`,
+      `Nom : ${createdCreds.fullName}`,
+      `Lien de connexion : ${createdCreds.loginUrl}`,
+      `E-mail : ${createdCreds.email}`,
+      `Mot de passe : ${createdCreds.password}`,
+    ].join('\n');
+    try {
+      await navigator.clipboard.writeText(text);
+      addToast('Accès copiés dans le presse-papiers !', 'success');
+    } catch {
+      addToast('Copie manuelle requise.', 'info');
+    }
+  };
+
   return (
     <>
-      <div className="flex justify-end mb-4">
-        <button
-          className="btn btn-primary btn-sm"
-          type="button"
-          onClick={() => setShowAddModal(true)}
-        >
-          <Icon name="user-plus" size={18} />
-          <span>Ajouter un agent</span>
-        </button>
-      </div>
-
-      {tempPasswordNote && (
-        <div className="alert mb-4 flex items-center justify-between gap-3">
-          <span>{tempPasswordNote}</span>
+      {creatableRoles.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <p className="text-xs muted">
+            {realRole === 'super_admin'
+              ? 'En tant que Super Admin, vous pouvez créer tous les comptes de l’équipe (encadrement, agents et étudiants livreurs).'
+              : 'En tant qu’Administrateur général, vous pouvez créer les comptes Agents terrain et Étudiants livreurs.'}
+          </p>
           <button
+            className="btn btn-primary btn-sm"
             type="button"
-            className="btn btn-ghost btn-sm"
-            onClick={() => setTempPasswordNote(null)}
+            onClick={() => {
+              setNewRole(creatableRoles[0] || 'agent');
+              setNewPassword(generateStrongPassword());
+              setShowAddModal(true);
+            }}
           >
-            Fermer
+            <Icon name="user-plus" size={18} />
+            <span>Créer un compte équipe</span>
           </button>
+        </div>
+      )}
+
+      {createdCreds && (
+        <div className="card mb-4 border-[#006191]/30 bg-[#edf5ff]">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-1 text-xs sm:text-sm">
+              <strong className="block text-[#004e78]">
+                Compte créé : {createdCreds.fullName} ({createdCreds.roleLabel})
+              </strong>
+              <p><strong>E-mail :</strong> {createdCreds.email}</p>
+              <p><strong>Mot de passe :</strong> <code className="rounded bg-white px-2 py-0.5 font-mono text-[#006191]">{createdCreds.password}</code></p>
+              <p>
+                <strong>Portail de connexion :</strong>{' '}
+                <a href={createdCreds.loginUrl} className="underline text-[#006191]" target="_blank" rel="noreferrer">
+                  {createdCreds.loginUrl}
+                </a>
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className="btn btn-gold btn-sm" onClick={handleCopyCredentials}>
+                <Copy className="h-4 w-4" aria-hidden="true" />
+                <span>Copier les accès</span>
+              </button>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setCreatedCreds(null)}>
+                Fermer
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
       {loading && teamMembers.length === 0 ? (
         <div className="empty">Chargement de l'équipe…</div>
       ) : (
-        <ul className="team-grid" data-profile-tick={profileTick}>
+        <ul className="team-grid">
           {teamMembers.map(u => {
             const initials = `${u.firstName[0] || ''}${u.lastName[0] || ''}`.toUpperCase() || '?';
-            const assignedProfile = getMemberInternalProfile(u.email || u.id, u.role);
+            const memberRoleCode = resolveRealBeniLinkRole(u.rawRole, u.role);
+            const memberRoleMeta = BENILINK_ROLE_META[memberRoleCode];
             return (
               <li key={u.id} className="card">
                 <div className="client-mini">
                   <span className="avatar">{initials}</span>
                   <span>
                     <strong>{u.firstName} {u.lastName}</strong>
-                    <small>{assignedProfile.label || ROLE_LABEL[u.role] || u.role}</small>
+                    <small>{memberRoleMeta?.label || ROLE_LABEL[u.role] || u.role}</small>
                   </span>
                   {u.suspended && <span className="badge badge-red ml-auto">Suspendu</span>}
                 </div>
@@ -209,30 +288,17 @@ export const AdminTeam: React.FC = () => {
                     <Icon name="phone" size={18} />
                     <span>{u.phone || '—'}</span>
                   </li>
+                  {memberRoleCode === 'etudiant_livreur' && u.age && (
+                    <li>
+                      <Icon name="user" size={18} />
+                      <span>Âge : {u.age} ans</span>
+                    </li>
+                  )}
                 </ul>
 
-                <div className="mt-3">
-                  <label className="mb-1 block text-[11px] font-semibold muted" htmlFor={`profile-${u.id}`}>
-                    Profil hiérarchique BeniLink
-                  </label>
-                  <select
-                    id={`profile-${u.id}`}
-                    value={assignedProfile.id}
-                    onChange={(e) => {
-                      const nextId = e.target.value as InternalProfileId;
-                      setMemberInternalProfile(u.email || u.id, nextId);
-                      setProfileTick((t) => t + 1);
-                      addToast(`Profil mis à jour : ${INTERNAL_PROFILES.find((p) => p.id === nextId)?.label || nextId}.`, 'info');
-                    }}
-                    className="w-full rounded-xl border border-[#d0e3f5] bg-white px-2.5 py-1.5 text-xs"
-                  >
-                    {INTERNAL_PROFILES.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <p className="mt-2 text-[11px] leading-relaxed muted">
+                  {memberRoleMeta?.description}
+                </p>
 
                 {u.role === 'OPERATOR' ? (
                   <p className="team-load">
@@ -322,11 +388,14 @@ export const AdminTeam: React.FC = () => {
         </div>
       </section>
 
-      {/* Add Operator Modal */}
+      {/* Create Team Account Modal (POST /admin/users) */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-[#e0e8e4]">
-            <h2 className="text-xl font-bold font-display mb-2">Ajouter un agent terrain</h2>
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-[#d0e3f5] my-auto">
+            <h2 className="text-xl font-bold font-display mb-1">Créer un compte équipe</h2>
+            <p className="text-xs muted mb-4">
+              Définissez le rôle et le mot de passe du collaborateur. Il se connectera sur son espace dédié avec ses permissions exactes.
+            </p>
             <form onSubmit={handleAddOperator}>
               <div className="form-grid">
                 <div className="field">
@@ -352,7 +421,7 @@ export const AdminTeam: React.FC = () => {
               </div>
 
               <div className="field">
-                <label htmlFor="agentEmail">Adresse email</label>
+                <label htmlFor="agentEmail">Adresse e-mail</label>
                 <input
                   id="agentEmail"
                   type="email"
@@ -367,28 +436,29 @@ export const AdminTeam: React.FC = () => {
                 <input
                   id="agentPhone"
                   type="tel"
-                  placeholder="+229 97 00 00 00"
+                  placeholder="+229 01 97 00 00 00"
                   value={newPhone}
                   onChange={(e) => setNewPhone(e.target.value)}
                 />
               </div>
 
               <div className="field">
-                <label htmlFor="agentProfile">Profil BeniLink</label>
+                <label htmlFor="agentProfile">Rôle BeniLink</label>
                 <select
                   id="agentProfile"
-                  value={newProfileId}
-                  onChange={(e) => setNewProfileId(e.target.value as InternalProfileId)}
+                  value={newRole}
+                  onChange={(e) => setNewRole(e.target.value as BeniLinkRole)}
                 >
-                  {INTERNAL_PROFILES.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.label}
+                  {creatableRoles.map((r) => (
+                    <option key={r} value={r}>
+                      {BENILINK_ROLE_META[r].label}
                     </option>
                   ))}
                 </select>
+                <p className="mt-1 text-[11px] muted">{BENILINK_ROLE_META[newRole]?.description}</p>
               </div>
 
-              {newProfileId === 'freelance_student' && (
+              {newRole === 'etudiant_livreur' && (
                 <div className="field">
                   <label htmlFor="agentAge">Âge de l'étudiant livreur</label>
                   <input
@@ -403,6 +473,43 @@ export const AdminTeam: React.FC = () => {
                 </div>
               )}
 
+              <div className="field">
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <label htmlFor="agentPassword" className="!mb-0">
+                    Mot de passe initial
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setNewPassword(generateStrongPassword())}
+                    className="inline-flex items-center gap-1 rounded-full bg-[#edf4ff] px-2.5 py-0.5 text-[11px] font-bold text-[#006191] hover:bg-[#d9eafd]"
+                  >
+                    <Sparkles className="h-3 w-3" aria-hidden="true" />
+                    Générer
+                  </button>
+                </div>
+                <div className="relative flex items-center">
+                  <KeyRound className="pointer-events-none absolute left-3 h-4 w-4 text-[#6f7881]" aria-hidden="true" />
+                  <input
+                    id="agentPassword"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    minLength={8}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Min. 8 car., 1 majuscule, 1 chiffre"
+                    style={{ paddingLeft: '2.4rem', paddingRight: '2.6rem' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                    className="absolute right-2.5 text-[#4c657a] hover:text-[#006191]"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
               <div className="dialog-actions mt-6 flex justify-end gap-3">
                 <button
                   className="btn btn-ghost"
@@ -416,7 +523,7 @@ export const AdminTeam: React.FC = () => {
                   type="submit"
                   disabled={submitting}
                 >
-                  {submitting ? 'Ajout…' : 'Ajouter'}
+                  {submitting ? 'Création…' : 'Créer le compte'}
                 </button>
               </div>
             </form>

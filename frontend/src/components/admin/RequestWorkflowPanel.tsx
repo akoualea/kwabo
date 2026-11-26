@@ -19,7 +19,6 @@ import { formatConvertedMoney, useCurrency } from '../../data/worldCountries';
 import {
   BENILINK_ROLE_META,
   generateDefaultInstallments,
-  getActiveSubRole,
   getProvidersAndPartners,
   getRequestWorkflow,
   INTERNAL_STAGE_META,
@@ -29,6 +28,7 @@ import {
   postTeamRoomMessage,
   QuoteLineItem,
   RequestWorkflowState,
+  resolveRealBeniLinkRole,
   saveRequestWorkflow,
   subscribeWorkflow,
   TeamOpinion,
@@ -55,7 +55,7 @@ export const RequestWorkflowPanel: React.FC<Props> = ({
   const { role, currentUser, addToast } = useApp();
   const { currency } = useCurrency();
   const isOperator = role === 'OPERATOR';
-  const subRole = getActiveSubRole(role);
+  const subRole = resolveRealBeniLinkRole(currentUser?.rawRole, role);
 
   const [wf, setWf] = useState<RequestWorkflowState>(() =>
     getRequestWorkflow(requestId, { tracking, serviceName, city, status })

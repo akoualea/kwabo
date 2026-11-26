@@ -4,14 +4,18 @@ import { useApp } from '../../context/AppContext';
 import { api } from '../../services/api';
 import {
   addProviderOrPartner,
+  canEditProvidersPartners,
   deleteProviderOrPartner,
   getProvidersAndPartners,
   ProviderPartnerFiche,
+  resolveRealBeniLinkRole,
   subscribeWorkflow,
 } from '../../utils/benilinkWorkflow';
 
 export const AdminProvidersPartners: React.FC = () => {
-  const { addToast } = useApp();
+  const { addToast, currentUser, role } = useApp();
+  const realRole = resolveRealBeniLinkRole(currentUser?.rawRole, role);
+  const canEdit = canEditProvidersPartners(realRole);
   const [tab, setTab] = useState<'prestataire' | 'partenaire'>('prestataire');
   const [items, setItems] = useState<ProviderPartnerFiche[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -130,10 +134,12 @@ export const AdminProvidersPartners: React.FC = () => {
           </button>
         </div>
 
-        <button type="button" onClick={() => setShowModal(true)} className="btn btn-gold btn-sm">
-          <Plus className="h-4 w-4" aria-hidden="true" />
-          <span>{tab === 'prestataire' ? 'Ajouter un prestataire' : 'Ajouter un partenaire'}</span>
-        </button>
+        {canEdit && (
+          <button type="button" onClick={() => setShowModal(true)} className="btn btn-gold btn-sm">
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            <span>{tab === 'prestataire' ? 'Ajouter un prestataire' : 'Ajouter un partenaire'}</span>
+          </button>
+        )}
       </div>
 
       <p className="notice text-xs">
@@ -158,19 +164,21 @@ export const AdminProvidersPartners: React.FC = () => {
               )}
               {item.notes && <p className="mt-1.5 text-[11px] muted">{item.notes}</p>}
             </div>
-            <div className="flex justify-end border-t border-[#d0e3f5] pt-2.5">
-              <button
-                type="button"
-                onClick={() => {
-                  deleteProviderOrPartner(item.id);
-                  addToast('Fiche supprimée.', 'info');
-                }}
-                className="btn btn-danger-ghost btn-sm"
-              >
-                <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-                <span>Retirer</span>
-              </button>
-            </div>
+            {canEdit && (
+              <div className="flex justify-end border-t border-[#d0e3f5] pt-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    deleteProviderOrPartner(item.id);
+                    addToast('Fiche supprimée.', 'info');
+                  }}
+                  className="btn btn-danger-ghost btn-sm"
+                >
+                  <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>Retirer</span>
+                </button>
+              </div>
+            )}
           </article>
         ))}
       </div>
